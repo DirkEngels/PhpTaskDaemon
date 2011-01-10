@@ -1,0 +1,74 @@
+PlugWeb
+=======
+
+* PlugWeb Introduction
+* What is PlugWise?
+* Installation
+* Usage
+* Contribute
+* License
+* Contact Information
+
+
+PlugWeb Introduction
+--------------------
+PlugWeb is a web application for controlling and polling Plugwise devices. The 
+web application provides easy access for controlling and monitoring the 
+devices. Historic statistics can easily be requested and printed. Devices can
+be grouped into types and placed onto areas (images). There should be no 
+dependencies with the official plugwise application (a custom driver needs to
+be build to communicate with the zigbee network using the plugwise USB stick). 
+A background process should periodically collect historic information about the
+power consumption of every device. Also authorised users should be able to 
+switch on/off devices immediately.
+
+Plugwise Introduction
+---------------------
+Each Plugwise system consists of Circle+, one or more Circles, the Plugwise 
+Stick and the Source software. These components communicate with each other
+wireless, using the highly efficient and energy-saving ZigBee protocol. The 
+Plugwise system has been designed to provide details of energy consumption per
+appliance and save energy by creating switching schemes. The plugwise software,
+called source, is a windows application.
+
+
+Installation
+------------
+Basic installation 
+* Extract the package
+* Edit the configuration file: src/application/configs/daemon.ini
+* Start the executable in src/bin
+
+Startup on boot
+* Edit the file (doc/files/init-script)
+* Copy the edited init script file to /etc/init.d/phptaskdaemon
+
+Restart by cron
+* Add a crontab job:  
+	* * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action start
+
+Optional: Web Monitor 
+* Edit the file (doc/files/apache.conf) to your needs 
+* Copy the edited apache conf to /etc/apache2/sites-available/phptaskdaemon
+* Enable the phptaskdaemon site: a2enmod phptaskdaemon
+* Restart the apache server
+
+
+Usage
+-----
+To use the PhpTaskDaemon you need to add task definitions. A task definition 
+exists of a php class implementing an interface with two methods. The first 
+method 'loadQueue' needs to load a queue of tasks to execute. The return value
+is an array of tasks. A tasks consists of an array with input data. The second
+method is called 'executeTask' and executes a single task. Each task class can
+define a variable for setting a manager. The manager determines how and when 
+the task is executed.
+
+
+Contact Information
+-------------------
+For more info about the PlugWeb application see the website:
+
+GitHub:		https://github.com/DirkEngels/PhpTaskDaemon
+Blog:		http://blog.dirkengels.com/category/phptaskdaemon/
+

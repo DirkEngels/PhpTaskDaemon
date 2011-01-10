@@ -1,0 +1,49 @@
+#!/usr/bin/env php
+<?php
+
+// Set include paths
+define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
+define('APPLICATION_PATH', realpath(PROJECT_ROOT .'/application'));
+define('LIBRARY_PATH', realpath(PROJECT_ROOT .'/library'));
+define('TMP_PATH', realpath(PROJECT_ROOT .'/../tmp'));
+
+set_include_path(
+	implode(
+		PATH_SEPARATOR, 
+		array(LIBRARY_PATH, get_include_path())
+	)
+);
+
+include_once('../library/Zend/Log.php');
+include_once('../library/Zend/Log/Writer/Null.php');
+include_once('../library/Zend/Log/Writer/Stream.php');
+include_once('../library/Zend/Console/Getopt.php');
+include_once('../library/Zend/Config.php');
+include_once('../library/Zend/Form.php');
+include_once('../library/Zend/Db/Table/Abstract.php');
+include_once('../library/Zend/Db/Table/Row.php');
+
+
+require_once('../library/Dew/Daemon.php');
+require_once('../library/Dew/Daemon/Run.php');
+require_once('../library/Dew/Daemon/Pid.php');
+require_once('../library/Dew/Daemon/Shm.php');
+require_once('../library/Dew/Daemon/Signals.php');
+
+require_once('../library/Dew/Daemon/Pid/Reader.php');
+require_once('../library/Dew/Daemon/Pid/Manager.php');
+
+require_once('../library/Dew/Daemon/Task/Interface.php');
+require_once('../library/Dew/Daemon/Task/Abstract.php');
+
+require_once('../library/Dew/Daemon/Manager/Interface.php');
+require_once('../library/Dew/Daemon/Manager/Abstract.php');
+require_once('../library/Dew/Daemon/Manager/Interval.php');
+require_once('../library/Dew/Daemon/Manager/Cron.php');
+require_once('../library/Dew/Daemon/Manager/Forked.php');
+require_once('../library/Dew/Daemon/Manager/Gearman.php');
+
+
+// Start the application
+$daemon = new Dew_Daemon();
+$daemon->run();

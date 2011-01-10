@@ -1,0 +1,19 @@
+Shared Memory
+-------------
+
+The daemon uses shared memory segments to share information between processes. 
+Each manager instance and the daemon it self registers a shared memory segment.
+The shared memory segments will be stored in the tmp directory. The daemon will
+use the memory for storing the pids of the running managers.
+
+
+Daemon
+------
+childs		array
+
+Manager
+-------
+queued		int
+done		int
+wait		date
+state-{ID}	string
