@@ -21,9 +21,9 @@ class Dew_Daemon_Run {
 	
 	/**
 	 * Pid reader object
-	 * @var Dew_Daemon_Pid_Reader $_pidReader
+	 * @var Dew_Daemon_Pid_File $_pidFile
 	 */
-	protected $_pidReader = null;
+	protected $_pidFile = null;
 	
 	/**
 	 * Shared memory object
@@ -52,7 +52,7 @@ class Dew_Daemon_Run {
 	public function __construct($parent = null) {
 		$pidFile = TMP_PATH . '/' . strtolower(get_class($this)) . 'd.pid';
 		$this->_pidManager = new Dew_Daemon_Pid_Manager(getmypid(), $parent);
-		$this->_pidReader = new Dew_Daemon_Pid_Reader($pidFile);
+		$this->_pidFile = new Dew_Daemon_Pid_File($pidFile);
 		
 		$this->_shm = new Dew_Daemon_Shm('daemon');
 		$this->_shm->setVar('state', 'running');
@@ -67,7 +67,7 @@ class Dew_Daemon_Run {
 	public function __destruct() {
 		$this->_shm->setVar('state', 'stopped');
 		unset($this->_pidManager);
-		unset($this->_pidReader);
+		unset($this->_pidFile);
 		unset($this->_shm);
 	}
 
@@ -199,7 +199,7 @@ class Dew_Daemon_Run {
 	 * available managers before running the daemon.
 	 */
 	public function start() {
-		$this->_pidReader->writePidFile($this->_pidManager->getCurrent());
+		$this->_pidFile->writePidFile($this->_pidManager->getCurrent());
 		$this->_initLogOutput();
 
 		// Check input here
@@ -232,7 +232,7 @@ class Dew_Daemon_Run {
 			case SIGINT:
 				// Shutdown
 				$this->log('Application (' . get_class($this) . ') received SIGINT signal (shutting down)', Zend_Log::DEBUG);
-				$this->_pidReader->unlinkPidFile();
+				$this->_pidFile->unlinkPidFile();
 				$this->_shm->remove();
 				exit;
 				break;
@@ -274,7 +274,7 @@ class Dew_Daemon_Run {
     	}
 		$this->log("Running done.", Zend_Log::NOTICE);
 
-		$this->_pidReader->unlinkPidFile();
+		$this->_pidFile->unlinkPidFile();
 		$this->_shm->remove();
 
 		exit;

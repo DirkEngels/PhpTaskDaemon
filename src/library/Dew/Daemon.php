@@ -161,12 +161,12 @@ class Dew_Daemon {
 //		if (!$this->_isRunning()) {
 //			echo 'Application (' . $this->_name . ') is NOT running!!!' . "\n";
 //		} else {
-		$pidReader = new Dew_Daemon_Pid_Reader(TMP_PATH . '/dew_daemon_rund.pid');
+		$pidFile = new Dew_Daemon_Pid_File(TMP_PATH . '/dew_daemon_rund.pid');
 //		echo ;
 //		exit;
 		$shm = new Dew_Daemon_Shm('daemon');
 
-		echo 'Getting status of daemon (PID: ' . $pidReader->readPidFile() . ') !!!' . "\n";		
+		echo 'Getting status of daemon (PID: ' . $pidFile->readPidFile() . ') !!!' . "\n";		
 		
 		foreach($shm->getKeys() as $key) {
 			echo $key . ' => ' . $shm->getVar($key) . "\n";

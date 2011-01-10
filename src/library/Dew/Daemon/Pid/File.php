@@ -7,12 +7,12 @@
  */
 
 /**
- * This Dew_Daemon_Pid_Reader object is responsible for reading and writing the
+ * This Dew_Daemon_Pid_File object is responsible for reading and writing the
  * process ID to a file. Currently only the main daemon and it's managers use
  * this class to store the process IDs to disk. The task do not write a pid to
  * disk.
  */
-class Dew_Daemon_Pid_Reader {
+class Dew_Daemon_Pid_File {
 
 	/**
 	 * The location of the pidfile. This is only used by the main and its 

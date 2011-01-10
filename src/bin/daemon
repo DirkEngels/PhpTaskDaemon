@@ -33,7 +33,7 @@ require_once('../library/Dew/Daemon/Pid.php');
 require_once('../library/Dew/Daemon/Shm.php');
 require_once('../library/Dew/Daemon/Signals.php');
 
-require_once('../library/Dew/Daemon/Pid/Reader.php');
+require_once('../library/Dew/Daemon/Pid/File.php');
 require_once('../library/Dew/Daemon/Pid/Manager.php');
 
 require_once('../library/Dew/Daemon/Task/Interface.php');
