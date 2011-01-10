@@ -7,41 +7,28 @@ define('APPLICATION_PATH', realpath(PROJECT_ROOT .'/application'));
 define('LIBRARY_PATH', realpath(PROJECT_ROOT .'/library'));
 define('TMP_PATH', realpath(PROJECT_ROOT .'/../tmp'));
 
+// Include Paths
+$includePaths = array(
+    get_include_path(),
+    LIBRARY_PATH, 
+    '/usr/share/php/libzend-framework-php/'
+);
 set_include_path(
-	implode(
-		PATH_SEPARATOR, 
-		array(
-			LIBRARY_PATH, 
-			get_include_path()
-		)
-	)
+    implode(
+        PATH_SEPARATOR,
+        $includePaths
+    )
 );
 
+function autoload($className) {
+	foreach($GLOBALS['includePaths'] as $path) {
+    	if (file_exists($path . '/' . str_replace('_','/',$className) . '.php')) {
+    		include_once($path . '/' . str_replace('_','/',$className) . '.php');
+    	}
+    }
+}
+spl_autoload_register('autoload');
 
-include_once('../library/Zend/Log.php');
-include_once('../library/Zend/Log/Writer/Null.php');
-include_once('../library/Zend/Log/Writer/Stream.php');
-include_once('../library/Zend/Console/Getopt.php');
-include_once('../library/Zend/Config.php');
-
-require_once('../library/Dew/Daemon.php');
-require_once('../library/Dew/Daemon/Run.php');
-require_once('../library/Dew/Daemon/Pid.php');
-require_once('../library/Dew/Daemon/Shm.php');
-require_once('../library/Dew/Daemon/Signals.php');
-
-require_once('../library/Dew/Daemon/Pid/File.php');
-require_once('../library/Dew/Daemon/Pid/Manager.php');
-
-require_once('../library/Dew/Daemon/Task/Interface.php');
-require_once('../library/Dew/Daemon/Task/Abstract.php');
-
-require_once('../library/Dew/Daemon/Manager/Interface.php');
-require_once('../library/Dew/Daemon/Manager/Abstract.php');
-require_once('../library/Dew/Daemon/Manager/Interval.php');
-require_once('../library/Dew/Daemon/Manager/Cron.php');
-require_once('../library/Dew/Daemon/Manager/Forked.php');
-require_once('../library/Dew/Daemon/Manager/Gearman.php');
 
 
 // Start the application
