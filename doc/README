@@ -64,6 +64,18 @@ method is called 'executeTask' and executes a single task. Each task class can
 define a variable for setting a manager. The manager determines how and when 
 the task is executed.
 
+Command line:
+* Start:		./daemon --verbose --action start
+* Stop:			./daemon --action start
+* Status		./daemon --action status
+* Monitor		./daemon --action monitor
+
+PHP API Example:
+
+  $daemon = new Dew_Daemon();
+  $status = $daemon->status();
+  var_dump($status);
+  
 
 Contact Information
 -------------------
