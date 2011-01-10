@@ -10,9 +10,13 @@ define('TMP_PATH', realpath(PROJECT_ROOT .'/../tmp'));
 set_include_path(
 	implode(
 		PATH_SEPARATOR, 
-		array(LIBRARY_PATH, get_include_path())
+		array(
+			LIBRARY_PATH, 
+			get_include_path()
+		)
 	)
 );
+
 
 include_once('../library/Zend/Log.php');
 include_once('../library/Zend/Log/Writer/Null.php');
@@ -22,7 +26,6 @@ include_once('../library/Zend/Config.php');
 include_once('../library/Zend/Form.php');
 include_once('../library/Zend/Db/Table/Abstract.php');
 include_once('../library/Zend/Db/Table/Row.php');
-
 
 require_once('../library/Dew/Daemon.php');
 require_once('../library/Dew/Daemon/Run.php');
