@@ -32,6 +32,11 @@ class Dew_Daemon {
 		$this->setConsoleOpts();
 	}
 	
+	/**
+	 * 
+	 * Returns an object containing the console arguments.
+	 * @return Zend_Console_Getopt
+	 */
 	public function getConsoleOpts() {
 		// Initialize default console options
 		if (is_null($this->_consoleOpts)) {
@@ -49,6 +54,13 @@ class Dew_Daemon {
 		}
 		return $this->_consoleOpts;
 	}
+	
+	/**
+	 * 
+	 * Sets new console arguments
+	 * @param Zend_Console_Getopt $consoleOpts
+	 * @return $this
+	 */
 	public function setConsoleOpts(Zend_Console_Getopt $consoleOpts = null) {
 		if ($consoleOpts === null) {
 			$consoleOpts = $this->getConsoleOpts();
@@ -62,11 +74,25 @@ class Dew_Daemon {
 			exit;
 		}
 		$this->_consoleOpts = $consoleOpts;
+
+		return $this;
 	}
 	
+	/**
+	 * 
+	 * Returns the daemon runner object
+	 * @return Dew_Daemon_Runner
+	 */
 	public function getRunner() {
 		return $this->_runner;
 	}
+	
+	/**
+	 * 
+	 * Sets a daemon runner object
+	 * @param Dew_Daemon_Runner $runner
+	 * @return $this
+	 */
 	public function setRunner($runner) {
 		if ($runner === null) {
 			$runner = new Dew_Daemon_Run($this->_consoleOpts);
