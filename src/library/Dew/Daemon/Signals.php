@@ -14,6 +14,17 @@
 */
 class Dew_Daemon_Signals {
 
+	/**
+	 * Task identifier
+	 * @var string|null 
+	 */
+	protected $_identifier = null;
+	
+	/**
+	 * 
+	 * Zend_Log object
+	 * @var Zend_Log|null
+	 */
 	protected $_log = null;
 	
 	/**
@@ -21,7 +32,8 @@ class Dew_Daemon_Signals {
 	 * Register POSIX Signals
 	 * @param $sig
 	 */
-	public function __construct($log = null, $callback = null, $signals = null) {
+	public function __construct($identifier, $log = null, $callback = null, $signals = null) {
+		$this->_identifier = $identifier;
 		$this->_log = $log;
 		if ($callback === null) {
 			$callback = array(&$this, 'defaultHandler');
@@ -59,20 +71,20 @@ class Dew_Daemon_Signals {
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
-				$this->log('Application (' . get_class($this) . ') received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
+				$this->log('Application (' . $this->_identifier . ') received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
 				exit;
 			case SIGCHLD:
 				// Halt
-				$this->log('Application (' . get_class($this) . ') received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
+				$this->log('Application (' . $this->_identifier . ') received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
 				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
 				break;
 			case SIGINT:
 				// Shutdown
-				$this->log('Application (' . get_class($this) . ') received SIGINT signal (shutting down)', Zend_Log::DEBUG);
+				$this->log('Application (' . $this->_identifier . ') received SIGINT signal (shutting down)', Zend_Log::DEBUG);
 				exit;
 				break;
 			default:
-				$this->log('Application (' . get_class($this) . ') received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
+				$this->log('Application (' . $this->_identifier . ') received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
 				//exit;
 				break;
 		}

@@ -88,7 +88,10 @@ class Dew_Daemon_Task_Abstract {
 			$this->_shm = new Dew_Daemon_Shm(getmypid());
 		}
 		$this->init();
-		$sigHandler = new Dew_Daemon_Signals($this->_log);
+		$sigHandler = new Dew_Daemon_Signals(
+			get_class($this),
+			$this->_log
+		);
 	}
 	
 	/**

@@ -205,7 +205,7 @@ class Dew_Daemon_Run {
 		// Check input here
 		$this->scanTaskDirectory(APPLICATION_PATH . '/daemon/');
 		
-		$this->_sigHandler = new Dew_Daemon_Signals($this->_log);
+		$this->_sigHandler = new Dew_Daemon_Signals('Dew_Daemon_Run', $this->_log);
 	
 		// All valid
 		$this->_run();
@@ -264,6 +264,7 @@ class Dew_Daemon_Run {
 		
 		// Override signal handler
 		$this->_sigHandler = new Dew_Daemon_Signals(
+			'Dew_Daemon_Run', 
 			$this->_log, 
 			array(&$this, 'sigHandler')
 		);		
