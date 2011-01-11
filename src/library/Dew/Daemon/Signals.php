@@ -1,9 +1,9 @@
 <?php
-
 /**
-* @package Dew
-* @subpackage Dew_Daemon
-*/
+ * @author DirkEngels <d.engels@dirkengels.com>
+ * @package Dew
+ * @subpackage Dew_Daemon
+ */
 
 /**
 * The Dew_Daemon_Signals object can be encapsulated by other classes to 

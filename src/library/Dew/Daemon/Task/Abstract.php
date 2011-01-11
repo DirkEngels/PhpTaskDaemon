@@ -84,6 +84,8 @@ class Dew_Daemon_Task_Abstract {
 		}
 		if (is_a($shm, 'Dew_Daemon_Shm')) {
 			$this->setShm($shm);
+		} else {
+			$this->_shm = new Dew_Daemon_Shm(getmypid());
 		}
 		$this->init();
 		$sigHandler = new Dew_Daemon_Signals($this->_log);
@@ -96,7 +98,6 @@ class Dew_Daemon_Task_Abstract {
 	public function __destruct() {
 		unset($this->_shm);
 		unset($this->_pidManager);
-		unset($this->_pid);
 	}
 
 	/**
@@ -110,9 +111,6 @@ class Dew_Daemon_Task_Abstract {
 			$name = preg_replace('/^Dew_Daemon_Task_/', '', get_class($this));
 		}
 		$this->_name = $name;
-		$pid = getmypid();
-		$this->_pid = new Dew_Daemon_Pid($pid);
-		$this->_shm = new Dew_Daemon_Shm($name . '-' . $pid);
 	}
 	
 	/**

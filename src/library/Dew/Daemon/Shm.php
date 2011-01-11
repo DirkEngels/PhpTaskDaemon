@@ -1,6 +1,6 @@
 <?php
 /**
- * @author DirkEngels
+ * @author DirkEngels <d.engels@dirkengels.com>
  * @package Dew
  * @subpackage Dew_Daemon
  */
