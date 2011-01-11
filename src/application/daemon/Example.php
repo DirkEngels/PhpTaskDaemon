@@ -1,13 +1,19 @@
 <?php
+/**
+ * @author DirkEngels <d.engels@dirkengels.com>
+ * @package Dew
+ * @subpackage Dew_Daemon
+ */
 
 /**
  * 
- * This class is an example for a parallel daemon task.
- *  
- * @author DirkEngels
+ * This example class shows a task running with an interval manager. Every task
+ * can adjust the time to wait after finishing all tasks and running again. 
+ * This example is called sloppy, because the time between loading a queue and
+ * executing its tasks is at a random interval. 
  *
  */
-class Dew_Daemon_Task_Sleep extends Dew_Daemon_Task_Abstract implements Dew_Daemon_Task_Interface {
+class Dew_Daemon_Task_Example extends Dew_Daemon_Task_Abstract implements Dew_Daemon_Task_Interface {
 
 	static protected $_managerType = Dew_Daemon_Manager_Abstract::PROCESS_TYPE_INTERVAL;
 	
