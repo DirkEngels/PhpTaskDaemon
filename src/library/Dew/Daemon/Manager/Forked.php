@@ -50,7 +50,7 @@ class Dew_Daemon_Manager_Forked extends Dew_Daemon_Manager_Abstract implements D
 				}
 			}
 
-			$this->_log('Current queue finished... taking a small ' . $this->_sleepTime);
+//			$this->_log('Current queue finished... taking a small ' . $this->_sleepTime);
 			sleep($this->_sleepTime);
 		}
 	}	
