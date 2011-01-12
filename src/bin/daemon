@@ -20,6 +20,7 @@ set_include_path(
     )
 );
 
+// Custom Autoloader
 function autoload($className) {
 	foreach($GLOBALS['includePaths'] as $path) {
     	if (file_exists($path . '/' . str_replace('_','/',$className) . '.php')) {
@@ -30,7 +31,6 @@ function autoload($className) {
 spl_autoload_register('autoload');
 
 
-
 // Start the application
-$daemon = new Dew_Daemon();
+$daemon = new Dew_Daemon_Command();
 $daemon->run();
