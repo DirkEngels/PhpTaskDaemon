@@ -1,23 +1,28 @@
 <?php
 /**
-* @package Dew
-* @subpackage Dew_Daemon
-*/
+ * @package Dew
+ * @subpackage Daemon
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ */
 
 /**
-* The main Daemon class is responsible for handling the command line arguments.
-* The start method creates an instance of Dew_Daemon_Starter and contains the 
+* The main Daemon class is responsible for starting, stopping and monitoring
+* the daemon. It accepts command line arguments to set daemon runner options.
+* The start method creates an instance of Dew_Daemon_Runner and contains the 
 * methods for setup a logger, read the config, daemonize the process and set 
-* the uid/gui of the process
+* the uid/gui of the process. After that the runner instance starts all the 
+* managers.
 */
-class Dew_Daemon {
+class Dew_Daemon_Command {
 
 	protected $_consoleOpts;					// Zend_Console_GetOpt instance
 	
 	/**
 	 * 
 	 * Daemon run object
-	 * @var Dew_Daemon_Run
+	 * @var Dew_Daemon_Runner
 	 */
 	protected $_runner;
 
@@ -26,7 +31,7 @@ class Dew_Daemon {
 	 * Daemon constructor method
 	 * @param Zend_Console_Getopt $consoleOpts
 	 */
-	public function __construct(Dew_Daemon_Run $runner = null) {
+	public function __construct(Dew_Daemon_Runner $runner = null) {
 		// Initialize command line arguments
 		$this->setRunner($runner);
 		$this->setConsoleOpts();
@@ -81,22 +86,22 @@ class Dew_Daemon {
 	/**
 	 * 
 	 * Returns the daemon runner object
-	 * @return Dew_Daemon_Runner
+	 * @return Dew_Daemon_Runnerner
 	 */
 	public function getRunner() {
+		if ($this->_runner === null) {
+			$this->_runner = new Dew_Daemon_Runner();
+		}
 		return $this->_runner;
 	}
 	
 	/**
 	 * 
 	 * Sets a daemon runner object
-	 * @param Dew_Daemon_Runner $runner
+	 * @param Dew_Daemon_Runnerner $runner
 	 * @return $this
 	 */
 	public function setRunner($runner) {
-		if ($runner === null) {
-			$runner = new Dew_Daemon_Run($this->_consoleOpts);
-		}
 		$this->_runner = $runner;
 		return $this;
 	}
@@ -127,7 +132,7 @@ class Dew_Daemon {
 	 * Action: Start Daemon
 	 */
 	public function start() {
-		$this->_runner->start();	
+		$this->getRunner()->start();	
 	}
 	
 	/**
@@ -135,11 +140,11 @@ class Dew_Daemon {
 	 * Action: Stop daemon 
 	 */
 	public function stop() {
-		if (!$this->_runner->isRunning()) {
+		if (!$this->getRunner()->isRunning()) {
 			echo 'Daemon is NOT running!!!' . "\n";
 		} else {	
 			echo 'Terminating application  !!!' . "\n";
-			$this->_runner->stop();
+			$this->getRunner()->stop();
 		}
 
 		exit();
