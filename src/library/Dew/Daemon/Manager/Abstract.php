@@ -82,6 +82,9 @@ abstract class Dew_Daemon_Manager_Abstract {
 			$parentPid
 		);
 	}
+	public function __destruct() {
+		echo 'Shutting down manager: ' . get_class($this) . "\n";
+	}
 
 	/**
 	 * 
@@ -185,17 +188,6 @@ abstract class Dew_Daemon_Manager_Abstract {
 		// All OK!
 		return true;
 	}
-
-
-	/**
-	 * Logs data to a logfile 
-	 * 
-	 * @param string $message
-	 */
-	protected function _log($message) {
-		echo $message . "\n";
-	}
-
 	
 	/**
 	 * 
@@ -214,6 +206,6 @@ abstract class Dew_Daemon_Manager_Abstract {
 		}
 		
 		return $out;
-	}	
+	}
 	
 }
