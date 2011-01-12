@@ -1,8 +1,10 @@
 <?php
 /**
- * @author DirkEngels <d.engels@dirkengels.com>
  * @package Dew
- * @subpackage Dew_Daemon
+ * @subpackage Daemon
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
 /**
@@ -12,7 +14,7 @@
 * A callback can be provided to run a method related to the current process. 
 * 
 */
-class Dew_Daemon_Signals {
+class Dew_Daemon_SignalHandler {
 
 	/**
 	 * Task identifier
@@ -67,7 +69,6 @@ class Dew_Daemon_Signals {
 	 * @param $sig
 	 */
 	public function defaultHandler($sig) {
-		echo "GOT DEFAULT SIGNAL: " . $sig . "\n";
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
