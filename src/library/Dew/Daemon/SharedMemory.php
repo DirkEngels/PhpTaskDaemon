@@ -1,8 +1,10 @@
 <?php
 /**
- * @author DirkEngels <d.engels@dirkengels.com>
  * @package Dew
- * @subpackage Dew_Daemon
+ * @subpackage Daemon
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
 /**
@@ -11,18 +13,24 @@
  * memory segments. The keys of the shared memory variables are stored in an
  * array.
  */
-class Dew_Daemon_Shm {
+class Dew_Daemon_SharedMemory {
 	/**
 	 * This variable contains the identifier string.
 	 * @var string|null
 	 */
-	protected $_identifier = null;
-	
+	protected $_pathNameWithPid = null;
+
 	/**
 	 * The actual resource of the shared memory segment
 	 * @var resource
 	 */
-	protected $_resource = null;
+	protected $_sharedMemory = null;
+
+	/**
+	 * The semaphore needed to lock/unlock access to the shared memory
+	 * segment.
+	 */
+	protected $_semaphore = null;
 	
 	/**
 	 * This array contains the keys of all registered variables.
@@ -37,10 +45,17 @@ class Dew_Daemon_Shm {
 	 * @param string $id
 	 */
 	public function __construct($id) {
-		$pathname = TMP_PATH . '/' . strtolower($id) . '.shm';
-		touch($pathname);
-		$this->_identifier = $pathname;
-		$this->_resource = shm_attach(ftok($this->_identifier, 'a'));
+		$pathname = TMP_PATH . '/' . strtolower($id);
+		$this->_pathNameWithPid = $pathname;
+
+		touch($pathname . '.sem');
+//		$this->_semaphore = sem_get(
+//			ftok($this->_pathNameWithPid . '.sem', 'a')
+//		);
+		touch($pathname . '.shm');
+		$this->_sharedMemory = shm_attach(
+			ftok($this->_pathNameWithPid . '.shm', 'a')
+		);
 	}
 
 	/**
@@ -48,7 +63,7 @@ class Dew_Daemon_Shm {
 	 * The destructor detaches the shared memory segment.
 	 */
 	public function __destruct() {
-		shm_detach($this->_resource);
+		shm_detach($this->_sharedMemory);
 	}
 	
 	/**
@@ -68,10 +83,9 @@ class Dew_Daemon_Shm {
 	 * @return mixed|false
 	 */
 	public function getVar($key) {
-//		echo $key . ' => ' . $this->_keys[$key] . "\n";
 		if (in_array($key, array_keys($this->_keys))) {
 			
-			return shm_get_var($this->_resource, $this->_keys[$key]);
+			return shm_get_var($this->_sharedMemory, $this->_keys[$key]);
 		}
 		return false;
 	}
@@ -87,9 +101,8 @@ class Dew_Daemon_Shm {
 	public function setVar($key, $value) {
 		if (!in_array($key, array_keys($this->_keys))) {
 			$this->_keys[$key] = count($this->_keys)+1;
-//			echo var_dump($this->_keys);
 		}
-		return shm_put_var($this->_resource, $this->_keys[$key], $value);	
+		return shm_put_var($this->_sharedMemory, $this->_keys[$key], $value);	
 	}
 	
 	/**
@@ -101,7 +114,7 @@ class Dew_Daemon_Shm {
 	public function removeVar($key) {
 		if (!in_array($key, array_keys($this->_keys))) {
 			unset($this->_keys[$key]);
-			return shm_remove_var($this->_resource, $this->_keys[$key]);
+			return shm_remove_var($this->_sharedMemory, $this->_keys[$key]);
 		}
 		return false;
 	}
@@ -112,10 +125,11 @@ class Dew_Daemon_Shm {
 	 * @return bool|int
 	 */
 	public function remove() {
-		$ret = shm_remove($this->_resource);
-		if (file_exists($this->_identifier)) {
-			unlink($this->_identifier);
+		$ret = shm_remove($this->_sharedMemory);
+		if (file_exists($this->_pathNameWithPid)) {
+			unlink($this->_pathNameWithPid);
 		}
+//		sem_remove($this->_semaphore);
 		return $ret;
 	}
 }
