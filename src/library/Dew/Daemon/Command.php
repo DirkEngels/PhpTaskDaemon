@@ -163,16 +163,15 @@ class Dew_Daemon_Command {
 	 * Action: Get daemon status
 	 */
 	public function status() {
-//		if (!$this->_isRunning()) {
-//			echo 'Application (' . $this->_name . ') is NOT running!!!' . "\n";
-//		} else {
-		$pidFile = new Dew_Daemon_Pid_File(TMP_PATH . '/dew_daemon_rund.pid');
-//		echo ;
-//		exit;
-		$shm = new Dew_Daemon_Shm('daemon');
+		$pidFile = new Dew_Daemon_Pid_File(TMP_PATH . '/dew_daemon_runnerd.pid');
+		$pid = $pidFile->readPidFile();
+		if ($pid === null) {
+			echo "Daemon not running\n";
+			exit;
+		}
+		$shm = new Dew_Daemon_SharedMemory('daemon');
 
-		echo 'Getting status of daemon (PID: ' . $pidFile->readPidFile() . ') !!!' . "\n";		
-		
+		echo 'Getting status of daemon (PID: ' . $pidFile->readPidFile() . ') !!!' . "\n";
 		foreach($shm->getKeys() as $key) {
 			echo $key . ' => ' . $shm->getVar($key) . "\n";
 		}
