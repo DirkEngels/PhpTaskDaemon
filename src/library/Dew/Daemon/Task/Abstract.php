@@ -49,7 +49,7 @@ class Dew_Daemon_Task_Abstract {
 	/**
 	 * 
 	 * The shared memory object
-	 * @var Dew_Daemon_Shm
+	 * @var Dew_Daemon_SharedMemory
 	 */
 	protected $_shm = null;
 	
@@ -73,7 +73,7 @@ class Dew_Daemon_Task_Abstract {
 	 * and/or shared memory object.
 	 * @param Zend_Log $log
 	 * @param Dew_Daemon_Pid_Manager $pidManager
-	 * @param Dew_Daemon_Shm $shm
+	 * @param Dew_Daemon_SharedMemory $shm
 	 */
 	public function __construct($log = null, $pidManager = null, $shm = null) {
 		if (is_a($log, 'Zend_Log')) {
@@ -82,16 +82,13 @@ class Dew_Daemon_Task_Abstract {
 		if (is_a($pidManager, 'Dew_Daemon_Pid_Manager')) {
 			$this->setPidManager($pidManager);
 		}
-		if (is_a($shm, 'Dew_Daemon_Shm')) {
-			$this->setShm($shm);
+		if (is_a($shm, 'Dew_Daemon_SharedMemory')) {
+			$this->_shm = $shm;
 		} else {
-			$this->_shm = new Dew_Daemon_Shm(getmypid());
+			$this->_shm = new Dew_Daemon_SharedMemory(getmypid());
 		}
+
 		$this->init();
-		$sigHandler = new Dew_Daemon_Signals(
-			get_class($this),
-			$this->_log
-		);
 	}
 	
 	/**
@@ -99,6 +96,7 @@ class Dew_Daemon_Task_Abstract {
 	 * Clean up objects to free memory.
 	 */
 	public function __destruct() {
+		echo 'Shutting down task: ' . get_class($this) . "\n";
 		unset($this->_shm);
 		unset($this->_pidManager);
 	}
@@ -114,6 +112,14 @@ class Dew_Daemon_Task_Abstract {
 			$name = preg_replace('/^Dew_Daemon_Task_/', '', get_class($this));
 		}
 		$this->_name = $name;
+
+		// Override signal handler
+		echo "Overriding SIGHANDLER\n\n";
+		$this->_sigHandler = new Dew_Daemon_SignalHandler(
+			get_class($this),
+			$this->_log, 
+			array(&$this, 'sigHandler')
+		);
 	}
 	
 	/**
@@ -193,7 +199,7 @@ class Dew_Daemon_Task_Abstract {
 	 * @param int $count
 	 */
 	public function updateMemoryQueue($count) {
-		echo "Sys (" . getmypid() . "): Queue: " . $count . "\n";
+//		$this->_log->log("Sys (" . getmypid() . "): Queue: " . $count, Zend_Log::INFO);
 		$this->_shm->setVar(1, $count);
 	}
 
@@ -216,7 +222,39 @@ class Dew_Daemon_Task_Abstract {
 			$this->_log->log("Task (" . getmypid() . "): " . $message . ' (' . $duration . ' secs)', Zend_Log::DEBUG);
 		} 
 		
-		echo "Task (" . getmypid() . "): " . $message . "\n";
+//		$this->_log->log("Task (" . getmypid() . "): " . $message, Zend_Log::INFO);
 		$this->_shm->setVar(getmypid(), $message);	
 	}
+
+	/**
+	 * 
+	 * POSIX Signal handler callback
+	 * @param $sig
+	 */
+	public function sigHandler($sig) {
+		switch ($sig) {
+			case SIGTERM:
+				// Shutdown
+				$this->_log->log('Application (TASK) received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
+				break;
+			case SIGCHLD:
+				// Halt
+				$this->_log->log('Application (TASK) received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
+				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
+				break;
+			case SIGINT:
+				// Shutdown
+				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
+//				$this->_shm->remove();
+//				exit;
+				break;
+			default:
+				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
+				break;
+		}
+		echo "sighandler Task done\n\n";
+		exit;
+	}
+	
+
 }
