@@ -85,7 +85,7 @@ class Dew_Daemon_Task_Abstract {
 		if (is_a($shm, 'Dew_Daemon_SharedMemory')) {
 			$this->_shm = $shm;
 		} else {
-			$this->_shm = new Dew_Daemon_SharedMemory(getmypid());
+			$this->_shm = new Dew_Daemon_SharedMemory('task-' . getmypid());
 		}
 
 		$this->init();
@@ -97,8 +97,8 @@ class Dew_Daemon_Task_Abstract {
 	 */
 	public function __destruct() {
 		echo 'Shutting down task: ' . get_class($this) . "\n";
-		unset($this->_shm);
-		unset($this->_pidManager);
+//		unset($this->_shm);
+//		unset($this->_pidManager);
 	}
 
 	/**
@@ -113,13 +113,6 @@ class Dew_Daemon_Task_Abstract {
 		}
 		$this->_name = $name;
 
-		// Override signal handler
-		echo "Overriding SIGHANDLER\n\n";
-		$this->_sigHandler = new Dew_Daemon_SignalHandler(
-			get_class($this),
-			$this->_log, 
-			array(&$this, 'sigHandler')
-		);
 	}
 	
 	/**
@@ -225,36 +218,5 @@ class Dew_Daemon_Task_Abstract {
 //		$this->_log->log("Task (" . getmypid() . "): " . $message, Zend_Log::INFO);
 		$this->_shm->setVar(getmypid(), $message);	
 	}
-
-	/**
-	 * 
-	 * POSIX Signal handler callback
-	 * @param $sig
-	 */
-	public function sigHandler($sig) {
-		switch ($sig) {
-			case SIGTERM:
-				// Shutdown
-				$this->_log->log('Application (TASK) received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
-				break;
-			case SIGCHLD:
-				// Halt
-				$this->_log->log('Application (TASK) received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
-				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
-				break;
-			case SIGINT:
-				// Shutdown
-				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
-//				$this->_shm->remove();
-//				exit;
-				break;
-			default:
-				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
-				break;
-		}
-		echo "sighandler Task done\n\n";
-		exit;
-	}
-	
 
 }

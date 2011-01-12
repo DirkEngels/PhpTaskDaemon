@@ -1,9 +1,10 @@
 <?php
-
 /**
- * @author DirkEngels <d.engels@dirkengels.com>
  * @package Dew
- * @subpackage Dew_Daemon
+ * @subpackage Daemon
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
 /**
@@ -12,7 +13,7 @@
  * for each task manager.
  *
  */
-class Dew_Daemon_Run {
+class Dew_Daemon_Runner {
 	/**
 	 * This variable contains pid manager object
 	 * @var Dew_Daemon_Pid_Manager $_pidManager
@@ -27,7 +28,7 @@ class Dew_Daemon_Run {
 	
 	/**
 	 * Shared memory object
-	 * @var Dew_Daemon_Shm $_shm
+	 * @var Dew_Daemon_SharedMemory $_shm
 	 */
 	protected $_shm = null;
 	
@@ -54,7 +55,7 @@ class Dew_Daemon_Run {
 		$this->_pidManager = new Dew_Daemon_Pid_Manager(getmypid(), $parent);
 		$this->_pidFile = new Dew_Daemon_Pid_File($pidFile);
 		
-		$this->_shm = new Dew_Daemon_Shm('daemon');
+		$this->_shm = new Dew_Daemon_SharedMemory('daemon');
 		$this->_shm->setVar('state', 'running');
 		
 		$this->_initLogSetup();
@@ -65,7 +66,8 @@ class Dew_Daemon_Run {
 	 * Unset variables at destruct to hopefully free some memory. 
 	 */
 	public function __destruct() {
-		$this->_shm->setVar('state', 'stopped');
+//		$this->_shm->setVar('state', 'stopped');
+//		echo var_dump($this->_pidManager);
 		unset($this->_pidManager);
 		unset($this->_pidFile);
 		unset($this->_shm);
@@ -79,7 +81,6 @@ class Dew_Daemon_Run {
 	 * @param int $logLevel
 	 */
 	public function log($message, $logLevel = Zend_Log::DEBUG) {
-//		echo '(' . getmypid() . ') ' . $message . "\n";
 		$this->_log->log('(' . getmypid() . ') ' . $message, $logLevel);
 	}
 
@@ -170,7 +171,7 @@ class Dew_Daemon_Run {
 	 * @param string $dir
 	 */
 	public function scanTaskDirectory($dir) {
-		$this->log("Scanning directory for tasks: " . $dir, Zend_Log::INFO);
+		$this->log("Scanning directory for tasks: " . $dir, Zend_Log::DEBUG);
 
 		if (!is_dir($dir)) {
 			throw new Exception('Directory does not exists');
@@ -181,7 +182,8 @@ class Dew_Daemon_Run {
 		foreach($files as $file) {
 			if (preg_match('/(.*)+\.php$/', $file, $match)) {
 				require_once($dir . '/' . $file);
-				$taskClass = substr(get_class($this), 0, -4) . '_Task_' . preg_replace('/\.php$/', '', $file);
+				$taskClass = substr(get_class($this), 0, -7) . '_Task_' . preg_replace('/\.php$/', '', $file);
+				$this->log("Checking task: " . $taskClass, Zend_Log::DEBUG);
 				if (class_exists($taskClass)) {
 					$this->log("Adding task: " . $taskClass . ' (' . $taskClass::getManagerType() . ')', Zend_Log::INFO);
 					$task = new $taskClass();
@@ -205,8 +207,6 @@ class Dew_Daemon_Run {
 		// Check input here
 		$this->scanTaskDirectory(APPLICATION_PATH . '/daemon/');
 		
-		$this->_sigHandler = new Dew_Daemon_Signals('Dew_Daemon_Run', $this->_log);
-	
 		// All valid
 		$this->_run();
 	}
@@ -217,30 +217,30 @@ class Dew_Daemon_Run {
 	 * @param $sig
 	 */
 	public function sigHandler($sig) {
-		echo "GOT SIGNAL : " . $sig . "\n";
+		echo "GOT SIGNAL "  . $sig . "\n\n\n";
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
-				$this->log('Application (' . get_class($this) . ') received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
+				$this->log('Application (DAEMON) received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
 				exit;
 				break;
 			case SIGCHLD:
 				// Halt
-				$this->log('Application (' . get_class($this) . ') received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
+				$this->log('Application (DAEMON) received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
 				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
 				break;
 			case SIGINT:
 				// Shutdown
-				$this->log('Application (' . get_class($this) . ') received SIGINT signal (shutting down)', Zend_Log::DEBUG);
-				$this->_pidFile->unlinkPidFile();
-				$this->_shm->remove();
-				exit;
+//				$this->log('Application (DAEMON) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
+//				$this->_pidFile->unlinkPidFile();
+//				$this->_shm->remove();
 				break;
 			default:
-				$this->log('Application (' . get_class($this) . ') received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
+				$this->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
 				//exit;
 				break;
 		}
+		echo "sighandler Runner done\n\n";
 	}
 
 	/**
@@ -255,23 +255,25 @@ class Dew_Daemon_Run {
 			$this->log("No daemon tasks found", Zend_Log::INFO);
 			exit;
 		}
-		$this->log("Starting daemon tasks", Zend_Log::INFO);
+		$this->log("Starting daemon tasks", Zend_Log::DEBUG);
 		foreach ($this->_managers as $manager) {
-			$manager->getTask()->setLog($this->_log);
+//			$manager->setLog($this->_log);
+			$manager->setLog(clone($this->_log));
 			$this->log("Forking manager: "  . get_class($manager), Zend_Log::INFO);
 			$this->_forkManager($manager);
 		}
-		
-		// Override signal handler
-		$this->_sigHandler = new Dew_Daemon_Signals(
-			'Dew_Daemon_Run', 
-			$this->_log, 
+		// Default sigHandler
+		$this->log("Setting default sighanler", Zend_Log::DEBUG);
+		$this->_sigHandler = new Dew_Daemon_SignalHandler(
+			'Main Daemon',
+			$this->_log,
 			array(&$this, 'sigHandler')
-		);		
+		);
+	
 		// Wait till all childs are done
 	    while (pcntl_waitpid(0, $status) != -1) {
         	$status = pcntl_wexitstatus($status);
-        	echo "Child $status completed\n";
+        	$this->log("Child $status completed");
     	}
 		$this->log("Running done.", Zend_Log::NOTICE);
 
@@ -305,8 +307,7 @@ class Dew_Daemon_Run {
 			$this->_pidManager->forkChild($newPid);
 			
 			$this->log('Manager forked (PID: ' . $newPid . ') !!!', Zend_Log::DEBUG);
-			$manager->executeManager();
-			echo "EXITING CHILD\n";
+			$manager->runManager();
 			exit;
 		}
 	}

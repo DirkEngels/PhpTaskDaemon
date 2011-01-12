@@ -63,7 +63,9 @@ class Dew_Daemon_SharedMemory {
 	 * The destructor detaches the shared memory segment.
 	 */
 	public function __destruct() {
-		shm_detach($this->_sharedMemory);
+		if (is_resource($this->_sharedMemory)) {
+			shm_detach($this->_sharedMemory);
+		}
 	}
 	
 	/**
@@ -125,11 +127,24 @@ class Dew_Daemon_SharedMemory {
 	 * @return bool|int
 	 */
 	public function remove() {
-		$ret = shm_remove($this->_sharedMemory);
-		if (file_exists($this->_pathNameWithPid)) {
-			unlink($this->_pathNameWithPid);
+		$retSem = $retShm = false;
+
+		// Remove Shared Memory
+		if (is_resource($this->_sharedMemory)) {
+			$retShm = shm_remove($this->_sharedMemory);
 		}
-//		sem_remove($this->_semaphore);
-		return $ret;
+		if (file_exists($this->_pathNameWithPid . '.shm')) {
+			unlink($this->_pathNameWithPid . '.shm');
+		}
+
+		// Remove Semaphore
+		if (is_resource($this->_semaphore)) {
+			$retSem = sem_remove($this->_semaphore);
+		}
+		if (file_exists($this->_pathNameWithPid . '.sem')) {
+			unlink($this->_pathNameWithPid . '.sem');
+		}
+
+		return ($retShm && $retSem);
 	}
 }

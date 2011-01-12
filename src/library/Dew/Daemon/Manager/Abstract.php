@@ -43,6 +43,13 @@ abstract class Dew_Daemon_Manager_Abstract {
 	
 	/**
 	 * 
+	 * The log file object
+	 * @var Zend_Log
+	 */
+	protected $_log = null;
+
+	/**
+	 * 
 	 * Pid manager object. This class is repsonsible for storing the current, 
 	 * parent and child process IDs.
 	 * @var Dew_Daemon_Pid_Manager
@@ -81,9 +88,16 @@ abstract class Dew_Daemon_Manager_Abstract {
 			getmypid(), 
 			$parentPid
 		);
+		
+		$this->_shm= new Dew_Daemon_SharedMemory(
+			'task-' . $this->_pidManager->getCurrent()
+		);
 	}
 	public function __destruct() {
 		echo 'Shutting down manager: ' . get_class($this) . "\n";
+//		echo var_dump($this->_shm);
+//		$this->_shm->remove();
+		unset($this->_shm);
 	}
 
 	/**
@@ -105,6 +119,26 @@ abstract class Dew_Daemon_Manager_Abstract {
 		if (is_a($task, 'Dew_Daemon_Task_Abstract')) {
 			$this->_task = $task;
 		}
+		return $this;
+	}
+
+	/**
+	 * 
+	 * Returns the log object
+	 * @return Zend_Log
+	 */
+	public function getLog() {
+		return $this->_log;
+	}
+
+	/**
+	 * 
+	 * Sets the log object
+	 * @param Zend_Log $log
+	 * @return $this
+	 */
+	public function setLog(Zend_Log $log) {
+		$this->_log = $log;
 		return $this;
 	}
 
@@ -168,6 +202,25 @@ abstract class Dew_Daemon_Manager_Abstract {
 		return $this;
 	}
 
+	public function runManager() {
+		// Override signal handler
+		echo "Overriding SIGHANDLER\n\n";
+		$this->_sigHandler = new Dew_Daemon_SignalHandler(
+			get_class($this),
+			$this->_log, 
+			array(&$this, 'sigHandler')
+		);
+
+		if ($this->getTask()->getLog() === null) {
+			$this->getTask()->setLog($this->_log);
+		}
+		if ($this->getTask()->getPidManager() === null) {
+			$this->getTask()->setPidManager($this->_pidManager);
+		}
+		
+		$this->executeManager();
+	}
+
 	/**
 	 * Checks the sanity of the manager input data.
 	 * 
@@ -206,6 +259,36 @@ abstract class Dew_Daemon_Manager_Abstract {
 		}
 		
 		return $out;
+	}
+
+	/**
+	 * 
+	 * POSIX Signal handler callback
+	 * @param $sig
+	 */
+	public function sigHandler($sig) {
+		switch ($sig) {
+			case SIGTERM:
+				// Shutdown
+				$this->_log->log('Application (TASK) received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
+				break;
+			case SIGCHLD:
+				// Halt
+				$this->_log->log('Application (TASK) received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
+				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
+				break;
+			case SIGINT:
+				// Shutdown
+				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
+				$this->_shm->remove();
+//				exit;
+				break;
+			default:
+				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
+				break;
+		}
+		echo "sighandler Task done\n\n";
+		exit;
 	}
 	
 }
