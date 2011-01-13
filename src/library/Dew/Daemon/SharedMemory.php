@@ -48,14 +48,26 @@ class Dew_Daemon_SharedMemory {
 		$pathname = TMP_PATH . '/' . strtolower($id);
 		$this->_pathNameWithPid = $pathname;
 
-		touch($pathname . '.sem');
-//		$this->_semaphore = sem_get(
-//			ftok($this->_pathNameWithPid . '.sem', 'a')
-//		);
-		touch($pathname . '.shm');
-		$this->_sharedMemory = shm_attach(
-			ftok($this->_pathNameWithPid . '.shm', 'a')
+		if (!file_exists($pathname . '.sem')) {
+			touch($pathname . '.sem');
+		}
+		$this->_semaphore = sem_get(
+			ftok($this->_pathNameWithPid . '.sem', 1)
 		);
+
+		
+		if (!file_exists($pathname . '.shm')) {
+			touch($pathname . '.shm');
+		}
+		$this->_sharedMemory = shm_attach(
+			ftok($this->_pathNameWithPid . '.shm', 2)
+		);
+
+		sem_acquire($this->_semaphore);
+		if (!shm_has_var($this->_sharedMemory, 1)) {
+			$retInit = shm_put_var($this->_sharedMemory, 1, array());
+		}
+		sem_release($this->_semaphore);
 	}
 
 	/**
@@ -66,6 +78,9 @@ class Dew_Daemon_SharedMemory {
 		if (is_resource($this->_sharedMemory)) {
 			shm_detach($this->_sharedMemory);
 		}
+		if (is_resource($this->_semaphore)) {
+//			sem_release($this->_semaphore);
+		}
 	}
 	
 	/**
@@ -74,7 +89,11 @@ class Dew_Daemon_SharedMemory {
 	 * @return array
 	 */
 	public function getKeys() {
-		return array_keys($this->_keys);
+		sem_acquire($this->_semaphore);
+		$keys = shm_get_var($this->_sharedMemory, 1);
+		sem_release($this->_semaphore);
+		
+		return $keys;
 	}
 	
 	/**
@@ -85,11 +104,15 @@ class Dew_Daemon_SharedMemory {
 	 * @return mixed|false
 	 */
 	public function getVar($key) {
-		if (in_array($key, array_keys($this->_keys))) {
-			
-			return shm_get_var($this->_sharedMemory, $this->_keys[$key]);
+		sem_acquire($this->_semaphore);
+		$value = false;
+		$keys = shm_get_var($this->_sharedMemory, 1);
+		if (in_array($key, array_keys($keys))) {
+			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
 		}
-		return false;
+		sem_release($this->_semaphore);
+		
+		return $value;
 	}
 
 	/**
@@ -101,10 +124,28 @@ class Dew_Daemon_SharedMemory {
 	 * @return bool
 	 */
 	public function setVar($key, $value) {
-		if (!in_array($key, array_keys($this->_keys))) {
-			$this->_keys[$key] = count($this->_keys)+1;
+		sem_acquire($this->_semaphore);
+		// Check the first variable for keys
+		if (shm_has_var($this->_sharedMemory, 1)) {
+			$keys = shm_get_var($this->_sharedMemory, 1);
+		} else {
+			$keys = array();
 		}
-		return shm_put_var($this->_sharedMemory, $this->_keys[$key], $value);	
+		$retInit = true;
+		
+		// Update keys
+		if (!in_array($key, array_keys($keys))) {
+			if (count($keys)==0) {
+				$keys[$key] = 2;
+			} else {
+				$keys[$key] = count($keys)+2;
+			}
+			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
+		}
+		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+		sem_release($this->_semaphore);
+		
+		return $retInit && $retPut;
 	}
 	
 	/**
@@ -114,11 +155,16 @@ class Dew_Daemon_SharedMemory {
 	 * @return bool|int
 	 */
 	public function removeVar($key) {
-		if (!in_array($key, array_keys($this->_keys))) {
+		sem_acquire($this->_semaphore);
+		$ret = false;
+		if (isset($this->_keys[$key])) {
+			if (shm_has_var($this->_sharedMemory, $this->_keys[$key])) {
+				$ret = shm_remove_var($this->_sharedMemory, $this->_keys[$key]);
+			}
 			unset($this->_keys[$key]);
-			return shm_remove_var($this->_sharedMemory, $this->_keys[$key]);
 		}
-		return false;
+		sem_release($this->_semaphore);
+		return $ret;
 	}
 	
 	/**
