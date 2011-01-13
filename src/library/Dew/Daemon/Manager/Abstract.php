@@ -84,22 +84,24 @@ abstract class Dew_Daemon_Manager_Abstract {
 	 * @param string $filename
 	 */
 	public function __construct($parentPid = null) {
-		$this->_pidManager = new Dew_Daemon_Pid_Manager(
-			getmypid(), 
-			$parentPid
-		);
-		
-		$this->_shm= new Dew_Daemon_SharedMemory(
-			'task-' . $this->_pidManager->getCurrent()
-		);
+//		$this->init($parentPid);
 	}
 	public function __destruct() {
 		echo 'Shutting down manager: ' . get_class($this) . "\n";
-//		echo var_dump($this->_shm);
 //		$this->_shm->remove();
 		unset($this->_shm);
 	}
 
+	public function init($parentPid = null) {
+		$this->_pidManager = new Dew_Daemon_Pid_Manager(
+			getmypid(), 
+			$parentPid
+		);
+		$this->_shm= new Dew_Daemon_SharedMemory(
+			'manager-' . $this->_pidManager->getCurrent()
+		);
+		$this->_shm->setVar('name', $this->getTask()->getName());
+	}
 	/**
 	 * 
 	 * Returns the current loaded task object.
@@ -204,7 +206,6 @@ abstract class Dew_Daemon_Manager_Abstract {
 
 	public function runManager() {
 		// Override signal handler
-		echo "Overriding SIGHANDLER\n\n";
 		$this->_sigHandler = new Dew_Daemon_SignalHandler(
 			get_class($this),
 			$this->_log, 
@@ -217,7 +218,11 @@ abstract class Dew_Daemon_Manager_Abstract {
 		if ($this->getTask()->getPidManager() === null) {
 			$this->getTask()->setPidManager($this->_pidManager);
 		}
-		
+		$this->getTask()->setShm(
+			new Dew_Daemon_SharedMemory(
+				'manager-' . $this->_pidManager->getCurrent()
+			)
+		);
 		$this->executeManager();
 	}
 
@@ -248,18 +253,20 @@ abstract class Dew_Daemon_Manager_Abstract {
 	 * shared memory segments registered by the daemon and its managers.
 	 * @return string
 	 */
+/*
 	public function showStatus() {
 		$out = "[" . $this->_pidManager->getCurrent() . "] " . get_class($this) . " (" . $this->_task->getManagerType() . ") :\n";
 
 		if ($this->_pidManager->hasChilds()) {
 			$childs = $this->_pidManager->getChilds();
 			foreach($childs as $child) {
-				echo $this->_shm->getVar($child);
+//				echo $this->_shm->getVar($child);
 			}
 		}
 		
 		return $out;
 	}
+*/
 
 	/**
 	 * 
