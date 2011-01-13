@@ -67,7 +67,6 @@ class Dew_Daemon_Runner {
 	 */
 	public function __destruct() {
 //		$this->_shm->setVar('state', 'stopped');
-//		echo var_dump($this->_pidManager);
 		unset($this->_pidManager);
 		unset($this->_pidFile);
 		unset($this->_shm);
@@ -217,7 +216,6 @@ class Dew_Daemon_Runner {
 	 * @param $sig
 	 */
 	public function sigHandler($sig) {
-		echo "GOT SIGNAL "  . $sig . "\n\n\n";
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
@@ -231,16 +229,12 @@ class Dew_Daemon_Runner {
 				break;
 			case SIGINT:
 				// Shutdown
-//				$this->log('Application (DAEMON) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
-//				$this->_pidFile->unlinkPidFile();
-//				$this->_shm->remove();
+				$this->log('Application (DAEMON) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
 				break;
 			default:
 				$this->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
-				//exit;
 				break;
 		}
-		echo "sighandler Runner done\n\n";
 	}
 
 	/**
@@ -257,11 +251,11 @@ class Dew_Daemon_Runner {
 		}
 		$this->log("Starting daemon tasks", Zend_Log::DEBUG);
 		foreach ($this->_managers as $manager) {
-//			$manager->setLog($this->_log);
 			$manager->setLog(clone($this->_log));
 			$this->log("Forking manager: "  . get_class($manager), Zend_Log::INFO);
 			$this->_forkManager($manager);
 		}
+		
 		// Default sigHandler
 		$this->log("Setting default sighanler", Zend_Log::DEBUG);
 		$this->_sigHandler = new Dew_Daemon_SignalHandler(
@@ -269,6 +263,9 @@ class Dew_Daemon_Runner {
 			$this->_log,
 			array(&$this, 'sigHandler')
 		);
+		
+		// Write pids to shared memory
+		$this->_shm->setVar('childs', $this->_pidManager->getChilds());
 	
 		// Wait till all childs are done
 	    while (pcntl_waitpid(0, $status) != -1) {
@@ -303,8 +300,10 @@ class Dew_Daemon_Runner {
 
 		} else {
 			// Child
-			$newPid = posix_getpid();
+			$newPid = getmypid();
 			$this->_pidManager->forkChild($newPid);
+			$manager->init($this->_pidManager->getParent());
+//			
 			
 			$this->log('Manager forked (PID: ' . $newPid . ') !!!', Zend_Log::DEBUG);
 			$manager->runManager();
@@ -312,4 +311,43 @@ class Dew_Daemon_Runner {
 		}
 	}
 
+	public static function getStatus() {
+		$pidFile = new Dew_Daemon_Pid_File(TMP_PATH . '/dew_daemon_runnerd.pid');
+		$pid = $pidFile->readPidFile();
+
+		$status = array('pid' => $pid);
+		
+		if (file_exists(TMP_PATH . '/daemon.shm')) {
+			$shm = new Dew_Daemon_SharedMemory('daemon');
+			$shmKeys = $shm->getKeys();
+			$status['memKeys'] = count($shmKeys); 
+			foreach($shm->getKeys() as $key => $value) {
+				$status[$key] = $shm->getVar($key);
+			}
+
+			// Child info
+			if (isset($status['childs'])) {
+				foreach($status['childs'] as $child) {
+					$status['manager-' . $child] = self::getStatusChild($child);
+				}
+			}
+		}
+		
+
+		return $status;
+	}
+	public static function getStatusChild($childPid) {
+		$status = array('childPid' => $childPid);
+		
+		if (file_exists(TMP_PATH . '/manager-' . $childPid . '.shm')) {
+			$shm = new Dew_Daemon_SharedMemory('manager-' . $childPid);
+			$shmKeys = $shm->getKeys();
+			$status['memKeys'] = count($shmKeys); 
+			foreach($shm->getKeys() as $key => $value) {
+				$status[$key] = $shm->getVar($key);
+			}
+		}
+
+		return $status;
+	}
 }
