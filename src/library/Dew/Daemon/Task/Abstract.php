@@ -57,7 +57,7 @@ class Dew_Daemon_Task_Abstract {
 	 * This name of the task, which will be extracted from the class name.
 	 * @var string
 	 */
-	protected $_name = '';
+	protected $_name = null;
 	
 	/**
 	 * 
@@ -84,11 +84,8 @@ class Dew_Daemon_Task_Abstract {
 		}
 		if (is_a($shm, 'Dew_Daemon_SharedMemory')) {
 			$this->_shm = $shm;
-		} else {
-			$this->_shm = new Dew_Daemon_SharedMemory('task-' . getmypid());
 		}
 
-		$this->init();
 	}
 	
 	/**
@@ -101,20 +98,19 @@ class Dew_Daemon_Task_Abstract {
 //		unset($this->_pidManager);
 	}
 
-	/**
-	 * 
-	 * Initializes a task process by registering its name, pid and shared 
-	 * memory segment.
-	 * @param string $name
-	 */
-	public function init($name = null) {
-		if ($name === null) {
-			$name = preg_replace('/^Dew_Daemon_Task_/', '', get_class($this));
-		}
-		$this->_name = $name;
 
+
+	public function getName() {
+		if ($this->_name === null) {
+			$this->_name = preg_replace('/^Dew_Daemon_Task_/', '', get_class($this));
+		}
+		return $this->_name;
 	}
-	
+	public function setName($name) {
+		$this->_name = $name;
+		return $this;
+	}
+
 	/**
 	 * 
 	 * Returns the manager type
@@ -143,7 +139,25 @@ class Dew_Daemon_Task_Abstract {
 		$this->_log = $log;
 		return $this;
 	}
-	
+
+	/**
+	 * 
+	 * Returns the shared memory object
+	 * @return Dew_Daemon_SharedMemory
+	 */
+	public function getShm() {
+		return $this->_shm;
+	}
+
+	/**
+	 * 
+	 * Sets a shared memory object
+	 * @param Dew_Daemon_SharedMemory $shm
+	 */
+	public function setShm(Dew_Daemon_SharedMemory $shm) {
+		$this->_shm = $shm;
+	}
+
 	/**
 	 * 
 	 * Returns the pid manager of the task manager
@@ -193,7 +207,7 @@ class Dew_Daemon_Task_Abstract {
 	 */
 	public function updateMemoryQueue($count) {
 //		$this->_log->log("Sys (" . getmypid() . "): Queue: " . $count, Zend_Log::INFO);
-		$this->_shm->setVar(1, $count);
+		$this->_shm->setVar('count', $count);
 	}
 
 	/**
@@ -207,16 +221,15 @@ class Dew_Daemon_Task_Abstract {
 		if ($progress == 0) {
 			$message = 'Started';
 			$this->_executionTime = mktime();
-			$this->_log->log("Task (" . getmypid() . "): " . $message, Zend_Log::DEBUG);
-		}
-		if ($progress == 100) {
+			$this->_log->log("Task (" . getmypid() . "): " . $message, Zend_Log::INFO);
+		} else if ($progress == 100) {
 			$message = 'Done';
 			$duration = mktime() - $this->_executionTime;
-			$this->_log->log("Task (" . getmypid() . "): " . $message . ' (' . $duration . ' secs)', Zend_Log::DEBUG);
-		} 
-		
-//		$this->_log->log("Task (" . getmypid() . "): " . $message, Zend_Log::INFO);
-		$this->_shm->setVar(getmypid(), $message);	
+			$this->_log->log("Task (" . getmypid() . "): " . $message . ' (' . $duration . ' secs)', Zend_Log::INFO);
+		} else {
+			$this->_log->log("Task (" . getmypid() . "): " . $message, Zend_Log::DEBUG);
+		}
+		$this->_shm->setVar('task-' . getmypid(), $message);	
 	}
 
 }
