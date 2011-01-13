@@ -31,8 +31,6 @@ class Dew_Daemon_Task_Abstract {
 	 */
 	protected $_pidManager = null;
 	
-	
-
 	/**
 	 * The execution time it to process a single task.
 	 * @var int
@@ -93,19 +91,26 @@ class Dew_Daemon_Task_Abstract {
 	 * Clean up objects to free memory.
 	 */
 	public function __destruct() {
-		echo 'Shutting down task: ' . get_class($this) . "\n";
-//		unset($this->_shm);
-//		unset($this->_pidManager);
 	}
 
-
-
+	/**
+	 * 
+	 * Returns the name of the task/manager instance
+	 * @return string
+	 */
 	public function getName() {
 		if ($this->_name === null) {
 			$this->_name = preg_replace('/^Dew_Daemon_Task_/', '', get_class($this));
 		}
 		return $this->_name;
 	}
+	
+	/**
+	 * 
+	 * Sets the name of task/manager instance
+	 * @param string $name
+	 * @return $this
+	 */
 	public function setName($name) {
 		$this->_name = $name;
 		return $this;
@@ -206,7 +211,6 @@ class Dew_Daemon_Task_Abstract {
 	 * @param int $count
 	 */
 	public function updateMemoryQueue($count) {
-//		$this->_log->log("Sys (" . getmypid() . "): Queue: " . $count, Zend_Log::INFO);
 		$this->_shm->setVar('count', $count);
 	}
 
@@ -231,5 +235,4 @@ class Dew_Daemon_Task_Abstract {
 		}
 		$this->_shm->setVar('task-' . getmypid(), $message);	
 	}
-
 }
