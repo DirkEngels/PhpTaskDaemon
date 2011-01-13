@@ -163,20 +163,32 @@ class Dew_Daemon_Command {
 	 * Action: Get daemon status
 	 */
 	public function status() {
-		$pidFile = new Dew_Daemon_Pid_File(TMP_PATH . '/dew_daemon_runnerd.pid');
-		$pid = $pidFile->readPidFile();
-		if ($pid === null) {
+		
+		$status = Dew_Daemon_Runner::getStatus();
+//		echo var_dump($status);
+		if ($status['pid'] === null) {
 			echo "Daemon not running\n";
 			exit;
 		}
-		$shm = new Dew_Daemon_SharedMemory('daemon');
-
-		echo 'Getting status of daemon (PID: ' . $pidFile->readPidFile() . ') !!!' . "\n";
-		foreach($shm->getKeys() as $key) {
-			echo $key . ' => ' . $shm->getVar($key) . "\n";
-		}
 		
-		exit();
+		echo "PhpTaskDaemon - Status\n";
+		echo "==========================\n";
+		echo "\n";
+		if (count($status['childs']) == 0) {
+			echo "No processes!\n";
+		} else {
+			echo "Processes (" . count($status['childs']) . ")\n";
+		
+			foreach ($status['childs'] as $childPid) {
+				$managerData = $status['manager-' . $childPid];
+				foreach ($managerData as $managerDataKey => $managerDataValue) {
+					if (preg_match('/^task-/', $managerDataKey)) {
+						echo "  - " . ucfirst($managerData['name']) . " Task\t\t- " . $managerDataValue . "\n";
+					}
+				}
+			}
+		}
+		return true;
 	}
 	
 	/**
