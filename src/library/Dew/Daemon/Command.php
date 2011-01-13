@@ -165,7 +165,6 @@ class Dew_Daemon_Command {
 	public function status() {
 		
 		$status = Dew_Daemon_Runner::getStatus();
-//		echo var_dump($status);
 		if ($status['pid'] === null) {
 			echo "Daemon not running\n";
 			exit;
@@ -198,30 +197,7 @@ class Dew_Daemon_Command {
 	 */
 	public function monitor() {
 		$out  = "PhpTaskDaemon - Monitoring\n" .
-				"==========================\n" .
-				"System\n";
-		
-echo "
-PhpTaskDaemon - Monitoring
-==========================
-System
-- Memory:			12.42 Mb	Max:	28.32 Mb
-- Load average:			0.03 (1 min) 	0.11 (5 min)	0.54 (15 min)
-
-Processes
-- Sleep Manager	(I)		Queued: 23	Done: 1.234	State: running
-  - Sleep Task			- Running: 70%
-- Sleep2 Manager (I)		Queued: 0	Done: 2.434	State: wait till 14:04:03
-- Sleep Manager (C)		Queued: 0	Done:   574	State: wait till 14:05:05
-- Sleep Manager (G)		Queued: 345	Done: 3.123	State: 1 of 2 workers active
-  - Sleep Worker		- Running: 50%
-  - Sleep Worker		- Waiting for job
-- Sleep Manager (F)		Queue:  10	Done: 9.231	State: 4 of 4 childs active
-  - Sleep Task			- Running: 50%
-  - Sleep Task			- Running: 20%
-  - Sleep Task			- Running: 80%
-  - Sleep Task			- Running: 10%
-";
+				"==========================\n";
 		echo "Function not yet implemented\n";
 	}
 
