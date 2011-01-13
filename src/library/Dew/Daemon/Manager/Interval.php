@@ -24,9 +24,9 @@ class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements
 			$this->_queue = $this->_task->loadTasks();
 
 			if (count($this->_queue)==0) {
-				echo "Queue checked: empty!!!\n";
+				$this->_log->log("Queue checked: empty!!!", Zend_Log::INFO);
 			} else {
-				echo "Queue loaded: " . count($this->_queue) . " elements\n";
+				$this->_log->log("Queue loaded: " . count($this->_queue) . " elements", Zend_Log::INFO);
 	
 				while ($taskInput = array_shift($this->_queue)) {
 					// Set manager input and start the manager
@@ -34,6 +34,8 @@ class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements
 					$this->_task->updateMemoryTask(0);
 					$this->_task->executeTask();
 					$this->_task->updateMemoryTask(100);
+					$this->_task->updateMemoryQueue(count($this->_queue));
+
 					usleep(10);
 				}
 			}
@@ -50,7 +52,7 @@ class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements
 	 */
 	protected function _sleep() {
 		// Sleep
-		echo "Sleeping <interval> for : " . $this->_sleepTime . " micro seconds\n";
+		$this->_log->log("Sleeping <interval> for : " . $this->_sleepTime . " micro seconds", Zend_Log::INFO);
 		sleep($this->_sleepTime);
 	}
 
