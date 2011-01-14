@@ -114,6 +114,26 @@ class Dew_Daemon_Runner {
 
 	/**
 	 * 
+	 * Returns the log object
+	 * @return Zend_Log
+	 */
+	public function getLog() {
+		return $this->_log;
+	}
+
+	/**
+	 * 
+	 * Sets the log object
+	 * @param Zend_Log $log
+	 * @return $this
+	 */
+	public function setLog(Zend_Log $log) {
+		$this->_log = $log;
+		return $this;
+	}
+
+	/**
+	 * 
 	 * Add additional (zend) log writers
 	 */
 	protected function _initLogOutput() {

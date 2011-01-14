@@ -50,7 +50,6 @@ class Dew_Daemon_Command {
 					'config|c-s'	=> 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
 					'logfile|l-s'	=> 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
 					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
-					'single|s'		=> 'Run single tick (default: no) (no gearman workers are started)',
 					'action|a=s'	=> 'Action (default: start) (options: start, stop, restart, status, monitor)',
 					'verbose|v'		=> 'Verbose',
 					'help|h'		=> 'Show help message (this message)',
@@ -120,6 +119,12 @@ class Dew_Daemon_Command {
 		if (!in_array($action, $allActions))  {
 			$this->help();
 			exit;
+		}
+
+		if (!$this->_consoleOpts->getOption('verbose')) {
+			$this->getRunner()
+				->getLog()
+				->addFilter(new Zend_Log_Filter_Priority(Zend_Log::NOTICE));
 		}
 
 		// Perform action
