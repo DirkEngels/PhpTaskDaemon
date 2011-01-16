@@ -4,9 +4,11 @@ TODO
 Base
 ----
 +	Fix auto loader
--	Add locking mechanism (semaphores) for the shared memory object
++	Add locking mechanism (semaphores) for the shared memory object
 -	Refine timing from seconds to millisecond precision.
 -	Change user/group of main daemon
+-	Verbose log levels
+-	Read config/log file arguments
 
 
 Managers
