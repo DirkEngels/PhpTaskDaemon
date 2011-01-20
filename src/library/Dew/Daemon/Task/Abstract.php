@@ -235,4 +235,13 @@ class Dew_Daemon_Task_Abstract {
 		}
 		$this->_shm->setVar('task-' . getmypid(), $message);	
 	}
+	
+	public function triggerGearmanTask($task, $data = array()) {
+		return array();
+	}
+	public function triggerGearmanBackground($task, $data = array()) {
+		return true;
+	}
+	
+	
 }
