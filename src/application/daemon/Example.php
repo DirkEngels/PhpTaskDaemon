@@ -35,12 +35,13 @@ class Dew_Daemon_Task_Example extends Dew_Daemon_Task_Abstract implements Dew_Da
 		$queue = array();
 		if (count($queue)==0) {
 			for ($i=0; $i<rand(0,30); $i++) {
-				array_push($queue, array('taskId' => $i, 'sleepTime' => rand(1000, 500000)));
+				array_push(
+					$queue, 
+					array('taskId' => $i, 'sleepTime' => rand(1000, 500000))
+				);
 			}
-			// Inform the manager about the amount of tasks loaded into the queue
-			$this->updateMemoryQueue(count($queue));
 		}
-
+	
 		return $queue;
 	}
 	
@@ -53,10 +54,10 @@ class Dew_Daemon_Task_Example extends Dew_Daemon_Task_Abstract implements Dew_Da
 		$inputData = $this->getTaskInput();
 		
 		// Sleep
-		$data = substr(md5(uniqid()), 0,10);
+		$randomString = substr(md5(uniqid()), 0,10);
 		for ($i=1; $i<10; $i++) {
 			usleep($inputData['sleepTime']);
-			$this->updateMemoryTask(($i*10), 'Task data: ' . $data);
+			$this->updateMemoryTask(($i*10), 'Task data: ' . $randomString);
 		}
 
 		// Override sleeping time
