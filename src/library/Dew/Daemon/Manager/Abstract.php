@@ -79,18 +79,14 @@ abstract class Dew_Daemon_Manager_Abstract {
 
 	/**
 	 * 
-	 * The pid reader constructor has one optional argument containing a 
-	 * filename.
-	 * @param string $filename
-	 */
-	public function __construct($parentPid = null) {
-//		$this->init($parentPid);
-	}
+	 * Destroy the shared memory object
+	 */	
 	public function __destruct() {
-		echo 'Shutting down manager: ' . get_class($this) . "\n";
-//		$this->_shm->remove();
-		unset($this->_shm);
+		if (isset($this->_shm)) {
+			unset($this->_shm);
+		}
 	}
+
 
 	public function init($parentPid = null) {
 		$this->_pidManager = new Dew_Daemon_Pid_Manager(
@@ -102,6 +98,7 @@ abstract class Dew_Daemon_Manager_Abstract {
 		);
 		$this->_shm->setVar('name', $this->getTask()->getName());
 	}
+	
 	/**
 	 * 
 	 * Returns the current loaded task object.
@@ -246,27 +243,6 @@ abstract class Dew_Daemon_Manager_Abstract {
 		// All OK!
 		return true;
 	}
-	
-	/**
-	 * 
-	 * Displays the status of a running task, which is retreived from the 
-	 * shared memory segments registered by the daemon and its managers.
-	 * @return string
-	 */
-/*
-	public function showStatus() {
-		$out = "[" . $this->_pidManager->getCurrent() . "] " . get_class($this) . " (" . $this->_task->getManagerType() . ") :\n";
-
-		if ($this->_pidManager->hasChilds()) {
-			$childs = $this->_pidManager->getChilds();
-			foreach($childs as $child) {
-//				echo $this->_shm->getVar($child);
-			}
-		}
-		
-		return $out;
-	}
-*/
 
 	/**
 	 * 
@@ -294,7 +270,6 @@ abstract class Dew_Daemon_Manager_Abstract {
 				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
 				break;
 		}
-		echo "sighandler Task done\n\n";
 		exit;
 	}
 	
