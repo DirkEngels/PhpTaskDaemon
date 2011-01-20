@@ -9,6 +9,7 @@ Base
 -	Change user/group of main daemon
 -	Verbose log levels
 -	Read config/log file arguments
+-	Read tasks dir(s) from config file
 
 
 Managers
