@@ -137,13 +137,7 @@ class Dew_Daemon_Runner {
 	 * Add additional (zend) log writers
 	 */
 	protected function _initLogOutput() {
-		// Add writer: verbose
-//		if ($this->_consoleOpts->getOption('verbose')) {
-			$writerVerbose= new Zend_Log_Writer_Stream('php://output');
-			$this->_log->addWriter($writerVerbose);
-			$this->log('Adding log console', Zend_Log::DEBUG);
-//		}
-		
+		// Add writer: verbose		
 		$logFile = $this->_getLogFile();
 		if (!file_exists($logFile)) {
 			touch($logFile);

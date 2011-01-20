@@ -122,11 +122,16 @@ class Dew_Daemon_Command {
 		}
 
 		if (!$this->_consoleOpts->getOption('verbose')) {
-			$this->getRunner()
-				->getLog()
-				->addFilter(new Zend_Log_Filter_Priority(Zend_Log::NOTICE));
+//			$this->getRunner()
+//				->getLog()
+//				->addFilter(new Zend_Log_Filter_Priority(Zend_Log::NOTICE));
 		}
-
+		if ($this->_consoleOpts->getOption('verbose')) {
+			$writerVerbose= new Zend_Log_Writer_Stream('php://output');
+			$this->getRunner()->getLog()->addWriter($writerVerbose);
+			$this->getRunner()->getLog()->log('Adding log console', Zend_Log::DEBUG);
+		}
+		
 		// Perform action
 		$this->$action();
 		exit;
@@ -137,7 +142,7 @@ class Dew_Daemon_Command {
 	 * Action: Start Daemon
 	 */
 	public function start() {
-		$this->getRunner()->start();	
+		$this->getRunner()->start();
 	}
 	
 	/**

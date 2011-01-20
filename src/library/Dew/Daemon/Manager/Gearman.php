@@ -30,7 +30,7 @@ class Dew_Daemon_Manager_Gearman extends Dew_Daemon_Manager_Abstract implements 
 		
 		$name = preg_replace('/Daemon_Manager_/i', '', get_class($this));
 		$gmworker->addFunction($name, array($this, 'acceptJob'));
-
+	
 		while($gmworker->work()) {
 			if ($gmworker->returnCode() != GEARMAN_SUCCESS) {
 				echo "return_code: " . $gmworker->returnCode();
@@ -41,6 +41,5 @@ class Dew_Daemon_Manager_Gearman extends Dew_Daemon_Manager_Abstract implements 
 	}
 	public function acceptJob($gearmanJob) {
 		echo "sdfdsdfs\n";
-	}
-	
+	}	
 }
