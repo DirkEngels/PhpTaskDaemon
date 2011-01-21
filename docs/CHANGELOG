@@ -1,12 +1,17 @@
 Change Log
 ==========
 
+Version 0.2
+-----------
+- simple concept of web interface for monitoring the daemon
+- move files according zend framework structure
+
 Version 0.1.1
 -------------
-- Added this line
++ Added this line
 
 Version 0.1
 -----------
-- understaning and playing with git
++/- understaning and playing with git
 + added initial documentation
 + inital import
