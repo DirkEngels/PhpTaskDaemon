@@ -26,16 +26,8 @@ class Dew_Daemon_Manager_Cron extends Dew_Daemon_Manager_Interval {
 	 * the next sleep time to another function.
 	 */
 	protected function _sleep() {
-		
-		$sleepTime = $this->_getNextTime()-mktime();
-//		echo "Sleepy time:\n";
-//		echo "- Current: " . mktime() . "\n";
-//		echo "- Next: " . $this->_getNextTime() . "\n";
-//		echo "- Wait: " . $sleepTime . "\n";
 
-		// Sleep
-		echo "Sleeping <cron> for : " . $sleepTime . "\n";
-		sleep($sleepTime);
+		time_sleep_until($this->_getNextTime());
 	}
 	
 	protected function _getNextTime() {
@@ -46,12 +38,15 @@ class Dew_Daemon_Manager_Cron extends Dew_Daemon_Manager_Interval {
 		$cron['day'] = ($this->_day !== null) ? $this->_day : date('j');
 		$cron['month'] = ($this->_month !== null) ? $this->_month : date('n');
 		$cron['year'] = ($this->_year !== null) ? $this->_year : date('Y');
-		
+
 		$currentTime = mktime();
-		$nextTime = mktime(
-			$cron['hour'], $cron['minute'], $cron['second'], 
-			$cron['month'], $cron['day'], $cron['year']
-		);
+		$nextTime = 0;
+		while ($currentTime>$nextTime) {
+			$nextTime = mktime(
+				$cron['hour'], $cron['minute'], $cron['second'], 
+				$cron['month'], $cron['day'], $cron['year']
+			);
+		}
 		
 		foreach ($cron as $field => $value) {
 			//echo "CHECK : " . $nextTime . " <=> " . $currentTime . "\n";
