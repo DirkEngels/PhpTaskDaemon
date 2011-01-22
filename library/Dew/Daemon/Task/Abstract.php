@@ -161,6 +161,7 @@ class Dew_Daemon_Task_Abstract {
 	 */
 	public function setShm(Dew_Daemon_SharedMemory $shm) {
 		$this->_shm = $shm;
+		$this->_shm->setVar('type', $this::$_managerType);
 	}
 
 	/**
@@ -210,7 +211,10 @@ class Dew_Daemon_Task_Abstract {
 	 * Updates the shared memory about the queue
 	 * @param int $count
 	 */
-	public function updateMemoryQueue($count) {
+	public function updateMemoryQueue($count, $loaded = null) {
+		if ($loaded !== null) {
+			$this->_shm->setVar('loaded', $count);
+		}
 		$this->_shm->setVar('count', $count);
 	}
 
@@ -221,6 +225,13 @@ class Dew_Daemon_Task_Abstract {
 	 * @param string $message
 	 */
 	public function updateMemoryTask($progress, $message = '') {
+		$this->_shm->setVar('task-' . getmypid() . '-memory', memory_get_usage());
+		$this->_shm->setVar('task-' . getmypid() . '-progress', $progress);	
+		$this->_shm->setVar('task-' . getmypid() . '-message', $message);
+		if ($progress== 100) {
+			$this->_shm->setVar('done', $this->_shm->getVar('done')+1);
+		}
+		
 		$message  .= " " . $progress . "%";
 		if ($progress == 0) {
 			$message = 'Started';
@@ -229,11 +240,11 @@ class Dew_Daemon_Task_Abstract {
 		} else if ($progress == 100) {
 			$message = 'Done';
 			$duration = mktime() - $this->_executionTime;
+			
 			$this->_log->log("Task (" . getmypid() . "): " . $message . ' (' . $duration . ' secs)', Zend_Log::INFO);
 		} else {
 			$this->_log->log("Task (" . getmypid() . "): " . $message, Zend_Log::DEBUG);
 		}
-		$this->_shm->setVar('task-' . getmypid(), $message);	
 	}
 	
 	public function triggerGearmanTask($task, $data = array()) {

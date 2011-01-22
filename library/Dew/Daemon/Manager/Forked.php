@@ -41,22 +41,22 @@ class Dew_Daemon_Manager_Forked extends Dew_Daemon_Manager_Abstract implements D
 		}
 	}	
 	
-protected function _forkTask($taskInput) {
-	// Fork the manager
-	$pid = pcntl_fork();
-	
-	if ($pid == -1) {
-		die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
-	} elseif ($pid) {
-		// The manager waits later
-		$childs++;
-	} else {
-		// Set manager input and start the manager
-		$this->_task->setTaskInput($taskInput);
-		$this->_task->executeTask();
+	protected function _forkTask($taskInput) {
+		// Fork the manager
+		$pid = pcntl_fork();
 		
-		// Exit after finishing the forked
-		exit;
-	}
-} 
+		if ($pid == -1) {
+			die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
+		} elseif ($pid) {
+			// The manager waits later
+			$childs++;
+		} else {
+			// Set manager input and start the manager
+			$this->_task->setTaskInput($taskInput);
+			$this->_task->executeTask();
+			
+			// Exit after finishing the forked
+			exit;
+		}
+	} 
 }
