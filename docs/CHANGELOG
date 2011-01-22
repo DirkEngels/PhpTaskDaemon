@@ -1,10 +1,17 @@
 Change Log
 ==========
 
+Version 0.3
+-----------
+- restructure shared memory variables
+- refactor cron manager
+- boot script (/etc/init.d/phptaskdaemon)
+- cron restart script (for restarting after critical errors)
+
 Version 0.2
 -----------
-- simple concept of web interface for monitoring the daemon
-- move files according zend framework structure
++ simple concept of web interface for monitoring the daemon
++ move files according zend framework structure
 
 Version 0.1.1
 -------------
