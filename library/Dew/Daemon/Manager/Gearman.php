@@ -23,8 +23,13 @@ class Dew_Daemon_Manager_Gearman extends Dew_Daemon_Manager_Abstract implements 
 	 */
 	protected $_gearmanJob = null;
 	
+	public function __construct() {
+		parent::__construct();
+	}
 
 	public function executeManager() {
+		$this->_task->updateMemoryTask(0);
+		
 		$gmworker= new GearmanWorker();
 		$gmworker->addServer();
 		
@@ -40,6 +45,15 @@ class Dew_Daemon_Manager_Gearman extends Dew_Daemon_Manager_Abstract implements 
 				
 	}
 	public function acceptJob($gearmanJob) {
-		echo "sdfdsdfs\n";
+		$this->_task->setTaskInput($gearmanJob->workload());
+		$this->_task->updateMemoryTask(0);
+
+		$ret = $this->_task->executeTask();
+
+		$this->_task->updateMemoryTask(100);
+		usleep(10);
+		$this->_task->updateMemoryTask(0);
+		
+		return $ret;
 	}	
 }
