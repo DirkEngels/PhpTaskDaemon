@@ -1,5 +1,5 @@
-PlugWeb
-=======
+PhpTaskDaemon
+=============
 
 * PhpTaskDaemon Introduction
 * Installation
@@ -55,7 +55,7 @@ Startup on boot
 
 Restart by cron
 * Add a crontab job:  
-	* * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action start
+	* * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action keeprunning
 
 Optional: Web Monitor 
 * Edit the file (doc/files/apache.conf) to your needs 
@@ -89,7 +89,7 @@ PHP API Example:
 
 Contact Information
 -------------------
-For more info about the PlugWeb application see the website:
+For more info about the PhpTaskDAemonapplication see the website:
 
 GitHub:		https://github.com/DirkEngels/PhpTaskDaemon
 Blog:		http://blog.dirkengels.com/category/phptaskdaemon/
