@@ -26,8 +26,11 @@ class Dew_Daemon_Manager_Cron extends Dew_Daemon_Manager_Interval {
 	 * the next sleep time to another function.
 	 */
 	protected function _sleep() {
-
-		time_sleep_until($this->_getNextTime());
+		$sleepTime = $this->_getNextTime();
+		if ($sleepTime == -1) {
+			$sleepTime = 300;
+		}
+		time_sleep_until($sleepTime);
 	}
 	
 	protected function _getNextTime() {
@@ -41,54 +44,23 @@ class Dew_Daemon_Manager_Cron extends Dew_Daemon_Manager_Interval {
 
 		$currentTime = mktime();
 		$nextTime = 0;
-		while ($currentTime>$nextTime) {
+		$durations = array(
+			'second' => 1, 'minute' => 60, 'hour' => 3600,
+			'day' => 86400, 
+		);
+		foreach ($durations as $type => $duration) {
 			$nextTime = mktime(
 				$cron['hour'], $cron['minute'], $cron['second'], 
 				$cron['month'], $cron['day'], $cron['year']
 			);
-		}
-		
-		foreach ($cron as $field => $value) {
-			//echo "CHECK : " . $nextTime . " <=> " . $currentTime . "\n";
-			if ($nextTime > $currentTime) {
-				$newTime = $nextTime;
-			} else {
-//				echo "CheckingField: " . $field . "\n";
-				switch($field) {
-					case 'second':
-						$nextTime++;
-						break;
-					case 'minute':
-						$nextTime += 60;
-						break;
-					case 'hour':
-						$nextTime += 3600;
-						break;
-					case 'day':
-						$nextTime = mktime(
-							$cron['hour'], $cron['minute'], $cron['second'], 
-							$cron['month'], $cron['day']+1, $cron['year']
-						);
-						break;
-					case 'month':
-						$nextTime = mktime(
-							$cron['hour'], $cron['minute'], $cron['second'], 
-							$cron['month']+1, $cron['day'], $cron['year']
-						);
-						break;
-					case 'year':
-						$nextTime = mktime(
-							$cron['hour'], $cron['minute'], $cron['second'], 
-							$cron['month'], $cron['day'], $cron['year']+1
-						);
-						break;
-					default:
-						break;
-				}
+			$nextTime += $durations[$type];
+
+			if ($nextTime>$currentTime) {
+				return $nextTime;
 			}
 		}
-		
-		return $newTime;
+		// Finished running!
+		return -1;
 	}
 
 }
