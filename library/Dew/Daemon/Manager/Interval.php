@@ -20,7 +20,7 @@ class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements
 		while (true) {
 			// Load Tasks in Queue
 			$this->_queue = $this->_task->loadTasks();
-			$this->_task->updateMemoryQueue(count($this->_queue));
+			$this->_task->updateMemoryQueue(count($this->_queue), count($this->_queue));
 	
 			if (count($this->_queue)==0) {
 				$this->_log->log("Queue checked: empty!!!", Zend_Log::INFO);
@@ -34,8 +34,8 @@ class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements
 					$this->_task->executeTask();
 					$this->_task->updateMemoryTask(100);
 					$this->_task->updateMemoryQueue(count($this->_queue));
-	
 					usleep(10);
+					$this->_task->updateMemoryTask(0);
 				}
 			}
 			

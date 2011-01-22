@@ -13,35 +13,22 @@
  * executing its tasks is at a random interval. 
  *
  */
-class Dew_Daemon_Task_Example2 extends Dew_Daemon_Task_Abstract implements Dew_Daemon_Task_Interface {
+class Dew_Daemon_Task_Example3 extends Dew_Daemon_Task_Abstract implements Dew_Daemon_Task_Interface {
 
-	static protected $_managerType = Dew_Daemon_Manager_Abstract::PROCESS_TYPE_INTERVAL;
+	static protected $_managerType = Dew_Daemon_Manager_Abstract::PROCESS_TYPE_GEARMAN;
 	
 	/** 
 	 * Task input variables: These items must be present in the task
 	 * input data in order to execute the task.
 	 */
 	protected $_inputFields = array('taskId', 'sleepTime');
-	
+
 	/**
-	 * Loads the task queue: The input for one or more tasks. The input of a 
-	 * sleep task must contain the following items:	
-	 * - taskId
-	 * - sleepTime
-	 * 
-	 * @see Dew_Daemon_Task::loadTaskQueue()
+	 * Dummy methods
+	 * @see Dew_Daemon_Task_Interface::loadTasks()
 	 */
 	public function loadTasks() {
-		$queue = array();
-		if (count($queue)==0) {
-			for ($i=0; $i<rand(0,20); $i++) {
-				array_push($queue, array('taskId' => $i, 'sleepTime' => rand(10000, 500000)));
-			}
-			// Inform the manager about the amount of tasks loaded into the queue
-			$this->updateMemoryQueue(count($queue));
-		}
-
-		return $queue;
+		return array();
 	}
 	
 	/**
@@ -54,9 +41,9 @@ class Dew_Daemon_Task_Example2 extends Dew_Daemon_Task_Abstract implements Dew_D
 		
 		// Sleep
 		$data = substr(md5(uniqid()), 0,10);
-		for ($i=1; $i<5; $i++) {
+		for ($i=1; $i<10; $i++) {
 			usleep($inputData['sleepTime']);
-			$this->updateMemoryTask(($i*20), 'Task data: ' . $data);
+			$this->updateMemoryTask(($i*10), 'Task data: ' . $data);
 		}
 
 		// Override sleeping time
