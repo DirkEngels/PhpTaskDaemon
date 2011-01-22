@@ -8,11 +8,34 @@ defined('APPLICATION_PATH')
 defined('APPLICATION_ENV')
     || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
 
-// Ensure library/ is on include_path
-set_include_path(implode(PATH_SEPARATOR, array(
-    realpath(APPLICATION_PATH . '/../library'),
+// Set include paths
+define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
+//define('APPLICATION_PATH', realpath(PROJECT_ROOT .'/application'));
+define('LIBRARY_PATH', realpath(PROJECT_ROOT .'/library'));
+define('TMP_PATH', realpath(PROJECT_ROOT .'/../tmp'));
+
+// Include Paths
+$includePaths = array(
     get_include_path(),
-)));
+    LIBRARY_PATH, 
+    '/usr/share/php/libzend-framework-php/'
+);
+set_include_path(
+    implode(
+        PATH_SEPARATOR,
+        $includePaths
+    )
+);
+
+// Custom Autoloader
+function autoload($className) {
+	foreach($GLOBALS['includePaths'] as $path) {
+    	if (file_exists($path . '/' . str_replace('_','/',$className) . '.php')) {
+    		include_once($path . '/' . str_replace('_','/',$className) . '.php');
+    	}
+    }
+}
+spl_autoload_register('autoload');
 
 /** Zend_Application */
 require_once 'Zend/Application.php';
