@@ -37,7 +37,7 @@ class Dew_Daemon_Task_Example extends Dew_Daemon_Task_Abstract implements Dew_Da
 			for ($i=0; $i<rand(0,30); $i++) {
 				array_push(
 					$queue, 
-					array('taskId' => $i, 'sleepTime' => rand(1000, 500000))
+					array('taskId' => $i, 'sleepTime' => rand(100000, 500000))
 				);
 			}
 		}

@@ -15,7 +15,7 @@
  */
 class Dew_Daemon_Task_Example2 extends Dew_Daemon_Task_Abstract implements Dew_Daemon_Task_Interface {
 
-	static protected $_managerType = Dew_Daemon_Manager_Abstract::PROCESS_TYPE_INTERVAL;
+	static protected $_managerType = Dew_Daemon_Manager_Abstract::PROCESS_TYPE_CRON;
 	
 	/** 
 	 * Task input variables: These items must be present in the task
