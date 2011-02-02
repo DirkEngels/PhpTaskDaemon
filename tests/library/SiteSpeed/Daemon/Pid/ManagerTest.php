@@ -1,6 +1,6 @@
 <?php
 
-class Dew_Daemon_Pid_ManagerTest extends PHPUnit_Framework_Testcase {
+class SiteSpeed_Daemon_Pid_ManagerTest extends PHPUnit_Framework_Testcase {
 	protected $_manager;
 	
 	protected function setUp() {
@@ -9,7 +9,7 @@ class Dew_Daemon_Pid_ManagerTest extends PHPUnit_Framework_Testcase {
 	}
 	
 	public function testConstructorNoArguments() {
-		$this->_manager = new Dew_Daemon_Pid_Manager();
+		$this->_manager = new \SiteSpeed\Daemon\Pid\Manager();
 		$this->assertEquals(null, $this->_manager->getCurrent());
 		$this->assertEquals(null, $this->_manager->getParent());
 		$this->assertEquals(false, $this->_manager->hasChilds());
@@ -17,14 +17,14 @@ class Dew_Daemon_Pid_ManagerTest extends PHPUnit_Framework_Testcase {
 	}
 	
 	public function testConstructorOneArgument() {
-		$this->_manager = new Dew_Daemon_Pid_Manager(12);
+		$this->_manager = new \SiteSpeed\Daemon\Pid\Manager(12);
 		$this->assertEquals(12, $this->_manager->getCurrent());
 		$this->assertEquals(null, $this->_manager->getParent());
 		$this->assertEquals(false, $this->_manager->hasChilds());
 		$this->assertEquals(0, sizeof($this->_manager->getChilds()));
 	}
 	public function testConstructorTwoArgument() {
-		$this->_manager = new Dew_Daemon_Pid_Manager(12, 23);
+		$this->_manager = new \SiteSpeed\Daemon\Pid\Manager(12, 23);
 		$this->assertEquals(12, $this->_manager->getCurrent());
 		$this->assertEquals(23, $this->_manager->getParent());
 		$this->assertEquals(false, $this->_manager->hasChilds());
@@ -32,14 +32,14 @@ class Dew_Daemon_Pid_ManagerTest extends PHPUnit_Framework_Testcase {
 	}
 	
 	public function testAddChildOneItem() {
-		$this->_manager = new Dew_Daemon_Pid_Manager();
+		$this->_manager = new \SiteSpeed\Daemon\Pid\Manager();
 		$this->_manager->addChild(34);
 		$this->assertEquals(true, $this->_manager->hasChilds());
 		$this->assertEquals(1, sizeof($this->_manager->getChilds()));
 		$this->assertEquals(serialize(array(34)), serialize($this->_manager->getChilds()));
 	}
 	public function testAddChildThreeItems() {
-		$this->_manager = new Dew_Daemon_Pid_Manager();
+		$this->_manager = new \SiteSpeed\Daemon\Pid\Manager();
 		$this->_manager->addChild(34);
 		$this->_manager->addChild(56);
 		$this->_manager->addChild(78);
