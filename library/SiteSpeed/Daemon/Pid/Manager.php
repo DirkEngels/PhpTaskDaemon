@@ -1,18 +1,22 @@
 <?php
 
 /**
- * @author DirkEngels
- * @package Dew
- * @subpackage Dew_Daemon
+ * @package SiteSpeed
+ * @subpackage Daemon\Pid
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
+namespace SiteSpeed\Daemon\Pid;
+
 /**
- * This Dew_Daemon_Pid_Manager object manages process ID's of the current, 
+ * This SiteSpeed Daemon Pid Manager object manages process ID's of the current, 
  * parent and child processes. When forking processes, the forkChild() method
  * of this class can be called to shift the current pid to parent and empty
  * any child pids.
  */
-class Dew_Daemon_Pid_Manager {
+class Manager {
 
 	/**
 	 * This variables stores the current process ID.
