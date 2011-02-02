@@ -1,15 +1,22 @@
 <?php
 
 /**
+ * @package SiteSpeed
+ * @subpackage Daemon\Manager
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ */
+
+namespace SiteSpeed\Daemon\Manager;
+
+/**
  * 
  * This class represents a manager which runs periodically based on a preset 
  * interval in cron.  
  * 
- * 
- * @author DirkEngels <d.engels@dirkengels.com> 
- * 
  */
-class Dew_Daemon_Manager_Cron extends Dew_Daemon_Manager_Interval {
+class Cron extends Interval {
 	
 	protected $_second = 1;
 	protected $_minute = null;

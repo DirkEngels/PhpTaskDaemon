@@ -1,14 +1,22 @@
 <?php
 
 /**
+ * @package SiteSpeed
+ * @subpackage Daemon\Manager
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ */
+
+namespace SiteSpeed\Daemon\Manager;
+
+/**
  * 
  * This class represents a manager which can have multiple instances running in
  * parallel.
  * 
- * @author DirkEngels 
- * 
  */
-class Dew_Daemon_Manager_Forked extends Dew_Daemon_Manager_Abstract implements Dew_Daemon_Manager_Interface {
+class Forked extends AbstractClass implements InterfaceClass {
 	
 	protected $_sleepTime = 3;
 	

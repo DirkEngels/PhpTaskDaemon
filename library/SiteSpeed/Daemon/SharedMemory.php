@@ -1,11 +1,13 @@
 <?php
 /**
- * @package Dew
+ * @package SiteSpeed
  * @subpackage Daemon
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+
+namespace SiteSpeed\Daemon;
 
 /**
  * 
@@ -13,7 +15,7 @@
  * memory segments. The keys of the shared memory variables are stored in an
  * array.
  */
-class Dew_Daemon_SharedMemory {
+class SharedMemory {
 	/**
 	 * This variable contains the identifier string.
 	 * @var string|null

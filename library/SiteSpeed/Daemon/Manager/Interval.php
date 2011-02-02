@@ -1,15 +1,22 @@
 <?php
 
 /**
+ * @package SiteSpeed
+ * @subpackage Daemon\Manager
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ */
+
+namespace SiteSpeed\Daemon\Manager;
+
+/**
  * 
  * This class represents a manager which runs periodically based on a preset 
  * interval.  
  * 
- * 
- * @author DirkEngels <d.engels@dirkengels.com> 
- * 
  */
-class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements Dew_Daemon_Manager_Interface {
+class Interval extends AbstractClass implements InterfaceClass {
 	protected $_sleepTime = 5;
 	
 	/**
@@ -23,9 +30,9 @@ class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements
 			$this->_task->updateMemoryQueue(count($this->_queue), count($this->_queue));
 	
 			if (count($this->_queue)==0) {
-				$this->_log->log("Queue checked: empty!!!", Zend_Log::INFO);
+				$this->_log->log("Queue checked: empty!!!", \Zend_Log::INFO);
 			} else {
-				$this->_log->log("Queue loaded: " . count($this->_queue) . " elements", Zend_Log::INFO);
+				$this->_log->log("Queue loaded: " . count($this->_queue) . " elements", \Zend_Log::INFO);
 	
 				while ($taskInput = array_shift($this->_queue)) {
 					// Set manager input and start the manager
@@ -51,7 +58,7 @@ class Dew_Daemon_Manager_Interval extends Dew_Daemon_Manager_Abstract implements
 	 */
 	protected function _sleep() {
 		// Sleep
-		$this->_log->log("Sleeping <interval> for : " . $this->_sleepTime . " micro seconds", Zend_Log::INFO);
+		$this->_log->log("Sleeping <interval> for : " . $this->_sleepTime . " micro seconds", \Zend_Log::INFO);
 		sleep($this->_sleepTime);
 	}
 
