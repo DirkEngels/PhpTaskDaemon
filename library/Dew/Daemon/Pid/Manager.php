@@ -44,7 +44,7 @@ class Dew_Daemon_Pid_Manager {
 			$this->_current = $pid;
 		}
 		if ($parent !== null) {
-			$this->_current = $pid;
+			$this->_parent = $parent;
 		}
 	}
 	
