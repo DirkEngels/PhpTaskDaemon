@@ -328,7 +328,7 @@ class Runner {
 	}
 
 	public static function getStatus() {
-		$pidFile = new \SiteSpeed\Daemon\Pid\File(TMP_PATH . '/dew_daemon_runnerd.pid');
+		$pidFile = new \SiteSpeed\Daemon\Pid\File(TMP_PATH . '/sitespeed-daemon-runnerd.pid');
 		$pid = $pidFile->readPidFile();
 
 		$status = array('pid' => $pid);
