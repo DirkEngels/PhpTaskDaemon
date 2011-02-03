@@ -33,10 +33,13 @@
 		<td width="400"><b>Description</b></td>
 	</tr>
 	<?php foreach ($this->status['childs'] as $childPid): ?>
+	<tr>
+		<td colspan="5">&nbsp;</td>
+	</tr>
 	<tr bgcolor="eeeeee">
 		<td><?php echo $this->escape($this->status['manager-' . $childPid]['childPid']) ?></td>
 		<td><?php echo $this->escape(ucfirst($this->status['manager-' . $childPid]['type'])) ?></td>
-		<td><?php echo $this->escape(ucfirst($this->status['manager-' . $childPid]['name'])) ?></td>
+		<td>Manager (<?php echo $this->escape(ucfirst(str_replace('SiteSpeed\\Daemon\\Task\\', '', $this->status['manager-' . $childPid]['name']))) ?>)</td>
 		<td>
 			<?php
 				$queueProgress = round((($this->status['manager-' . $childPid]['loaded']-$this->status['manager-' . $childPid]['count']) / $this->status['manager-' . $childPid]['loaded'])*100); 
@@ -53,11 +56,16 @@
 		<td><?php echo $this->escape($this->status['manager-' . $childPid]['childPid']) ?></td>
 		<td><?php echo $this->escape($this->status['manager-' . $childPid]['task-' . $childPid . '-memory']) ?></td>
 		<td>Task</td>
-		<td>
-			<img src="/images/progress2.gif" height="15" width="<?php echo $this->escape($this->status['manager-' . $childPid]['task-' . $childPid . '-progress']*2) ?>" />
-			<?php echo $this->escape($this->status['manager-' . $childPid]['task-' . $childPid . '-progress']) ?>%
-		</td>
-		<td><?php echo $this->escape($this->status['manager-' . $childPid]['task-' . $childPid . '-message']) ?></td>
+		<?php if (isset($this->status['manager-' . $childPid]['task-' . $childPid . '-message'])): ?>
+			<td>
+				<img src="/images/progress2.gif" height="15" width="<?php echo $this->escape($this->status['manager-' . $childPid]['task-' . $childPid . '-progress']*2) ?>" />
+				<?php echo $this->escape($this->status['manager-' . $childPid]['task-' . $childPid . '-progress']) ?>%
+			</td>
+			<td><?php echo $this->escape($this->status['manager-' . $childPid]['task-' . $childPid . '-message']) ?></td>
+		<?php else :?>
+			<td></td>
+			<td></td>
+		<?php endif; ?>
 	</tr>
 	<?php endforeach; ?>
 	</table>
