@@ -1,13 +1,16 @@
 Change Log
 ==========
 
-Version 0.3
------------
-- namespaces
-- restructure shared memory variables
+Version 0.4
+===========
 - refactor cron manager
 - boot script (/etc/init.d/phptaskdaemon)
 - cron restart script (for restarting after critical errors)
+
+Version 0.3
+-----------
++ namespaces
++ restructure shared memory variables
 
 Version 0.2
 -----------
