@@ -7,6 +7,8 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
+namespace SiteSpeed\Daemon;
+
 /**
 * The main Daemon class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon runner options.
@@ -15,14 +17,14 @@
 * the uid/gui of the process. After that the runner instance starts all the 
 * managers.
 */
-class Dew_Daemon_Command {
+class Command {
 
 	protected $_consoleOpts;					// Zend_Console_GetOpt instance
 	
 	/**
 	 * 
 	 * Daemon run object
-	 * @var Dew_Daemon_Runner
+	 * @var Runner
 	 */
 	protected $_runner;
 
@@ -31,7 +33,7 @@ class Dew_Daemon_Command {
 	 * Daemon constructor method
 	 * @param Zend_Console_Getopt $consoleOpts
 	 */
-	public function __construct(Dew_Daemon_Runner $runner = null) {
+	public function __construct(Runner $runner = null) {
 		// Initialize command line arguments
 		$this->setRunner($runner);
 		$this->setConsoleOpts();
@@ -45,7 +47,7 @@ class Dew_Daemon_Command {
 	public function getConsoleOpts() {
 		// Initialize default console options
 		if (is_null($this->_consoleOpts)) {
-			$this->_consoleOpts = new Zend_Console_Getopt(
+			$this->_consoleOpts = new \Zend_Console_Getopt(
 				array(
 					'config|c-s'	=> 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
 					'logfile|l-s'	=> 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
@@ -85,11 +87,11 @@ class Dew_Daemon_Command {
 	/**
 	 * 
 	 * Returns the daemon runner object
-	 * @return Dew_Daemon_Runnerner
+	 * @return Runner
 	 */
 	public function getRunner() {
 		if ($this->_runner === null) {
-			$this->_runner = new Dew_Daemon_Runner();
+			$this->_runner = new Runner();
 		}
 		return $this->_runner;
 	}
@@ -97,7 +99,7 @@ class Dew_Daemon_Command {
 	/**
 	 * 
 	 * Sets a daemon runner object
-	 * @param Dew_Daemon_Runnerner $runner
+	 * @param Runner $runner
 	 * @return $this
 	 */
 	public function setRunner($runner) {
@@ -124,12 +126,12 @@ class Dew_Daemon_Command {
 		if (!$this->_consoleOpts->getOption('verbose')) {
 //			$this->getRunner()
 //				->getLog()
-//				->addFilter(new Zend_Log_Filter_Priority(Zend_Log::NOTICE));
+//				->addFilter(new Zend_Log_Filter_Priority(\Zend_Log::NOTICE));
 		}
 		if ($this->_consoleOpts->getOption('verbose')) {
-			$writerVerbose= new Zend_Log_Writer_Stream('php://output');
+			$writerVerbose= new \Zend_Log_Writer_Stream('php://output');
 			$this->getRunner()->getLog()->addWriter($writerVerbose);
-			$this->getRunner()->getLog()->log('Adding log console', Zend_Log::DEBUG);
+			$this->getRunner()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
 		}
 		
 		// Perform action
@@ -174,7 +176,7 @@ class Dew_Daemon_Command {
 	 */
 	public function status() {
 		
-		$status = Dew_Daemon_Runner::getStatus();
+		$status = Runner::getStatus();
 		if ($status['pid'] === null) {
 			echo "Daemon not running\n";
 			exit;

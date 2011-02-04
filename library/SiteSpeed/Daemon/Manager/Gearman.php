@@ -1,13 +1,23 @@
 <?php
 
 /**
+ * @package SiteSpeed
+ * @subpackage Daemon\Manager
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ */
+
+namespace SiteSpeed\Daemon\Manager;
+
+/**
  * 
  * This class represents a manager which runs as a gearman job.
  * 
  * @author DirkEngels <d.engels@dirkengels.com> 
  * 
  */
-class Dew_Daemon_Manager_Gearman extends Dew_Daemon_Manager_Abstract implements Dew_Daemon_Manager_Interface {
+class Gearman extends AbstractClass implements InterfaceClass {
 	
 	/**
 	 * Run as job async. Do not wait for the result.

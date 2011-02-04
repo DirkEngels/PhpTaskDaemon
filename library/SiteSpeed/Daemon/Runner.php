@@ -1,11 +1,13 @@
 <?php
 /**
- * @package Dew
+ * @package SiteSpeed
  * @subpackage Daemon
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+
+namespace SiteSpeed\Daemon;
 
 /**
  * 
@@ -13,22 +15,22 @@
  * for each task manager.
  *
  */
-class Dew_Daemon_Runner {
+class Runner {
 	/**
 	 * This variable contains pid manager object
-	 * @var Dew_Daemon_Pid_Manager $_pidManager
+	 * @var Manager $_pidManager
 	 */
 	protected $_pidManager = null;
 	
 	/**
 	 * Pid reader object
-	 * @var Dew_Daemon_Pid_File $_pidFile
+	 * @var File $_pidFile
 	 */
 	protected $_pidFile = null;
 	
 	/**
 	 * Shared memory object
-	 * @var Dew_Daemon_SharedMemory $_shm
+	 * @var SharedMemory $_shm
 	 */
 	protected $_shm = null;
 	
@@ -51,11 +53,11 @@ class Dew_Daemon_Runner {
 	 * @param int $parent
 	 */
 	public function __construct($parent = null) {
-		$pidFile = TMP_PATH . '/' . strtolower(get_class($this)) . 'd.pid';
-		$this->_pidManager = new Dew_Daemon_Pid_Manager(getmypid(), $parent);
-		$this->_pidFile = new Dew_Daemon_Pid_File($pidFile);
+		$pidFile = \TMP_PATH . '/' . strtolower(str_replace('\\', '-', get_class($this))) . 'd.pid';
+		$this->_pidManager = new \SiteSpeed\Daemon\Pid\Manager(getmypid(), $parent);
+		$this->_pidFile = new \SiteSpeed\Daemon\Pid\File($pidFile);
 		
-		$this->_shm = new Dew_Daemon_SharedMemory('daemon');
+		$this->_shm = new \SiteSpeed\Daemon\SharedMemory('daemon');
 		$this->_shm->setVar('state', 'running');
 		
 		$this->_initLogSetup();
@@ -79,7 +81,7 @@ class Dew_Daemon_Runner {
 	 * @param string $message
 	 * @param int $logLevel
 	 */
-	public function log($message, $logLevel = Zend_Log::DEBUG) {
+	public function log($message, $logLevel = \Zend_Log::DEBUG) {
 		$this->_log->log('(' . getmypid() . ') ' . $message, $logLevel);
 	}
 
@@ -103,10 +105,10 @@ class Dew_Daemon_Runner {
 	 */
 	protected function _initLogSetup(Zend_Log $log = null) {
 		if (is_null($log)) {
-			$log = new Zend_Log();
+			$log = new \Zend_Log();
 		}
 
-		$writerNull = new Zend_Log_Writer_Null;
+		$writerNull = new \Zend_Log_Writer_Null;
 		$log->addWriter($writerNull);
 		
 		$this->_log = $log;
@@ -143,33 +145,33 @@ class Dew_Daemon_Runner {
 			touch($logFile);
 		}
 		
-		$writerFile = new Zend_Log_Writer_Stream($logFile);
+		$writerFile = new \Zend_Log_Writer_Stream($logFile);
 		$this->_log->addWriter($writerFile);
-		$this->log('Adding log file: ' . $logFile, Zend_Log::DEBUG);
+		$this->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
 	}
 
 
 	/**
 	 * 
 	 * Adds a manager object to the managers stack
-	 * @param Dew_Daemon_Manager_Abstract $manager
+	 * @param Manager\AbstractClass $manager
 	 */
-	public function addManager(Dew_Daemon_Manager_Abstract $manager) {
+	public function addManager(Manager\AbstractClass $manager) {
 		return array_push($this->_managers, $manager);
 	}
 
 	/**
 	 * 
 	 * Creates a manager based on the task definition and adds it to the stack.
-	 * @param Dew_Daemon_Task_Abstract $task
+	 * @param Task\AbstractClass $task
 	 */
-	public function addManagerByTask(Dew_Daemon_Task_Abstract $task) {
+	public function addManagerByTask(Task\AbstractClass $task) {
 		$managerType = $task::getManagerType();
-		$managerClass = 'Dew_Daemon_Manager_' . $managerType;
+		$managerClass = 'Manager\\' . $managerType;
 		if (class_exists($managerClass)) {
 			$manager = new $managerClass();
 		} else {
-			$manager = new Dew_Daemon_Manager_Interval();
+			$manager = new \SiteSpeed\Daemon\Manager\Interval();
 		}
 		
 		$manager->setTask($task);
@@ -184,10 +186,10 @@ class Dew_Daemon_Runner {
 	 * @param string $dir
 	 */
 	public function scanTaskDirectory($dir) {
-		$this->log("Scanning directory for tasks: " . $dir, Zend_Log::DEBUG);
+		$this->log("Scanning directory for tasks: " . $dir, \Zend_Log::DEBUG);
 
 		if (!is_dir($dir)) {
-			throw new Exception('Directory does not exists');
+			throw new \Exception('Directory does not exists');
 		}
 
 		$files = scandir($dir);
@@ -195,10 +197,10 @@ class Dew_Daemon_Runner {
 		foreach($files as $file) {
 			if (preg_match('/(.*)+\.php$/', $file, $match)) {
 				require_once($dir . '/' . $file);
-				$taskClass = substr(get_class($this), 0, -7) . '_Task_' . preg_replace('/\.php$/', '', $file);
-				$this->log("Checking task: " . $taskClass, Zend_Log::DEBUG);
+				$taskClass = substr(get_class($this), 0, -7) . '\\Task\\' . preg_replace('/\.php$/', '', $file);
+				$this->log("Checking task: " . $taskClass, \Zend_Log::DEBUG);
 				if (class_exists($taskClass)) {
-					$this->log("Adding task: " . $taskClass . ' (' . $taskClass::getManagerType() . ')', Zend_Log::INFO);
+					$this->log("Adding task: " . $taskClass . ' (' . $taskClass::getManagerType() . ')', \Zend_Log::INFO);
 					$task = new $taskClass();
 					$this->addManagerByTask($task);
 					$countLoadedObjects++;
@@ -233,20 +235,20 @@ class Dew_Daemon_Runner {
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
-				$this->log('Application (DAEMON) received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
+				$this->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
 				exit;
 				break;
 			case SIGCHLD:
 				// Halt
-				$this->log('Application (DAEMON) received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
+				$this->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
 				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
 				break;
 			case SIGINT:
 				// Shutdown
-				$this->log('Application (DAEMON) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
+				$this->log('Application (DAEMON) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
 				break;
 			default:
-				$this->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
+				$this->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
 				break;
 		}
 	}
@@ -260,19 +262,19 @@ class Dew_Daemon_Runner {
 		declare(ticks = 1);
 
 		if (count($this->_managers)==0) {
-			$this->log("No daemon tasks found", Zend_Log::INFO);
+			$this->log("No daemon tasks found", \Zend_Log::INFO);
 			exit;
 		}
-		$this->log("Starting daemon tasks", Zend_Log::DEBUG);
+		$this->log("Starting daemon tasks", \Zend_Log::DEBUG);
 		foreach ($this->_managers as $manager) {
 			$manager->setLog(clone($this->_log));
-			$this->log("Forking manager: "  . get_class($manager), Zend_Log::INFO);
+			$this->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
 			$this->_forkManager($manager);
 		}
 		
 		// Default sigHandler
-		$this->log("Setting default sighanler", Zend_Log::DEBUG);
-		$this->_sigHandler = new Dew_Daemon_SignalHandler(
+		$this->log("Setting default sighanler", \Zend_Log::DEBUG);
+		$this->_sigHandler = new SignalHandler(
 			'Main Daemon',
 			$this->_log,
 			array(&$this, 'sigHandler')
@@ -286,7 +288,7 @@ class Dew_Daemon_Runner {
         	$status = pcntl_wexitstatus($status);
         	$this->log("Child $status completed");
     	}
-		$this->log("Running done.", Zend_Log::NOTICE);
+		$this->log("Running done.", \Zend_Log::NOTICE);
 
 		$this->_pidFile->unlinkPidFile();
 		$this->_shm->remove();
@@ -305,7 +307,7 @@ class Dew_Daemon_Runner {
 		$pid = pcntl_fork();
 		if ($pid === -1) {
 			// Error
-			$this->log('Managers could not be forked!!!', Zend_Log::CRIT);
+			$this->log('Managers could not be forked!!!', \Zend_Log::CRIT);
 			return false;
 
 		} elseif ($pid) {
@@ -319,20 +321,20 @@ class Dew_Daemon_Runner {
 			$manager->init($this->_pidManager->getParent());
 //			
 			
-			$this->log('Manager forked (PID: ' . $newPid . ') !!!', Zend_Log::DEBUG);
+			$this->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
 			$manager->runManager();
 			exit;
 		}
 	}
 
 	public static function getStatus() {
-		$pidFile = new Dew_Daemon_Pid_File(TMP_PATH . '/dew_daemon_runnerd.pid');
+		$pidFile = new \SiteSpeed\Daemon\Pid\File(TMP_PATH . '/sitespeed-daemon-runnerd.pid');
 		$pid = $pidFile->readPidFile();
 
 		$status = array('pid' => $pid);
 		
 		if (file_exists(TMP_PATH . '/daemon.shm')) {
-			$shm = new Dew_Daemon_SharedMemory('daemon');
+			$shm = new \SiteSpeed\Daemon\SharedMemory('daemon');
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
@@ -354,7 +356,7 @@ class Dew_Daemon_Runner {
 		$status = array('childPid' => $childPid);
 		
 		if (file_exists(TMP_PATH . '/manager-' . $childPid . '.shm')) {
-			$shm = new Dew_Daemon_SharedMemory('manager-' . $childPid);
+			$shm = new \SiteSpeed\Daemon\SharedMemory('manager-' . $childPid);
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {

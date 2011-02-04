@@ -1,18 +1,22 @@
 <?php
 
 /**
- * @author DirkEngels
- * @package Dew
- * @subpackage Dew_Daemon
+ * @package SiteSpeed
+ * @subpackage Daemon\Pid
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
+namespace SiteSpeed\Daemon\Pid;
+
 /**
- * This Dew_Daemon_Pid_File object is responsible for reading and writing the
- * process ID to a file. Currently only the main daemon and it's managers use
- * this class to store the process IDs to disk. The task do not write a pid to
- * disk.
+ * This SiteSpeed Daemon Pid File object is responsible for reading and writing
+ * the process ID to a file. Currently only the main daemon and it's managers
+ * use this class to store the process IDs to disk. The task do not write a pid
+ * to disk.
  */
-class Dew_Daemon_Pid_File {
+class File {
 
 	/**
 	 * The location of the pidfile. This is only used by the main and its 

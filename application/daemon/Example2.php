@@ -1,9 +1,14 @@
 <?php
 /**
- * @author DirkEngels <d.engels@dirkengels.com>
- * @package Dew
- * @subpackage Dew_Daemon
+ * @package SiteSpeed
+ * @subpackage Daemon\Task
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+
+namespace SiteSpeed\Daemon\Task;
+use \SiteSpeed\Daemon\Manager as Manager;
 
 /**
  * 
@@ -13,9 +18,9 @@
  * executing its tasks is at a random interval. 
  *
  */
-class Dew_Daemon_Task_Example2 extends Dew_Daemon_Task_Abstract implements Dew_Daemon_Task_Interface {
+class Example2 extends AbstractClass implements InterfaceClass {
 
-	static protected $_managerType = Dew_Daemon_Manager_Abstract::PROCESS_TYPE_CRON;
+	static protected $_managerType = Manager\AbstractClass::PROCESS_TYPE_CRON;
 	
 	/** 
 	 * Task input variables: These items must be present in the task

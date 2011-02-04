@@ -1,5 +1,7 @@
 <?php
 
+namespace SiteSpeed\Daemon\Manager;
+
 /**
  * 
  * This is the abstract class of a Daemon_Manager. It provides the basic 
@@ -8,7 +10,7 @@
  * @author DirkEngels <d.engels@dirkengels.com>
  *
  */
-abstract class Dew_Daemon_Manager_Abstract {
+abstract class AbstractClass {
 
 	/** 
 	 * 
@@ -52,14 +54,14 @@ abstract class Dew_Daemon_Manager_Abstract {
 	 * 
 	 * Pid manager object. This class is repsonsible for storing the current, 
 	 * parent and child process IDs.
-	 * @var Dew_Daemon_Pid_Manager
+	 * @var \SiteSpeed\Daemon\Pid\Manager
 	 */
 	protected $_pidManager = null;
 
 	/**
 	 * 
 	 * Shared memory object
-	 * @var Dew_Daemon_Shm
+	 * @var \SiteSpeed\Daemon\SharedMemory
 	 */
 	protected $_shm = null;
 	
@@ -89,11 +91,11 @@ abstract class Dew_Daemon_Manager_Abstract {
 
 
 	public function init($parentPid = null) {
-		$this->_pidManager = new Dew_Daemon_Pid_Manager(
+		$this->_pidManager = new \SiteSpeed\Daemon\Pid\Manager(
 			getmypid(), 
 			$parentPid
 		);
-		$this->_shm= new Dew_Daemon_SharedMemory(
+		$this->_shm= new \SiteSpeed\Daemon\SharedMemory(
 			'manager-' . $this->_pidManager->getCurrent()
 		);
 		$this->_shm->setVar('name', $this->getTask()->getName());
@@ -102,7 +104,7 @@ abstract class Dew_Daemon_Manager_Abstract {
 	/**
 	 * 
 	 * Returns the current loaded task object.
-	 * @return Dew_Daemon_Task_Abstract
+	 * @return \SiteSpeed\Daemon\Task\AbstractClass
 	 */
 	public function getTask() {
 		return $this->_task;
@@ -111,11 +113,11 @@ abstract class Dew_Daemon_Manager_Abstract {
 	/**
 	 * 
 	 * Sets the current task object to run.
-	 * @param Dew_Daemon_Task_Abstract $task
+	 * @param \SiteSpeed\Daemon\Task\AbstractClass $task
 	 * @return $this
 	 */
 	public function setTask($task) {
-		if (is_a($task, 'Dew_Daemon_Task_Abstract')) {
+		if (is_a($task, '\SiteSpeed\Daemon\Task\AbstractClass')) {
 			$this->_task = $task;
 		}
 		return $this;
@@ -136,7 +138,7 @@ abstract class Dew_Daemon_Manager_Abstract {
 	 * @param Zend_Log $log
 	 * @return $this
 	 */
-	public function setLog(Zend_Log $log) {
+	public function setLog(\Zend_Log $log) {
 		$this->_log = $log;
 		return $this;
 	}
@@ -144,7 +146,7 @@ abstract class Dew_Daemon_Manager_Abstract {
 	/**
 	 * 
 	 * Returns the pid manager of the task manager
-	 * @return Dew_Daemon_Pid_Manager
+	 * @return \SiteSpeed\Daemon\Pid\Manager
 	 */
 	public function getPidManager() {
 		return $this->_pidManager;
@@ -153,10 +155,10 @@ abstract class Dew_Daemon_Manager_Abstract {
 	/**
 	 * 
 	 * Sets the pid manager of the task manager
-	 * @param Dew_Daemon_Pid_Manager $pidManager
+	 * @param \SiteSpeed\Daemon\Pid\Manager $pidManager
 	 * @return $this
 	 */
-	public function setPidManager(Dew_Daemon_Pid_Manager $pidManager) {
+	public function setPidManager(\SiteSpeed\Daemon\Pid\Manager $pidManager) {
 		$this->_pidManager = $pidManager;
 		return $this;
 	}
@@ -203,7 +205,7 @@ abstract class Dew_Daemon_Manager_Abstract {
 
 	public function runManager() {
 		// Override signal handler
-		$this->_sigHandler = new Dew_Daemon_SignalHandler(
+		$this->_sigHandler = new \SiteSpeed\Daemon\SignalHandler(
 			get_class($this),
 			$this->_log, 
 			array(&$this, 'sigHandler')
@@ -216,7 +218,7 @@ abstract class Dew_Daemon_Manager_Abstract {
 			$this->getTask()->setPidManager($this->_pidManager);
 		}
 		$this->getTask()->setShm(
-			new Dew_Daemon_SharedMemory(
+			new \SiteSpeed\Daemon\SharedMemory(
 				'manager-' . $this->_pidManager->getCurrent()
 			)
 		);
@@ -253,21 +255,21 @@ abstract class Dew_Daemon_Manager_Abstract {
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
-				$this->_log->log('Application (TASK) received SIGTERM signal (shutting down)', Zend_Log::DEBUG);
+				$this->_log->log('Application (TASK) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
 				break;
 			case SIGCHLD:
 				// Halt
-				$this->_log->log('Application (TASK) received SIGCHLD signal (halting)', Zend_Log::DEBUG);		
+				$this->_log->log('Application (TASK) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
 				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
 				break;
 			case SIGINT:
 				// Shutdown
-				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', Zend_Log::DEBUG);
+				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
 				$this->_shm->remove();
 //				exit;
 				break;
 			default:
-				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', Zend_Log::DEBUG);
+				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
 				break;
 		}
 		exit;

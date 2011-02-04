@@ -1,20 +1,22 @@
 <?php
 /**
- * @package Dew
+ * @package SiteSpeed
  * @subpackage Daemon
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
+namespace SiteSpeed\Daemon;
+
 /**
-* The Dew_Daemon_Signals object can be encapsulated by other classes to 
+* The SiteSpeed Daemon Signals object can be encapsulated by other classes to 
 * enable posix signal handlers. These are needed for triggering the cleaning up
 * the daemon, managers and possible active tasks when receiving a posix signal.
 * A callback can be provided to run a method related to the current process. 
 * 
 */
-class Dew_Daemon_SignalHandler {
+class SignalHandler {
 
 	/**
 	 * Task identifier

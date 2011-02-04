@@ -11,7 +11,7 @@ class StatusController extends Zend_Controller_Action
     public function indexAction()
     {
         // action body
-        $daemon = new Dew_Daemon_Runner();
+        $daemon = new \SiteSpeed\Daemon\Runner();
         $this->view->status = $daemon->getStatus();
         
         $this->view->gearmanclient = false;
