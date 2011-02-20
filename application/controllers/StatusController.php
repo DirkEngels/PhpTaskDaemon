@@ -20,7 +20,7 @@ class StatusController extends Zend_Controller_Action
         	
 			$gmclient= new GearmanClient();
 			$gmclient->addServer();
-			$job_handle = $gmclient->doBackground("Dew_Example", "badieblasdasd");
+			$job_handle = $gmclient->doBackground("SiteSpeed_Example", "badieblasdasd");
 
         }
     }
