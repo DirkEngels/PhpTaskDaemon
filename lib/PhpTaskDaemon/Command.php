@@ -7,7 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace SiteSpeed\Daemon;
+namespace PhpTaskDaemon;
 
 /**
 * The main Daemon class is responsible for starting, stopping and monitoring

@@ -1,6 +1,6 @@
 <?php
 
-namespace SiteSpeed\Daemon\Manager;
+namespace PhpTaskDaemon\Manager;
 
 /**
  * 
@@ -54,14 +54,14 @@ abstract class AbstractClass {
 	 * 
 	 * Pid manager object. This class is repsonsible for storing the current, 
 	 * parent and child process IDs.
-	 * @var \SiteSpeed\Daemon\Pid\Manager
+	 * @var \PhpTaskDaemon\Pid\Manager
 	 */
 	protected $_pidManager = null;
 
 	/**
 	 * 
 	 * Shared memory object
-	 * @var \SiteSpeed\Daemon\SharedMemory
+	 * @var \PhpTaskDaemon\SharedMemory
 	 */
 	protected $_shm = null;
 	
@@ -91,11 +91,11 @@ abstract class AbstractClass {
 
 
 	public function init($parentPid = null) {
-		$this->_pidManager = new \SiteSpeed\Daemon\Pid\Manager(
+		$this->_pidManager = new \PhpTaskDaemon\Pid\Manager(
 			getmypid(), 
 			$parentPid
 		);
-		$this->_shm= new \SiteSpeed\Daemon\SharedMemory(
+		$this->_shm= new \PhpTaskDaemon\SharedMemory(
 			'manager-' . $this->_pidManager->getCurrent()
 		);
 		$this->_shm->setVar('name', $this->getTask()->getName());
@@ -104,7 +104,7 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Returns the current loaded task object.
-	 * @return \SiteSpeed\Daemon\Task\AbstractClass
+	 * @return \PhpTaskDaemon\Task\AbstractClass
 	 */
 	public function getTask() {
 		return $this->_task;
@@ -113,11 +113,11 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Sets the current task object to run.
-	 * @param \SiteSpeed\Daemon\Task\AbstractClass $task
+	 * @param \PhpTaskDaemon\Task\AbstractClass $task
 	 * @return $this
 	 */
 	public function setTask($task) {
-		if (is_a($task, '\SiteSpeed\Daemon\Task\AbstractClass')) {
+		if (is_a($task, '\PhpTaskDaemon\Task\AbstractClass')) {
 			$this->_task = $task;
 		}
 		return $this;
@@ -146,7 +146,7 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Returns the pid manager of the task manager
-	 * @return \SiteSpeed\Daemon\Pid\Manager
+	 * @return \PhpTaskDaemon\Pid\Manager
 	 */
 	public function getPidManager() {
 		return $this->_pidManager;
@@ -155,10 +155,10 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Sets the pid manager of the task manager
-	 * @param \SiteSpeed\Daemon\Pid\Manager $pidManager
+	 * @param \PhpTaskDaemon\Pid\Manager $pidManager
 	 * @return $this
 	 */
-	public function setPidManager(\SiteSpeed\Daemon\Pid\Manager $pidManager) {
+	public function setPidManager(\PhpTaskDaemon\Pid\Manager $pidManager) {
 		$this->_pidManager = $pidManager;
 		return $this;
 	}
@@ -205,7 +205,7 @@ abstract class AbstractClass {
 
 	public function runManager() {
 		// Override signal handler
-		$this->_sigHandler = new \SiteSpeed\Daemon\SignalHandler(
+		$this->_sigHandler = new \PhpTaskDaemon\SignalHandler(
 			get_class($this),
 			$this->_log, 
 			array(&$this, 'sigHandler')
@@ -218,7 +218,7 @@ abstract class AbstractClass {
 			$this->getTask()->setPidManager($this->_pidManager);
 		}
 		$this->getTask()->setShm(
-			new \SiteSpeed\Daemon\SharedMemory(
+			new \PhpTaskDaemon\SharedMemory(
 				'manager-' . $this->_pidManager->getCurrent()
 			)
 		);
