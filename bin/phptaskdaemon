@@ -36,5 +36,5 @@ spl_autoload_register('autoload');
 
 
 // Start the application
-$daemon = new \SiteSpeed\Daemon\Command();
+$daemon = new \PhpTaskDaemon\Command();
 $daemon->run();

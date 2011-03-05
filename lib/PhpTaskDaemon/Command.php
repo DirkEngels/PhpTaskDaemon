@@ -18,8 +18,12 @@ namespace PhpTaskDaemon;
 * managers.
 */
 class Command {
-
-	protected $_consoleOpts;					// Zend_Console_GetOpt instance
+	
+	/**
+	 * Console options object
+	 * @var Zend_Console_Getopt
+	 */
+	protected $_consoleOpts;
 	
 	/**
 	 * 
