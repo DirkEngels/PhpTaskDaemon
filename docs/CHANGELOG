@@ -1,14 +1,20 @@
 Change Log
 ==========
 
+Verison 0.5
+-----------
+- read and use configuration file
+
 Version 0.4
-===========
+-----------
++ move web status to seperate project
 - refactor cron manager
 - boot script (/etc/init.d/phptaskdaemon)
 - cron restart script (for restarting after critical errors)
+- implement verbose logging
 
 Version 0.3
------------
+===========
 + namespaces
 + restructure shared memory variables
 
