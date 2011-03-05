@@ -8,6 +8,7 @@ Verison 0.5
 Version 0.4
 -----------
 + move web status to seperate project
+- apply unix file system hierarchy standard
 - refactor cron manager
 - boot script (/etc/init.d/phptaskdaemon)
 - cron restart script (for restarting after critical errors)
