@@ -24,14 +24,21 @@ class Gearman extends AbstractClass implements InterfaceClass {
 	 * 
 	 * @var boolean
 	 */
-	protected $_async = false;
+	protected $_gearmanAsync = false;
+
+	/**
+	 * The amount of workers for running multiple workers in parallel. The
+	 * Gearman Manager uses the Forked Manager in order to fork multiple
+	 * processes. 
+	 */
+	protected $_gearmanForks = 1;
 
 	/**
 	 * Gearman Job object
 	 * 
 	 * @var GearmanJob
 	 */
-	protected $_gearmanJob = null;
+	private $_gearmanJob = null;
 	
 	public function __construct() {
 		parent::__construct();
