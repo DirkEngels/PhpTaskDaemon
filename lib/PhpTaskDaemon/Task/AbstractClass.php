@@ -6,7 +6,7 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace SiteSpeed\Daemon\Task;
+namespace PhpTaskDaemon\Task;
 
 /**
  *
@@ -23,14 +23,14 @@ class AbstractClass {
 	 * This variable needs to contain one of the defined manager types.
 	 * @var string
 	 */
-	static protected $_managerType = \SiteSpeed\Daemon\Manager\AbstractClass::PROCESS_TYPE_INTERVAL;
+	static protected $_managerType = \PhpTaskDaemon\Manager\AbstractClass::PROCESS_TYPE_INTERVAL;
 
 
 	/**
 	 *
 	 * Pid manager object. This class is repsonsible for storing the current,
 	 * parent and child process IDs.
-	 * @var SiteSpeed\Daemon\Pid\Manager
+	 * @var PhpTaskDaemon\Pid\Manager
 	 */
 	protected $_pidManager = null;
 
@@ -73,17 +73,17 @@ class AbstractClass {
 	 * Constructor with optional arguments to provide a logger, pidManager
 	 * and/or shared memory object.
 	 * @param \Zend_Log $log
-	 * @param \SiteSpeed\Daemon\Pid\Manager $pidManager
-	 * @param \SiteSpeed\Daemon\SharedMemory $shm
+	 * @param \PhpTaskDaemon\Pid\Manager $pidManager
+	 * @param \PhpTaskDaemon\SharedMemory $shm
 	 */
 	public function __construct($log = null, $pidManager = null, $shm = null) {
 		if (is_a($log, '\Zend_Log')) {
 			$this->setLog($log);
 		}
-		if (is_a($pidManager, '\SiteSpeed\Daemon\Pid\Manager')) {
+		if (is_a($pidManager, '\PhpTaskDaemon\Pid\Manager')) {
 			$this->setPidManager($pidManager);
 		}
-		if (is_a($shm, '\SiteSpeed\Daemon\SharedMemory')) {
+		if (is_a($shm, '\PhpTaskDaemon\SharedMemory')) {
 			$this->_shm = $shm;
 		}
 
@@ -151,7 +151,7 @@ class AbstractClass {
 	/**
 	 *
 	 * Returns the shared memory object
-	 * @return SiteSpeed\Daemon\SharedMemory
+	 * @return PhpTaskDaemon\SharedMemory
 	 */
 	public function getShm() {
 		return $this->_shm;
@@ -160,9 +160,9 @@ class AbstractClass {
 	/**
 	 *
 	 * Sets a shared memory object
-	 * @param \SiteSpeed\Daemon\SharedMemory $shm
+	 * @param \PhpTaskDaemon\SharedMemory $shm
 	 */
-	public function setShm(\SiteSpeed\Daemon\SharedMemory $shm) {
+	public function setShm(\PhpTaskDaemon\SharedMemory $shm) {
 		$this->_shm = $shm;
 		$this->_shm->setVar('type', $this::$_managerType);
 	}
@@ -170,7 +170,7 @@ class AbstractClass {
 	/**
 	 *
 	 * Returns the pid manager of the task manager
-	 * @return \SiteSpeed\Daemon\Pid\Manager
+	 * @return \PhpTaskDaemon\Pid\Manager
 	 */
 	public function getPidManager() {
 		return $this->_pidManager;
@@ -179,10 +179,10 @@ class AbstractClass {
 	/**
 	 *
 	 * Sets the pid manager of the task manager
-	 * @param \SiteSpeed\Daemon\Pid\Manager $pidManager
+	 * @param \PhpTaskDaemon\Pid\Manager $pidManager
 	 * @return $this
 	 */
-	public function setPidManager(\SiteSpeed\Daemon\Pid\Manager $pidManager) {
+	public function setPidManager(\PhpTaskDaemon\Pid\Manager $pidManager) {
 		$this->_pidManager = $pidManager;
 		return $this;
 	}

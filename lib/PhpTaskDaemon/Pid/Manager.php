@@ -8,7 +8,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace SiteSpeed\Daemon\Pid;
+namespace PhpTaskDaemon\Pid;
 
 /**
  * This SiteSpeed Daemon Pid Manager object manages process ID's of the current, 

@@ -7,7 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace SiteSpeed\Daemon;
+namespace PhpTaskDaemon;
 
 /**
  * 
@@ -54,10 +54,10 @@ class Runner {
 	 */
 	public function __construct($parent = null) {
 		$pidFile = \TMP_PATH . '/' . strtolower(str_replace('\\', '-', get_class($this))) . 'd.pid';
-		$this->_pidManager = new \SiteSpeed\Daemon\Pid\Manager(getmypid(), $parent);
-		$this->_pidFile = new \SiteSpeed\Daemon\Pid\File($pidFile);
+		$this->_pidManager = new \PhpTaskDaemon\Pid\Manager(getmypid(), $parent);
+		$this->_pidFile = new \PhpTaskDaemon\Pid\File($pidFile);
 		
-		$this->_shm = new \SiteSpeed\Daemon\SharedMemory('daemon');
+		$this->_shm = new \PhpTaskDaemon\SharedMemory('daemon');
 		$this->_shm->setVar('state', 'running');
 		
 		$this->_initLogSetup();
@@ -171,7 +171,7 @@ class Runner {
 		if (class_exists($managerClass)) {
 			$manager = new $managerClass();
 		} else {
-			$manager = new \SiteSpeed\Daemon\Manager\Interval();
+			$manager = new \PhpTaskDaemon\Manager\Interval();
 		}
 		
 		$manager->setTask($task);
@@ -328,13 +328,13 @@ class Runner {
 	}
 
 	public static function getStatus() {
-		$pidFile = new \SiteSpeed\Daemon\Pid\File(TMP_PATH . '/sitespeed-daemon-runnerd.pid');
+		$pidFile = new \PhpTaskDaemon\Pid\File(TMP_PATH . '/sitespeed-daemon-runnerd.pid');
 		$pid = $pidFile->readPidFile();
 
 		$status = array('pid' => $pid);
 		
 		if (file_exists(TMP_PATH . '/daemon.shm')) {
-			$shm = new \SiteSpeed\Daemon\SharedMemory('daemon');
+			$shm = new \PhpTaskDaemon\SharedMemory('daemon');
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
@@ -356,7 +356,7 @@ class Runner {
 		$status = array('childPid' => $childPid);
 		
 		if (file_exists(TMP_PATH . '/manager-' . $childPid . '.shm')) {
-			$shm = new \SiteSpeed\Daemon\SharedMemory('manager-' . $childPid);
+			$shm = new \PhpTaskDaemon\SharedMemory('manager-' . $childPid);
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
