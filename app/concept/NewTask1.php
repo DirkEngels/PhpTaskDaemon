@@ -13,6 +13,15 @@ use \PhpTaskDaemon\Executor as Executor;
 
 /**
  * 
+ * The NewTask1 definition
+ *
+ */
+class Task extends Task\AbstractClass implements Task\InterfaceClass {
+	
+}
+
+/**
+ * 
  * The NewTask1 Queue loads the queue for each time a task is checked for
  * execution.
  *
