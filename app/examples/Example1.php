@@ -18,7 +18,7 @@ use \SiteSpeed\Daemon\Manager as Manager;
  * executing its tasks is at a random interval. 
  *
  */
-class Example extends AbstractClass implements InterfaceClass {
+class Example1 extends AbstractClass implements InterfaceClass {
 
 	static protected $_managerType = Manager\AbstractClass::PROCESS_TYPE_INTERVAL;
 	
