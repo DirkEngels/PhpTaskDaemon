@@ -1,16 +1,16 @@
 <?php
 /**
- * @package SiteSpeed
- * @subpackage Daemon\Task
+ * @package App
+ * @subpackage Concept\NewTask2
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace App\Tmp;
-use \PhpTaskDaemon\Task as Task;
+namespace App\Concept\NewTask2;
+use \PhpTaskDaemon\Executor as Executor;
 
-class Executor extends Task\AbstractClass implements Task\InterfaceClass {
+class Executor extends Excutor\AbstractClass implements Executor\InterfaceClass {
 	/**
 	 * Execute the task: Sleeps for a little while.
 	 * 
