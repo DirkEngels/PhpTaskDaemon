@@ -2,15 +2,19 @@
 
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Executor
+ * @subpackage Job
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Executor;
+namespace PhpTaskDaemon\Job;
 
 interface InterfaceClass {
-	
-	public function run();
+    
+    public function getJobId();
+    public function setJobId($jobId);
+    public function getInputVar($key);
+    public function setInputVar($key, $value);
+    public function checkInput();
 
 }

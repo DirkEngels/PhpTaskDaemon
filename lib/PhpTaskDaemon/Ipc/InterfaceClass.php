@@ -7,10 +7,14 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Executor;
+namespace PhpTaskDaemon\Ipc;
 
 interface InterfaceClass {
-	
-	public function run();
+	protected $_keys = array();
 
+	public function get();
+	public function getVar();
+	public function setVar();
+	public function removeVar();
+	public function remove();
 }

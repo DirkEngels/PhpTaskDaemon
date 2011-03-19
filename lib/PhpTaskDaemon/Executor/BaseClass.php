@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package PhpTaskDaemon
  * @subpackage Task\Executor
@@ -9,8 +8,9 @@
  */
 namespace PhpTaskDaemon\Executor;
 
-interface InterfaceClass {
+class BaseClass extends AbstractClass implements InterfaceClass {
 	
-	public function run();
-
+	public function run() {
+		
+	}
 }

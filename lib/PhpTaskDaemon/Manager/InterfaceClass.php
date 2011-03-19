@@ -16,5 +16,5 @@ namespace PhpTaskDaemon\Manager;
  * 
  */
 interface InterfaceClass {
-	public function executeManager();
+	public function execute();
 }
