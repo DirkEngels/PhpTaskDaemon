@@ -1,8 +1,18 @@
 <?php
 
+/**
+ * @package SiteSpeed
+ * @subpackage Daemon\Pid
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ * @group PhpTaskDaemon_Pid
+ */
+
+
 namespace PhpTaskDaemon\Pid;
 
-class ManagerTest extends PHPUnit_Framework_Testcase {
+class ManagerTest extends \PHPUnit_Framework_Testcase {
 	protected $_manager;
 	
 	protected function setUp() {

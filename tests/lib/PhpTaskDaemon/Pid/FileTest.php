@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * @package SiteSpeed
+ * @subpackage Daemon\Pid
+ * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ * @group PhpTaskDaemon_Pid
+ */
+
 namespace PhpTaskDaemon\Pid;
 
-class FileTest extends PHPUnit_Framework_Testcase {
+class FileTest extends \PHPUnit_Framework_Testcase {
 	protected $_file;
 	
 	protected function setUp() {
@@ -12,11 +21,11 @@ class FileTest extends PHPUnit_Framework_Testcase {
 	
 	public function testConstructorNoArguments() {
 		$this->_file = new \PhpTaskDaemon\Pid\File();
-		$this->assertEquals('/daemon.pid', $this->_file->getFilename());
+		$this->assertEquals(\TMP_PATH . '/daemon.pid', $this->_file->getFilename());
 	}
 	public function testConstructorWithFileArgument() {
 		$this->_file = new \PhpTaskDaemon\Pid\File('henk.pid');
-		$this->assertEquals('henk.pid', $this->_file->getFilename());
+		$this->assertEquals(\TMP_PATH . '/henk.pid', $this->_file->getFilename());
 	}
 	
 }
