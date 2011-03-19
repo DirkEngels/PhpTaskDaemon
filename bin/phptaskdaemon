@@ -3,8 +3,8 @@
 
 // Set include paths
 define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
-define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/application'));
-define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/library'));
+define('TASKDIR_PATH', realpath(\PROJECT_ROOT .'/tasks'));
+define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/lib'));
 define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
 
 // Include Paths
@@ -36,5 +36,5 @@ spl_autoload_register('autoload');
 
 
 // Start the application
-$daemon = new \PhpTaskDaemon\Command();
+$daemon = new \PhpTaskDaemon\Core\Command();
 $daemon->run();
