@@ -97,7 +97,18 @@ class SharedMemory {
 		
 		return $keys;
 	}
-	
+
+	/**
+	 * 
+	 * Checks if a given key is already set within the shared memory keys.
+	 * @param unknown_type $key
+	 * @return bool
+	 */
+	public function hasKey($key) {
+		$keys = $this->getKeys();
+		return in_array($key, $keys);
+	}
+
 	/**
 	 * 
 	 * Returns the value of a registered shared variable or false if it does 

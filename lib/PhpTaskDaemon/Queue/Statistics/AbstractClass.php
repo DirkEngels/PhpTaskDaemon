@@ -11,15 +11,37 @@ namespace PhpTaskDaemon\Queue\Statistics;
 
 abstract class AbstractClass {
 	protected $_statistics = array();
+	protected $_sharedMemory;
 	
 	const STATUS_DONE = 'Done';
 	const STATUS_FAILED = 'Failed';
 
-	public function __construct() {
+	public function __construct(\PhpTaskDaemon\SharedMemory $sharedMemory = null) {
+		$this->setSharedMemory($sharedMemory);
 		$this->_initializeStatus(self::STATUS_DONE);
 		$this->_initializeStatus(self::STATUS_FAILED);
 	}
 
+	/**
+	 *
+	 * Returns the shared memory object
+	 * @return PhpTaskDaemon\SharedMemory
+	 */
+	public function getSharedMemory() {
+		return $this->_sharedMemory;
+	}
+
+	/**
+	 *
+	 * Sets a shared memory object
+	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
+	 * @return $this
+	 */
+	public function setSharedMemory(\PhpTaskDaemon\SharedMemory $sharedMemory) {
+		$this->_sharedMemory = $sharedMemory;
+		return $this;
+	}
+	
 	/**
 	 * Returns an array with the number of executed tasks grouped per status.
 	 * 
@@ -27,7 +49,7 @@ abstract class AbstractClass {
 	 * @return array
 	 */
     public function get($status = null) {
-    	if ($status != null) {
+    	if ($this->_sharedMemory->hasKey($status)) {
     		$this->_initializeStatus($status);
     		return $this->_statistics[$status];
     	}
@@ -42,8 +64,11 @@ abstract class AbstractClass {
 	 */
     public function increment($status = self::STATUS_DONE) {
     	$this->_initializeStatus($status);
-    	$this->_statistics[$status]++;
-    	return $this->_statistics[$status];
+    	// Update shared memory key +1
+    	$this->_sharedMemory->setVar(
+    		$status,
+    		$this->_sharedMemory->getVar($status)
+    	);
     }
     
     /**
@@ -53,10 +78,12 @@ abstract class AbstractClass {
      * @return bool
      */
     private function _initializeStatus($status) {
-    	if (isset($this->_statistics[$status])) {
-			$this->_statistics[$status] = 0;
-			return true;
-		}
-		return false;
-    }
+
+    	if (!$this->_sharedMemory->hasKey($status)) {
+    		$this->_sharedMemory->setVar($status, 0);
+    		return true;
+    	}
+    	return false;
+	}
+    
 }
