@@ -16,6 +16,9 @@ namespace PhpTaskDaemon\Manager;
  * interval.  
  * 
  */
+
+use PocTask\Job;
+
 class Interval extends AbstractClass implements InterfaceClass {
 	protected $_sleepTime = 5;
 	
@@ -23,26 +26,27 @@ class Interval extends AbstractClass implements InterfaceClass {
 	 * Loads the queue and executes all tasks 
 	 *
 	 */
-	public function executeManager() {
-		while (true) {
+	public function execute() {
+		while (true) {			
 			// Load Tasks in Queue
-			$this->_queue = $this->_task->loadTasks();
-			$this->_task->updateMemoryQueue(count($this->_queue), count($this->_queue));
+			$jobs = $this->getQueue()->load();
 	
-			if (count($this->_queue)==0) {
-				$this->_log->log("Queue checked: empty!!!", \Zend_Log::INFO);
+			if (count($jobs)==0) {
+				$this->log("Queue checked: empty!!!", \Zend_Log::INFO);
 			} else {
-				$this->_log->log("Queue loaded: " . count($this->_queue) . " elements", \Zend_Log::INFO);
+				$this->log("Queue loaded: " . count($this->getQueue()) . " elements", \Zend_Log::INFO);
 	
-				while ($taskInput = array_shift($this->_queue)) {
+				while ($job = array_shift($jobs)) {
 					// Set manager input and start the manager
-					$this->_task->setTaskInput($taskInput);
-					$this->_task->updateMemoryTask(0);
-					$this->_task->executeTask();
-					$this->_task->updateMemoryTask(100);
-					$this->_task->updateMemoryQueue(count($this->_queue));
+					$executor = new \PhpTaskDaemon\Executor\BaseClass($job);
+					$executor->updateStatus(0);
+					$retVal = $executor->run(); 
+					$executor->updateStatus(100);
+
 					usleep(10);
-					$this->_task->updateMemoryTask(0);
+					$status = ($retVal==1) ? 'Done' : 'Failed';
+					$this->getQueue()->updateStatistics($status);
+					$executor->updateStatus(0);
 				}
 			}
 			
@@ -58,7 +62,7 @@ class Interval extends AbstractClass implements InterfaceClass {
 	 */
 	protected function _sleep() {
 		// Sleep
-		$this->_log->log("Sleeping <interval> for : " . $this->_sleepTime . " micro seconds", \Zend_Log::INFO);
+		$this->log("Sleeping <interval> for : " . $this->_sleepTime . " micro seconds", \Zend_Log::INFO);
 		sleep($this->_sleepTime);
 	}
 

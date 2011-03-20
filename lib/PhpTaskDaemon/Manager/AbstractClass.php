@@ -38,12 +38,6 @@ abstract class AbstractClass {
 	const PROCESS_TYPE_FORKED = 'forked';
 
 	/**
-	 * Task object
-	 * @var Dew_Daemon_Task_Abstract
-	 */
-	protected $_task = null;	
-	
-	/**
 	 * 
 	 * The log file object
 	 * @var Zend_Log
@@ -66,10 +60,10 @@ abstract class AbstractClass {
 	protected $_shm = null;
 	
 	/**
-	 * Manager Queue
-	 * @var array
+	 * Queue object
+	 * @var Dew_Daemon_Queue_AbstractClass
 	 */
-	protected $_queue = array();
+	protected $_queue = null;
 	
 	/**
 	 * Time to wait in milliseconds before the next run.
@@ -78,6 +72,10 @@ abstract class AbstractClass {
 	 */
 	protected $_waitTime = 10;
 
+
+	public function __construct($queue = null) {
+		$this->setQueue($queue);
+	}
 
 	/**
 	 * 
@@ -99,28 +97,6 @@ abstract class AbstractClass {
 			'manager-' . $this->_pidManager->getCurrent()
 		);
 		$this->_shm->setVar('name', $this->getTask()->getName());
-	}
-	
-	/**
-	 * 
-	 * Returns the current loaded task object.
-	 * @return \PhpTaskDaemon\Task\AbstractClass
-	 */
-	public function getTask() {
-		return $this->_task;
-	}
-
-	/**
-	 * 
-	 * Sets the current task object to run.
-	 * @param \PhpTaskDaemon\Task\AbstractClass $task
-	 * @return $this
-	 */
-	public function setTask($task) {
-		if (is_a($task, '\PhpTaskDaemon\Task\AbstractClass')) {
-			$this->_task = $task;
-		}
-		return $this;
 	}
 
 	/**
@@ -184,23 +160,33 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Returns the current loaded queue array
-	 * @return array
+	 * @return \PhpTaskDaemon\Queue\AbstractClass
 	 */
 	public function getQueue() {
 		return $this->_queue;
 	}
-	
+
 	/**
 	 * 
 	 * Sets the current queue to process.
-	 * @param array $queue
+	 * @param \PhpTaskDaemon\Queue\AbstractClass $queue
 	 * @return $this
 	 */
 	public function setQueue($queue) {
-		if (is_array($queue)) {
-			$this->_queue = $queue;
+		if (!is_a($queue, '\PhpTaskDaemon\Queue\AbstractClass')) {
+			$queue = new \PhpTaskDaemon\Queue\BaseClass();
 		}
+		$this->_queue = $queue;
+
 		return $this;
+	}
+
+	public function log($message, $level = \Zend_Log::INFO) {
+		echo $message . "\n";
+		if (is_a($this->_log, 'Zend_Log')) {
+			return $this->_log->log($message, $level);
+		}
+		return false;
 	}
 
 	public function runManager() {
@@ -223,27 +209,6 @@ abstract class AbstractClass {
 			)
 		);
 		$this->executeManager();
-	}
-
-	/**
-	 * Checks the sanity of the manager input data.
-	 * 
-	 * @param array $inputData
-	 * @return boolean
-	 */
-	protected function _checkTaskInput($inputData) {
-		// Verify the input is an array
-		if (!is_array($inputData)) {
-			return false;
-		}
-		// Check if the needed inputFields exist
-		foreach($this->_inputFields as $field) {
-			if (!isset($inputData[$field])) {
-				return false;
-			}
-		}
-		// All OK!
-		return true;
 	}
 
 	/**

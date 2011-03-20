@@ -1,13 +1,13 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Core
+ * @subpackage Ipc
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon;
+namespace PhpTaskDaemon\Ipc;
 
 /**
  * 
@@ -15,7 +15,7 @@ namespace PhpTaskDaemon;
  * memory segments. The keys of the shared memory variables are stored in an
  * array.
  */
-class SharedMemory {
+class SharedMemory extends AbstractClass implements InterfaceClass {
 	/**
 	 * This variable contains the identifier string.
 	 * @var string|null
@@ -33,12 +33,6 @@ class SharedMemory {
 	 * segment.
 	 */
 	protected $_semaphore = null;
-	
-	/**
-	 * This array contains the keys of all registered variables.
-	 * @var array
-	 */
-	protected $_keys = array();
 	
 	/**
 	 * 
@@ -90,25 +84,14 @@ class SharedMemory {
 	 * Returns an array of registered variable keys.
 	 * @return array
 	 */
-	public function getKeys() {
+	public function get() {
 		sem_acquire($this->_semaphore);
 		$keys = shm_get_var($this->_sharedMemory, 1);
 		sem_release($this->_semaphore);
 		
 		return $keys;
 	}
-
-	/**
-	 * 
-	 * Checks if a given key is already set within the shared memory keys.
-	 * @param unknown_type $key
-	 * @return bool
-	 */
-	public function hasKey($key) {
-		$keys = $this->getKeys();
-		return in_array($key, $keys);
-	}
-
+	
 	/**
 	 * 
 	 * Returns the value of a registered shared variable or false if it does 

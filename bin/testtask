@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+include('../loader.php');
+
+// Start a single task
+$task = new \Concept\PocTask\Manager();
+$task->execute();
+
+echo "\n";

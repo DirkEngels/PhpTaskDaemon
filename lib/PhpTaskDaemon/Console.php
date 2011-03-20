@@ -1,7 +1,7 @@
 <?php
 /**
- * @package Dew
- * @subpackage Daemon
+ * @package PhpTaskDaemon
+ * @subpackage Core
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
@@ -11,31 +11,35 @@ namespace PhpTaskDaemon;
 
 /**
 * The main Daemon class is responsible for starting, stopping and monitoring
-* the daemon. It accepts command line arguments to set daemon runner options.
-* The start method creates an instance of Dew_Daemon_Runner and contains the 
+* the daemon. It accepts command line arguments to set daemon daemon options.
+* The start method creates an instance of Dew_Daemon_Daemon and contains the 
 * methods for setup a logger, read the config, daemonize the process and set 
-* the uid/gui of the process. After that the runner instance starts all the 
+* the uid/gui of the process. After that the daemon instance starts all the 
 * managers.
 */
-class Command {
-
-	protected $_consoleOpts;					// Zend_Console_GetOpt instance
+class Console {
+	
+	/**
+	 * Console options object
+	 * @var Zend_Console_Getopt
+	 */
+	protected $_consoleOpts;
 	
 	/**
 	 * 
 	 * Daemon run object
-	 * @var Runner
+	 * @var Daemon
 	 */
-	protected $_runner;
+	protected $_daemon;
 
 	/**
 	 * 
 	 * Daemon constructor method
 	 * @param Zend_Console_Getopt $consoleOpts
 	 */
-	public function __construct(Runner $runner = null) {
+	public function __construct(Daemon $daemon = null) {
 		// Initialize command line arguments
-		$this->setRunner($runner);
+		$this->setDaemon($daemon);
 		$this->setConsoleOpts();
 	}
 	
@@ -86,24 +90,24 @@ class Command {
 	
 	/**
 	 * 
-	 * Returns the daemon runner object
-	 * @return Runner
+	 * Returns the daemon daemon object
+	 * @return Daemon
 	 */
-	public function getRunner() {
-		if ($this->_runner === null) {
-			$this->_runner = new Runner();
+	public function getDaemon() {
+		if ($this->_daemon === null) {
+			$this->_daemon = new Daemon();
 		}
-		return $this->_runner;
+		return $this->_daemon;
 	}
 	
 	/**
 	 * 
-	 * Sets a daemon runner object
-	 * @param Runner $runner
+	 * Sets a daemon daemon object
+	 * @param Daemon $daemon
 	 * @return $this
 	 */
-	public function setRunner($runner) {
-		$this->_runner = $runner;
+	public function setDaemon($daemon) {
+		$this->_daemon = $daemon;
 		return $this;
 	}
 
@@ -124,14 +128,14 @@ class Command {
 		}
 
 		if (!$this->_consoleOpts->getOption('verbose')) {
-//			$this->getRunner()
+//			$this->getDaemon()
 //				->getLog()
 //				->addFilter(new Zend_Log_Filter_Priority(\Zend_Log::NOTICE));
 		}
 		if ($this->_consoleOpts->getOption('verbose')) {
 			$writerVerbose= new \Zend_Log_Writer_Stream('php://output');
-			$this->getRunner()->getLog()->addWriter($writerVerbose);
-			$this->getRunner()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
+			$this->getDaemon()->getLog()->addWriter($writerVerbose);
+			$this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
 		}
 		
 		// Perform action
@@ -144,7 +148,7 @@ class Command {
 	 * Action: Start Daemon
 	 */
 	public function start() {
-		$this->getRunner()->start();
+		$this->getDaemon()->start();
 	}
 	
 	/**
@@ -152,11 +156,11 @@ class Command {
 	 * Action: Stop daemon 
 	 */
 	public function stop() {
-		if (!$this->getRunner()->isRunning()) {
+		if (!$this->getDaemon()->isRunning()) {
 			echo 'Daemon is NOT running!!!' . "\n";
 		} else {	
 			echo 'Terminating application  !!!' . "\n";
-			$this->getRunner()->stop();
+			$this->getDaemon()->stop();
 		}
 
 		exit();
@@ -176,7 +180,7 @@ class Command {
 	 */
 	public function status() {
 		
-		$status = Runner::getStatus();
+		$status = Daemon::getStatus();
 		if ($status['pid'] === null) {
 			echo "Daemon not running\n";
 			exit;
@@ -201,7 +205,12 @@ class Command {
 		}
 		return true;
 	}
-	
+
+	/**
+	public function statistics() {
+		
+	}
+
 	/**
 	 * 
 	 * Displays the current tasks and activities of the daemon. The monitor 

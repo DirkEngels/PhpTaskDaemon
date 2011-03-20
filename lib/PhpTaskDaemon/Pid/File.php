@@ -44,7 +44,7 @@ class File {
 	 */
 	public function getFilename() {
 		if ($this->_filename == null) {
-			$this->_filename = realpath(APPLICATION_PATH . '/../../tmp/') . '/daemon.pid';
+			$this->_filename = \TMP_PATH . '/daemon.pid';
 		}
 		return $this->_filename;
 	}
@@ -55,11 +55,11 @@ class File {
 	 * @return bool
 	 */
 	public function setFilename($filename) {
-		if (!is_null($filename) && !file_exists($filename)) {
+		if (!is_null($filename) && !file_exists(\TMP_PATH . $filename)) {
 			touch($filename);
 		}
 		if (file_exists($filename)) {
-			$this->_filename = $filename;
+			$this->_filename = \TMP_PATH . '/' . $filename;
 			return true;
 		}
 		return false;
@@ -84,7 +84,7 @@ class File {
 	 * @param string $this->_filename
 	 * @return int
 	 */
-	public function readPidFile() {
+	public function read() {
 		if (file_exists($this->getFilename())) {
 			$pid = (int) file_get_contents($this->getFilename());
 			if ($pid>0) {
@@ -101,7 +101,7 @@ class File {
 	 * @param unknown_type $this->_filename
 	 * @return bool
 	 */
-	public function unlinkPidFile() {
+	public function unlink() {
 		if (file_exists($this->getFilename())) {
 			return unlink($this->getFilename());
 		}
@@ -115,7 +115,7 @@ class File {
 	 * @param string $this->_filename
 	 * @return bool
 	 */
-	public function writePidFile($pid = null) {
+	public function write($pid = null) {
 		if ($pid>0) {
 			if (!file_exists($this->getFilename())) {
 				touch($this->getFilename());

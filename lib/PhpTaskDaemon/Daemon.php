@@ -1,7 +1,7 @@
 <?php
 /**
- * @package SiteSpeed
- * @subpackage Daemon
+ * @package PhpTaskDaemon
+ * @subpackage Core
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
@@ -15,7 +15,7 @@ namespace PhpTaskDaemon;
  * for each task manager.
  *
  */
-class Runner {
+class Daemon {
 	/**
 	 * This variable contains pid manager object
 	 * @var Manager $_pidManager
@@ -76,13 +76,22 @@ class Runner {
 
 	/**
 	 * 
-	 * Logs a message to the Zend_Log object. This method can be used to hook 
-	 * in custom log actions. 
-	 * @param string $message
-	 * @param int $logLevel
+	 * Returns the log object
+	 * @return Zend_Log
 	 */
-	public function log($message, $logLevel = \Zend_Log::DEBUG) {
-		$this->_log->log('(' . getmypid() . ') ' . $message, $logLevel);
+	public function getLog() {
+		return $this->_log;
+	}
+
+	/**
+	 * 
+	 * Sets the log object
+	 * @param Zend_Log $log
+	 * @return $this
+	 */
+	public function setLog(Zend_Log $log) {
+		$this->_log = $log;
+		return $this;
 	}
 
 	/**
@@ -116,26 +125,6 @@ class Runner {
 
 	/**
 	 * 
-	 * Returns the log object
-	 * @return Zend_Log
-	 */
-	public function getLog() {
-		return $this->_log;
-	}
-
-	/**
-	 * 
-	 * Sets the log object
-	 * @param Zend_Log $log
-	 * @return $this
-	 */
-	public function setLog(Zend_Log $log) {
-		$this->_log = $log;
-		return $this;
-	}
-
-	/**
-	 * 
 	 * Add additional (zend) log writers
 	 */
 	protected function _initLogOutput() {
@@ -147,7 +136,7 @@ class Runner {
 		
 		$writerFile = new \Zend_Log_Writer_Stream($logFile);
 		$this->_log->addWriter($writerFile);
-		$this->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
+		$$this->_log->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
 	}
 
 
@@ -186,7 +175,7 @@ class Runner {
 	 * @param string $dir
 	 */
 	public function scanTaskDirectory($dir) {
-		$this->log("Scanning directory for tasks: " . $dir, \Zend_Log::DEBUG);
+		$$this->_log->log("Scanning directory for tasks: " . $dir, \Zend_Log::DEBUG);
 
 		if (!is_dir($dir)) {
 			throw new \Exception('Directory does not exists');
@@ -198,9 +187,9 @@ class Runner {
 			if (preg_match('/(.*)+\.php$/', $file, $match)) {
 				require_once($dir . '/' . $file);
 				$taskClass = substr(get_class($this), 0, -7) . '\\Task\\' . preg_replace('/\.php$/', '', $file);
-				$this->log("Checking task: " . $taskClass, \Zend_Log::DEBUG);
+				$$this->_log->log("Checking task: " . $taskClass, \Zend_Log::DEBUG);
 				if (class_exists($taskClass)) {
-					$this->log("Adding task: " . $taskClass . ' (' . $taskClass::getManagerType() . ')', \Zend_Log::INFO);
+					$$this->_log->log("Adding task: " . $taskClass . ' (' . $taskClass::getManagerType() . ')', \Zend_Log::INFO);
 					$task = new $taskClass();
 					$this->addManagerByTask($task);
 					$countLoadedObjects++;
@@ -235,20 +224,20 @@ class Runner {
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
-				$this->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
+				$$this->_log->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
 				exit;
 				break;
 			case SIGCHLD:
 				// Halt
-				$this->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
+				$$this->_log->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
 				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
 				break;
 			case SIGINT:
 				// Shutdown
-				$this->log('Application (DAEMON) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
+				$$this->_log->log('Application (DAEMON) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
 				break;
 			default:
-				$this->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
+				$$this->_log->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
 				break;
 		}
 	}
@@ -262,18 +251,18 @@ class Runner {
 		declare(ticks = 1);
 
 		if (count($this->_managers)==0) {
-			$this->log("No daemon tasks found", \Zend_Log::INFO);
+			$$this->_log->log("No daemon tasks found", \Zend_Log::INFO);
 			exit;
 		}
-		$this->log("Starting daemon tasks", \Zend_Log::DEBUG);
+		$$this->_log->log("Starting daemon tasks", \Zend_Log::DEBUG);
 		foreach ($this->_managers as $manager) {
 			$manager->setLog(clone($this->_log));
-			$this->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
+			$$this->_log->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
 			$this->_forkManager($manager);
 		}
 		
 		// Default sigHandler
-		$this->log("Setting default sighanler", \Zend_Log::DEBUG);
+		$$this->_log->log("Setting default sighanler", \Zend_Log::DEBUG);
 		$this->_sigHandler = new SignalHandler(
 			'Main Daemon',
 			$this->_log,
@@ -286,9 +275,9 @@ class Runner {
 		// Wait till all childs are done
 	    while (pcntl_waitpid(0, $status) != -1) {
         	$status = pcntl_wexitstatus($status);
-        	$this->log("Child $status completed");
+        	$$this->_log->log("Child $status completed");
     	}
-		$this->log("Running done.", \Zend_Log::NOTICE);
+		$$this->_log->log("Running done.", \Zend_Log::NOTICE);
 
 		$this->_pidFile->unlinkPidFile();
 		$this->_shm->remove();
@@ -307,7 +296,7 @@ class Runner {
 		$pid = pcntl_fork();
 		if ($pid === -1) {
 			// Error
-			$this->log('Managers could not be forked!!!', \Zend_Log::CRIT);
+			$$this->_log->log('Managers could not be forked!!!', \Zend_Log::CRIT);
 			return false;
 
 		} elseif ($pid) {
@@ -321,49 +310,10 @@ class Runner {
 			$manager->init($this->_pidManager->getParent());
 //			
 			
-			$this->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
+			$$this->_log->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
 			$manager->runManager();
 			exit;
 		}
 	}
 
-	public static function getStatus() {
-		$pidFile = new \PhpTaskDaemon\Pid\File(TMP_PATH . '/sitespeed-daemon-runnerd.pid');
-		$pid = $pidFile->readPidFile();
-
-		$status = array('pid' => $pid);
-		
-		if (file_exists(TMP_PATH . '/daemon.shm')) {
-			$shm = new \PhpTaskDaemon\SharedMemory('daemon');
-			$shmKeys = $shm->getKeys();
-			$status['memKeys'] = count($shmKeys); 
-			foreach($shm->getKeys() as $key => $value) {
-				$status[$key] = $shm->getVar($key);
-			}
-
-			// Child info
-			if (isset($status['childs'])) {
-				foreach($status['childs'] as $child) {
-					$status['manager-' . $child] = self::getStatusChild($child);
-				}
-			}
-		}
-		
-
-		return $status;
-	}
-	public static function getStatusChild($childPid) {
-		$status = array('childPid' => $childPid);
-		
-		if (file_exists(TMP_PATH . '/manager-' . $childPid . '.shm')) {
-			$shm = new \PhpTaskDaemon\SharedMemory('manager-' . $childPid);
-			$shmKeys = $shm->getKeys();
-			$status['memKeys'] = count($shmKeys); 
-			foreach($shm->getKeys() as $key => $value) {
-				$status[$key] = $shm->getVar($key);
-			}
-		}
-
-		return $status;
-	}
 }
