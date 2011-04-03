@@ -7,7 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon;
+namespace PhpTaskDaemon\Daemon\Interrupt;
 
 /**
 * The SiteSpeed Daemon Signals object can be encapsulated by other classes to 
@@ -16,7 +16,7 @@ namespace PhpTaskDaemon;
 * A callback can be provided to run a method related to the current process. 
 * 
 */
-class SignalHandler {
+class Signal {
 
 	/**
 	 * Task identifier

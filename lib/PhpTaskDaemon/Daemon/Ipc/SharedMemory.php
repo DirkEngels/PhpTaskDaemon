@@ -7,7 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon\Ipc;
+namespace PhpTaskDaemon\Daemon\Ipc;
 
 /**
  * 

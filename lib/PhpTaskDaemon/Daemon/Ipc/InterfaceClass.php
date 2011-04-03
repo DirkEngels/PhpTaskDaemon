@@ -7,7 +7,7 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Ipc;
+namespace PhpTaskDaemon\Daemon\Ipc;
 
 interface InterfaceClass {
 	protected $_keys = array();

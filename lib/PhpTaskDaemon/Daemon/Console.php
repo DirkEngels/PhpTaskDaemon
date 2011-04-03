@@ -7,7 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon;
+namespace PhpTaskDaemon\Daemon;
 
 /**
 * The main Daemon class is responsible for starting, stopping and monitoring
@@ -30,16 +30,16 @@ class Console {
 	 * Daemon run object
 	 * @var Daemon
 	 */
-	protected $_daemon;
+	protected $_instance;
 
 	/**
 	 * 
 	 * Daemon constructor method
 	 * @param Zend_Console_Getopt $consoleOpts
 	 */
-	public function __construct(Daemon $daemon = null) {
+	public function __construct(Daemon $instance = null) {
 		// Initialize command line arguments
-		$this->setDaemon($daemon);
+		$this->setDaemon($instance);
 		$this->setConsoleOpts();
 	}
 	
@@ -94,20 +94,20 @@ class Console {
 	 * @return Daemon
 	 */
 	public function getDaemon() {
-		if ($this->_daemon === null) {
-			$this->_daemon = new Daemon();
+		if ($this->_instance === null) {
+			$this->_instance = new Instance();
 		}
-		return $this->_daemon;
+		return $this->_instance;
 	}
 	
 	/**
 	 * 
 	 * Sets a daemon daemon object
-	 * @param Daemon $daemon
+	 * @param Daemon $instance
 	 * @return $this
 	 */
-	public function setDaemon($daemon) {
-		$this->_daemon = $daemon;
+	public function setDaemon($instance) {
+		$this->_instance = $instance;
 		return $this;
 	}
 
@@ -130,10 +130,10 @@ class Console {
 		if (!$this->_consoleOpts->getOption('verbose')) {
 //			$this->getDaemon()
 //				->getLog()
-//				->addFilter(new Zend_Log_Filter_Priority(\Zend_Log::NOTICE));
+//				->addFilter(new \Zend_Log_Filter_Priority(\Zend_Log::NOTICE));
 		}
 		if ($this->_consoleOpts->getOption('verbose')) {
-			$writerVerbose= new \Zend_Log_Writer_Stream('php://output');
+			$writerVerbose= \Zend_Log_Writer_Stream('php://output');
 			$this->getDaemon()->getLog()->addWriter($writerVerbose);
 			$this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
 		}

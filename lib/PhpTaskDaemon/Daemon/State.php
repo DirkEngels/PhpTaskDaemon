@@ -6,9 +6,9 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon;
+namespace PhpTaskDaemon\Daemon;
 
-class Info {
+class State {
 	
 	/**
 	 * 
@@ -17,13 +17,13 @@ class Info {
 	 * @return array
 	 */
 	public static function getStatus() {
-		$pidFile = new \PhpTaskDaemon\Pid\File(TMP_PATH . '/phptaskdaemond.pid');
-		$pid = $pidFile->readPidFile();
+		$pidFile = new \PhpTaskDaemon\Daemon\Pid\File(TMP_PATH . '/phptaskdaemond.pid');
+		$pid = $pidFile->read();
 
 		$status = array('pid' => $pid);
 		
 		if (file_exists(TMP_PATH . '/daemon.shm')) {
-			$shm = new \PhpTaskDaemon\SharedMemory('daemon');
+			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('daemon');
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
@@ -33,7 +33,7 @@ class Info {
 			// Child info
 			if (isset($status['childs'])) {
 				foreach($status['childs'] as $child) {
-					$status['manager-' . $child] = self::getStatusChild($child);
+					$status['manager-' . $child] = self::_getStatusChild($child);
 				}
 			}
 		}
@@ -49,11 +49,11 @@ class Info {
 	 * @param int $childPid
 	 * @return array
 	 */
-	public static function getStatusChild($childPid) {
+	protected static function _getStatusChild($childPid) {
 		$status = array('childPid' => $childPid);
 		
 		if (file_exists(TMP_PATH . '/manager-' . $childPid . '.shm')) {
-			$shm = new \PhpTaskDaemon\SharedMemory('manager-' . $childPid);
+			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('manager-' . $childPid);
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
@@ -67,7 +67,7 @@ class Info {
 	public static function getStatistics() {
 		
 	}
-	public static function getStatisticsChild($childPid) {
+	protected static function _getStatisticsChild($childPid) {
 		
 	}
 

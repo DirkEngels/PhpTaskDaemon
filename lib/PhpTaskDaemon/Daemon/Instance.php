@@ -7,7 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon;
+namespace PhpTaskDaemon\Daemon;
 
 /**
  * 
@@ -54,10 +54,10 @@ class Daemon {
 	 */
 	public function __construct($parent = null) {
 		$pidFile = \TMP_PATH . '/' . strtolower(str_replace('\\', '-', get_class($this))) . 'd.pid';
-		$this->_pidManager = new \PhpTaskDaemon\Pid\Manager(getmypid(), $parent);
-		$this->_pidFile = new \PhpTaskDaemon\Pid\File($pidFile);
+		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid(), $parent);
+		$this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
 		
-		$this->_shm = new \PhpTaskDaemon\SharedMemory('daemon');
+		$this->_shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('daemon');
 		$this->_shm->setVar('state', 'running');
 		
 		$this->_initLogSetup();
@@ -71,7 +71,7 @@ class Daemon {
 //		$this->_shm->setVar('state', 'stopped');
 		unset($this->_pidManager);
 		unset($this->_pidFile);
-		unset($this->_shm);
+//		unset($this->_shm);
 	}
 
 	/**
@@ -263,7 +263,7 @@ class Daemon {
 		
 		// Default sigHandler
 		$$this->_log->log("Setting default sighanler", \Zend_Log::DEBUG);
-		$this->_sigHandler = new SignalHandler(
+		$this->_sigHandler = new Interupt\SignalHandler(
 			'Main Daemon',
 			$this->_log,
 			array(&$this, 'sigHandler')

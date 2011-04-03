@@ -8,7 +8,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon\Pid;
+namespace PhpTaskDaemon\Daemon\Pid;
 
 /**
  * This SiteSpeed Daemon Pid File object is responsible for reading and writing
