@@ -8,7 +8,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon\Manager;
+namespace PhpTaskDaemon\Task\Manager;
 
 /**
  * 

@@ -7,10 +7,10 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Job;
+namespace PhpTaskDaemon\Task\Job;
 
 interface InterfaceClass {
-    
+
     public function getJobId();
     public function setJobId($jobId);
     public function getInputVar($key);

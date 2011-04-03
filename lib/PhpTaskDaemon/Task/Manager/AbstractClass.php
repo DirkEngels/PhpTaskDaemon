@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpTaskDaemon\Manager;
+namespace PhpTaskDaemon\Task\Manager;
 
 /**
  * 
@@ -66,6 +66,12 @@ abstract class AbstractClass {
 	protected $_queue = null;
 	
 	/**
+	 * Executor object
+	 * @var Dew_Daemon_Executo_AbstractClass
+	 */
+	protected $_executor = null;
+
+	/**
 	 * Time to wait in milliseconds before the next run.
 	 * 
 	 * @var integer
@@ -89,11 +95,11 @@ abstract class AbstractClass {
 
 
 	public function init($parentPid = null) {
-		$this->_pidManager = new \PhpTaskDaemon\Pid\Manager(
+		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
 			getmypid(), 
 			$parentPid
 		);
-		$this->_shm= new \PhpTaskDaemon\SharedMemory(
+		$this->_shm= new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
 			'manager-' . $this->_pidManager->getCurrent()
 		);
 		$this->_shm->setVar('name', $this->getTask()->getName());
@@ -173,10 +179,34 @@ abstract class AbstractClass {
 	 * @return $this
 	 */
 	public function setQueue($queue) {
-		if (!is_a($queue, '\PhpTaskDaemon\Queue\AbstractClass')) {
-			$queue = new \PhpTaskDaemon\Queue\BaseClass();
+		if (!is_a($queue, '\PhpTaskDaemon\Task\Queue\AbstractClass')) {
+			$queue = new \PhpTaskDaemon\Task\Queue\BaseClass();
 		}
 		$this->_queue = $queue;
+
+		return $this;
+	}
+
+	/**
+	 * 
+	 * Returns the executor object
+	 * @return \PhpTaskDaemon\Executor\AbstractClass
+	 */
+	public function getExecutor() {
+		return $this->_executor;
+	}
+
+	/**
+	 * 
+	 * Sets the current executor object.
+	 * @param \PhpTaskDaemon\Executor\AbstractClass $executor
+	 * @return $this
+	 */
+	public function setExecutor($executor) {
+		if (!is_a($executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
+			$executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
+		}
+		$this->_executor = $executor;
 
 		return $this;
 	}
@@ -191,7 +221,7 @@ abstract class AbstractClass {
 
 	public function runManager() {
 		// Override signal handler
-		$this->_sigHandler = new \PhpTaskDaemon\SignalHandler(
+		$this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\SignalHandler(
 			get_class($this),
 			$this->_log, 
 			array(&$this, 'sigHandler')
@@ -204,7 +234,7 @@ abstract class AbstractClass {
 			$this->getTask()->setPidManager($this->_pidManager);
 		}
 		$this->getTask()->setShm(
-			new \PhpTaskDaemon\SharedMemory(
+			new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
 				'manager-' . $this->_pidManager->getCurrent()
 			)
 		);

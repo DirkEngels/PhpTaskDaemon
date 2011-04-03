@@ -8,7 +8,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon\Manager;
+namespace PhpTaskDaemon\Task\Manager;
 
 /**
  * 
@@ -30,22 +30,27 @@ class Interval extends AbstractClass implements InterfaceClass {
 		while (true) {			
 			// Load Tasks in Queue
 			$jobs = $this->getQueue()->load();
-	
+			$executor = $this->getExecutor();
+
 			if (count($jobs)==0) {
 				$this->log("Queue checked: empty!!!", \Zend_Log::INFO);
 			} else {
-				$this->log("Queue loaded: " . count($this->getQueue()) . " elements", \Zend_Log::INFO);
+				$this->log("Queue loaded: " . count($jobs) . " elements", \Zend_Log::INFO);
 	
 				while ($job = array_shift($jobs)) {
 					// Set manager input and start the manager
-					$executor = new \PhpTaskDaemon\Executor\BaseClass($job);
+ 					$this->log("Job started: " . $job->getJobId(), \Zend_Log::DEBUG);
+					$executor->setJob($job);
 					$executor->updateStatus(0);
-					$retVal = $executor->run(); 
+					$output = $executor->run(); 
 					$executor->updateStatus(100);
 
+					$this->log("Job done: " . $job->getJobId(), \Zend_Log::DEBUG);
+					
 					usleep(10);
-					$status = ($retVal==1) ? 'Done' : 'Failed';
-					$this->getQueue()->updateStatistics($status);
+					$this->getQueue()->updateStatistics(
+						$job->getOutputVar('returnStatus')
+					);
 					$executor->updateStatus(0);
 				}
 			}

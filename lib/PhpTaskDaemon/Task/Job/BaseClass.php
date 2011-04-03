@@ -7,7 +7,7 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Job;
+namespace PhpTaskDaemon\Task\Job;
 
 class BaseClass extends AbstractClass implements InterfaceClass {
 	

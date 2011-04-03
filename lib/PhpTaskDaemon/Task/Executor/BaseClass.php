@@ -6,11 +6,10 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Executor;
+namespace PhpTaskDaemon\Task\Executor;
 
 class BaseClass extends AbstractClass implements InterfaceClass {
 	
 	public function run() {
-		
 	}
 }

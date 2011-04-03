@@ -7,17 +7,17 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Job;
 
 abstract class AbstractClass {
 	protected $_jobId;
 	protected $_input = array();
+	protected $_inputKeys = array();
 	protected $_output = array();
 	
 	
 	public function __construct($jobId = null, $input = array()) {
 		if ($jobId == null) {
-			$jobId = $this->_generateJobId();
+			$jobId = $this::generateJobId();
 		}
 		$this->setJobId($jobId);
 		$this->setInput($input);
@@ -28,7 +28,7 @@ abstract class AbstractClass {
 	 * Generates a random job Id
 	 * @return string
 	 */
-	public function generateJobId() {
+	public static function generateJobId() {
 		return substr(md5(uniqid()), 0,10);
 	}
 
@@ -88,6 +88,23 @@ abstract class AbstractClass {
 
 	/**
 	 * 
+	 * Returns the input field keys
+	 */
+	public function getInputKeys() {
+		return $this->_inputKeys;
+	}
+
+	/**
+	 * 
+	 * Sets the input field keys
+	 * @param array $inputKeys
+	 */
+	public function setInputKeys($inputKeys) {
+		$this->_inputKeys = $inputKeys;
+	}
+	
+	/**
+	 * 
 	 * Returns an array with output variables
 	 * @return array
 	 */
@@ -121,4 +138,18 @@ abstract class AbstractClass {
 		$this->_output[$var] = $value;
 	}
 
+	/**
+	 * 
+	 * Check the input array for the needed keys; in this case only a sleepTime
+	 * variable is expected
+	 * @return bool;`
+	 */
+	public function checkInput() {
+		foreach($this->_inputKeys as $key) {
+			if (!array_key_exists($key, $this->_input)) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

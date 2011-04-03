@@ -6,14 +6,13 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Executor;
+namespace PhpTaskDaemon\Task\Executor;
 
 abstract class AbstractClass {
 	protected $_job = null;
 	protected $_status = null;
 	
-	public function __construct($job, $status = null) {
-		$this->setJob($job);
+	public function __construct($status = null) {
 		$this->setStatus($status);
 	}
 	public function getJob() {

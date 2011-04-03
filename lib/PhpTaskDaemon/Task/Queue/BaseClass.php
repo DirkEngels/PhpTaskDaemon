@@ -6,14 +6,19 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Queue;
+namespace PhpTaskDaemon\Task\Queue;
 
 class BaseClass extends AbstractClass implements InterfaceClass {
 	
 	public function load() {
-		return array(
-			'jobId' => rand(0,100),
-			'sleepTime' => rand(1,3)
+		$queue = array(
+			new \PhpTaskDaemon\Task\Job\BaseClass(
+				'base-' . rand(0,100),
+				array(
+					'sleepTime' => rand(100000, 500000)
+				)
+			)
 		);
+		return $queue;
 	}
 }
