@@ -143,10 +143,14 @@ class Console {
 	}
 
     public function listActions() {
+        $this->getDaemon()->scanTaskDirectory(APPLICATION_PATH . '/Tasks/');
         $tasks = $this->getDaemon()->getManagers();
+        echo "Tasks: \n";
         foreach($tasks as $task) {
-            echo "task: \n";
-            echo var_dump($task);
+            $taskName = get_class($task);
+            $taskName = substr($taskName, 6);
+            $taskName = substr($taskName, 0, -8);
+            echo "- " . $taskName . "\n";
         }
         echo "\n";
         exit;
