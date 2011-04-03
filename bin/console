@@ -4,5 +4,5 @@
 include('bootstrap.php');
 
 // Start the application
-$daemon = new \PhpTaskDaemon\Console();
-$daemon->run();
+$console = new \PhpTaskDaemon\Daemon\Console();
+$console->run();
