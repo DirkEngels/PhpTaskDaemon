@@ -14,7 +14,7 @@ class Executor extends PTDTE\AbstractClass implements PTDTE\InterfaceClass {
 	public function run() {
 		$job = $this->getJob();
 		$input = $job->getInput();
-		
+
 		// Sleep
 		$sleepTimeProgress = round($job->getInputVar('sleepTime')/10);
 		$this->updateStatus(0, 'Initializing task');
