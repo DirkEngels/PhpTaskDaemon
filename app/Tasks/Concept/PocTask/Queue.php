@@ -1,8 +1,9 @@
 <?php
 
 namespace Tasks\Concept\PocTask;
+use \PhpTaskDaemon\Task\Queue as PTDTQ;
 
-class Queue extends \PhpTaskDaemon\Queue\AbstractClass implements \PhpTaskDaemon\Queue\InterfaceClass {
+class Queue extends PTDTQ\AbstractClass implements PTDTQ\InterfaceClass {
 
 	/**
 	 * Fills a queue with a random number of tasks (0 - 30). The input for each
