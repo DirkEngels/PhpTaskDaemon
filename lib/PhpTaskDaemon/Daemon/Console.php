@@ -57,6 +57,7 @@ class Console {
 					'logfile|l-s'	=> 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
 					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
 					'action|a=s'	=> 'Action (default: start) (options: start, stop, restart, status, monitor)',
+					'print|p'   => 'List Actions',
 					'verbose|v'		=> 'Verbose',
 					'help|h'		=> 'Show help message (this message)',
 				)
@@ -117,23 +118,21 @@ class Console {
 	 */
 	public function run() {
 		// Set action
-		$action = ($this->_consoleOpts->getOption('help')) 
-			? 'help' 
-			: $this->_consoleOpts->getOption('action');
-			
+		$action = $this->_consoleOpts->getOption('action');
+
+        if ($this->_consoleOpts->getOption('print')) {
+            $this->listActions();
+            exit;
+        }
+
 		$allActions = array('start', 'stop', 'restart', 'status', 'monitor', 'help');
 		if (!in_array($action, $allActions))  {
 			$this->help();
 			exit;
 		}
 
-		if (!$this->_consoleOpts->getOption('verbose')) {
-//			$this->getDaemon()
-//				->getLog()
-//				->addFilter(new \Zend_Log_Filter_Priority(\Zend_Log::NOTICE));
-		}
 		if ($this->_consoleOpts->getOption('verbose')) {
-			$writerVerbose= \Zend_Log_Writer_Stream('php://output');
+			$writerVerbose = new \Zend_Log_Writer_Stream('php://output');
 			$this->getDaemon()->getLog()->addWriter($writerVerbose);
 			$this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
 		}
@@ -142,6 +141,16 @@ class Console {
 		$this->$action();
 		exit;
 	}
+
+    public function listActions() {
+        $tasks = $this->getDaemon()->getManagers();
+        foreach($tasks as $task) {
+            echo "task: \n";
+            echo var_dump($task);
+        }
+        echo "\n";
+        exit;
+    }
 
 	/**
 	 * 

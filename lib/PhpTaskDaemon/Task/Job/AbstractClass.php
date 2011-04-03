@@ -2,11 +2,12 @@
 
 /**
  * @package PhpTaskDaemon
- * @subpackage Job
+ * @subpackage Task\Job
  * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+namespace PhpTaskDaemon\Task\Job;
 
 abstract class AbstractClass {
 	protected $_jobId;
@@ -127,7 +128,8 @@ abstract class AbstractClass {
 	 * @param mixed $var
 	 */
 	public function getOutputVar($var) {
-		return $this->_output[$var];
+		$value = (isset($this->_output[$var])) ? $this->_output[$var] : '?'; 
+		return $value;
 	}
 
 	/**

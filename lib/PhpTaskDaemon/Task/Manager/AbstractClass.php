@@ -79,8 +79,9 @@ abstract class AbstractClass {
 	protected $_waitTime = 10;
 
 
-	public function __construct($queue = null) {
+	public function __construct($executor, $queue = null) {
 		$this->setQueue($queue);
+		$this->setExecutor($executor);
 	}
 
 	/**
@@ -102,7 +103,7 @@ abstract class AbstractClass {
 		$this->_shm= new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
 			'manager-' . $this->_pidManager->getCurrent()
 		);
-		$this->_shm->setVar('name', $this->getTask()->getName());
+//		$this->_shm->setVar('name', $this->getName());
 	}
 
 	/**
@@ -159,7 +160,7 @@ abstract class AbstractClass {
 	 * Sets a shared memory object
 	 * @param Dew_Daemon_Shm $shm
 	 */
-	public function setShm(Dew_Daemon_Shm $shm) {
+	public function setShm($shm) {
 		$this->_shm = $shm;
 	}
 
@@ -221,24 +222,24 @@ abstract class AbstractClass {
 
 	public function runManager() {
 		// Override signal handler
-		$this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\SignalHandler(
+		$this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
 			get_class($this),
 			$this->_log, 
 			array(&$this, 'sigHandler')
 		);
 
-		if ($this->getTask()->getLog() === null) {
-			$this->getTask()->setLog($this->_log);
+		if ($this->getLog() === null) {
+			$this->setLog($this->_log);
 		}
-		if ($this->getTask()->getPidManager() === null) {
-			$this->getTask()->setPidManager($this->_pidManager);
+		if ($this->getPidManager() === null) {
+			$this->setPidManager($this->_pidManager);
 		}
-		$this->getTask()->setShm(
+		$this->setShm(
 			new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
 				'manager-' . $this->_pidManager->getCurrent()
 			)
 		);
-		$this->executeManager();
+		$this->execute();
 	}
 
 	/**

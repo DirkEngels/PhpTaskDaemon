@@ -59,7 +59,7 @@ class File {
 			touch($filename);
 		}
 		if (file_exists($filename)) {
-			$this->_filename = \TMP_PATH . '/' . $filename;
+			$this->_filename = $filename;
 			return true;
 		}
 		return false;

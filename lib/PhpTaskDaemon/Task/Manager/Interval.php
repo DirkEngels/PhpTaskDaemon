@@ -17,8 +17,6 @@ namespace PhpTaskDaemon\Task\Manager;
  * 
  */
 
-use PocTask\Job;
-
 class Interval extends AbstractClass implements InterfaceClass {
 	protected $_sleepTime = 5;
 	

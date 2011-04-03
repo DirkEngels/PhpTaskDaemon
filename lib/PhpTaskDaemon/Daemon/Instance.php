@@ -15,7 +15,7 @@ namespace PhpTaskDaemon\Daemon;
  * for each task manager.
  *
  */
-class Daemon {
+class Instance {
 	/**
 	 * This variable contains pid manager object
 	 * @var Manager $_pidManager
@@ -53,7 +53,7 @@ class Daemon {
 	 * @param int $parent
 	 */
 	public function __construct($parent = null) {
-		$pidFile = \TMP_PATH . '/' . strtolower(str_replace('\\', '-', get_class($this))) . 'd.pid';
+		$pidFile = \TMP_PATH . '/phptaskdaemond.pid';
 		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid(), $parent);
 		$this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
 		
@@ -101,7 +101,7 @@ class Daemon {
 	 * @return string
 	 */
 	protected function _getLogFile() {
-		$logFile = TMP_PATH . '/' . strtolower(get_class($this)) . 'd.log';
+		$logFile = TMP_PATH . '/phptaskdaemond.log';
 		return $logFile;
 	}
 
@@ -136,36 +136,21 @@ class Daemon {
 		
 		$writerFile = new \Zend_Log_Writer_Stream($logFile);
 		$this->_log->addWriter($writerFile);
-		$$this->_log->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
+		$this->_log->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
 	}
 
+
+	public function getManagers() {
+		return $this->_managers;
+	}
 
 	/**
 	 * 
 	 * Adds a manager object to the managers stack
 	 * @param Manager\AbstractClass $manager
 	 */
-	public function addManager(Manager\AbstractClass $manager) {
+	public function addManager($manager) {
 		return array_push($this->_managers, $manager);
-	}
-
-	/**
-	 * 
-	 * Creates a manager based on the task definition and adds it to the stack.
-	 * @param Task\AbstractClass $task
-	 */
-	public function addManagerByTask(Task\AbstractClass $task) {
-		$managerType = $task::getManagerType();
-		$managerClass = 'Manager\\' . $managerType;
-		if (class_exists($managerClass)) {
-			$manager = new $managerClass();
-		} else {
-			$manager = new \PhpTaskDaemon\Manager\Interval();
-		}
-		
-		$manager->setTask($task);
-		$this->addManager($manager);
-		return $this;
 	}
 
 	/**
@@ -175,41 +160,62 @@ class Daemon {
 	 * @param string $dir
 	 */
 	public function scanTaskDirectory($dir) {
-		$$this->_log->log("Scanning directory for tasks: " . $dir, \Zend_Log::DEBUG);
+		$this->_log->log("Scanning directory for tasks: " . $dir, \Zend_Log::DEBUG);
 
 		if (!is_dir($dir)) {
 			throw new \Exception('Directory does not exists');
 		}
 
-		$files = scandir($dir);
+		$groups = scandir($dir);
+		$tasks = 0;
 		$countLoadedObjects = 0;
-		foreach($files as $file) {
-			if (preg_match('/(.*)+\.php$/', $file, $match)) {
-				require_once($dir . '/' . $file);
-				$taskClass = substr(get_class($this), 0, -7) . '\\Task\\' . preg_replace('/\.php$/', '', $file);
-				$$this->_log->log("Checking task: " . $taskClass, \Zend_Log::DEBUG);
-				if (class_exists($taskClass)) {
-					$$this->_log->log("Adding task: " . $taskClass . ' (' . $taskClass::getManagerType() . ')', \Zend_Log::INFO);
-					$task = new $taskClass();
-					$this->addManagerByTask($task);
-					$countLoadedObjects++;
-				}
+		foreach($groups as $group) {
+			if ($group == '.' || $group == '..') { continue; }
+
+			$this->_log->log("Scanning dir: " . $dir . $group, \Zend_Log::INFO);
+			$tasks = scandir($dir . '/' . $group);
+			foreach ($tasks as $task) {
+				if ($task == '.' || $task == '..') { continue; }
+
+				$this->_log->log("Found: " . $group . "\\" . $task, \Zend_Log::INFO);
+				$this->loadManagerByName($group . '\\' . $task);			
 			}
 		}
 		return $countLoadedObjects;
 	}
-	
+	public function loadManagerByName($taskName) {
+		$managerClass = '\\Tasks\\' . $taskName . '\\Manager'; 
+		$queueClass = '\\Tasks\\' . $taskName . '\\Queue';
+		$executorClass = '\\Tasks\\' . $taskName . '\\Execuctor';
+
+		$queue = (class_exists($queueClass)) 
+			? new $queueClass()
+			: new \PhpTaskDaemon\Task\Queue\BaseClass();
+
+		$executor = (class_exists($executorClass)) 
+			? new $executorClass()
+			: new \PhpTaskDaemon\Task\Executor\BaseClass();
+
+		$manager = (class_exists($managerClass)) 
+			? new $managerClass($executor, $queue)
+			: new \PhpTaskDaemon\Task\Manager\Interval($executor, $queue);
+		
+		$this->addManager($manager);
+
+		return $manager;
+	}
+
 	/**
 	 * 
 	 * This is the public start function of the daemon. It checks the input and
 	 * available managers before running the daemon.
 	 */
 	public function start() {
-		$this->_pidFile->writePidFile($this->_pidManager->getCurrent());
+		$this->_pidFile->write($this->_pidManager->getCurrent());
 		$this->_initLogOutput();
 
 		// Check input here
-		$this->scanTaskDirectory(APPLICATION_PATH . '/daemon/');
+		$this->scanTaskDirectory(APPLICATION_PATH . '/Tasks/');
 		
 		// All valid
 		$this->_run();
@@ -224,20 +230,20 @@ class Daemon {
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
-				$$this->_log->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
+				$this->_log->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
 				exit;
 				break;
 			case SIGCHLD:
 				// Halt
-				$$this->_log->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
+				$this->_log->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
 				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
 				break;
 			case SIGINT:
 				// Shutdown
-				$$this->_log->log('Application (DAEMON) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
+				$this->_log->log('Application (DAEMON) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
 				break;
 			default:
-				$$this->_log->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
+				$this->_log->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
 				break;
 		}
 	}
@@ -251,19 +257,19 @@ class Daemon {
 		declare(ticks = 1);
 
 		if (count($this->_managers)==0) {
-			$$this->_log->log("No daemon tasks found", \Zend_Log::INFO);
+			$this->_log->log("No daemon tasks found", \Zend_Log::INFO);
 			exit;
 		}
-		$$this->_log->log("Starting daemon tasks", \Zend_Log::DEBUG);
+		$this->_log->log("Starting daemon tasks", \Zend_Log::DEBUG);
 		foreach ($this->_managers as $manager) {
 			$manager->setLog(clone($this->_log));
-			$$this->_log->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
+			$this->_log->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
 			$this->_forkManager($manager);
 		}
 		
 		// Default sigHandler
-		$$this->_log->log("Setting default sighanler", \Zend_Log::DEBUG);
-		$this->_sigHandler = new Interupt\SignalHandler(
+		$this->_log->log("Setting default signal interrupt handler", \Zend_Log::DEBUG);
+		$this->_sigHandler = new Interrupt\Signal(
 			'Main Daemon',
 			$this->_log,
 			array(&$this, 'sigHandler')
@@ -275,11 +281,11 @@ class Daemon {
 		// Wait till all childs are done
 	    while (pcntl_waitpid(0, $status) != -1) {
         	$status = pcntl_wexitstatus($status);
-        	$$this->_log->log("Child $status completed");
+        	$this->_log->log("Child $status completed", \Zend_Log::NOTICE);
     	}
-		$$this->_log->log("Running done.", \Zend_Log::NOTICE);
+		$this->_log->log("Running done.", \Zend_Log::NOTICE);
 
-		$this->_pidFile->unlinkPidFile();
+		$this->_pidFile->unlink();
 		$this->_shm->remove();
 
 		exit;
@@ -296,7 +302,7 @@ class Daemon {
 		$pid = pcntl_fork();
 		if ($pid === -1) {
 			// Error
-			$$this->_log->log('Managers could not be forked!!!', \Zend_Log::CRIT);
+			$this->_log->log('Managers could not be forked!!!', \Zend_Log::CRIT);
 			return false;
 
 		} elseif ($pid) {
@@ -308,9 +314,8 @@ class Daemon {
 			$newPid = getmypid();
 			$this->_pidManager->forkChild($newPid);
 			$manager->init($this->_pidManager->getParent());
-//			
 			
-			$$this->_log->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
+			$this->_log->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
 			$manager->runManager();
 			exit;
 		}
