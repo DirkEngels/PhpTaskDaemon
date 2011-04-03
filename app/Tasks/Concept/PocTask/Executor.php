@@ -1,6 +1,6 @@
 <?php
 
-namespace PocTask;
+namespace Tasks\Concept\PocTask;
 
 class Executor extends \PhpTaskDaemon\Executor\AbstractClass implements \PhpTaskDaemon\Executor\InterfaceClass {
 	

@@ -1,6 +1,7 @@
 <?php
 
-namespace PocTask;
+namespace Tasks\Concept\PocTask;
+
 use \PhpTaskDaemon\Queue as Queue;
 
 class Queue extends Queue\AbstractClass implements Queue\InterfaceClass {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PocTask;
+namespace Tasks\Concept\PocTask;
 
 class Job extends \PhpTaskDaemon\Job\AbstractClass implements \PhpTaskDaemon\Job\InterfaceClass {
 

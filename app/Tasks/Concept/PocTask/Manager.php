@@ -1,6 +1,6 @@
 <?php
 
-namespace Concept\PocTask;
+namespace Tasks\Concept\PocTask;
 
 class Manager extends \PhpTaskDaemon\Manager\Interval {
 	
