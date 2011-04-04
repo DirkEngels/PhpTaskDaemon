@@ -19,6 +19,11 @@ abstract class AbstractClass {
 		$this->setSharedMemory($sharedMemory);
 	}
 	
+	public function __destruct() {
+		$this->_sharedMemory->remove();
+		unset($this->_sharedMemory); 
+	}
+		
 	public function getSharedMemory() {
 		return $this->_sharedMemory;
 	}

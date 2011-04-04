@@ -25,6 +25,10 @@ abstract class AbstractClass {
 		$this->_initializeStatus(self::STATUS_DONE);
 		$this->_initializeStatus(self::STATUS_FAILED);
 	}
+	public function __destruct() {
+		$this->_sharedMemory->remove();
+		unset($this->_sharedMemory); 
+	}
 
 	/**
 	 *
@@ -43,7 +47,7 @@ abstract class AbstractClass {
 	 */
 	public function setSharedMemory($sharedMemory) {
 		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('test');
+			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . getmypid());
 		}
 		$this->_sharedMemory = $sharedMemory;
 		return $this;
