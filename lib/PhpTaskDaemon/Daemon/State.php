@@ -22,18 +22,20 @@ class State {
 
 		$status = array('pid' => $pid);
 		
-		if (file_exists(TMP_PATH . '/daemon.shm')) {
-			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('daemon');
+		if (file_exists(TMP_PATH . '/phptaskdaemond.shm')) {
+			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
+				echo $key .  ' = > ' . $value . "\n";
 				$status[$key] = $shm->getVar($key);
 			}
 
 			// Child info
 			if (isset($status['childs'])) {
 				foreach($status['childs'] as $child) {
-					$status['manager-' . $child] = self::_getStatusChild($child);
+					$status['task-' . $child] = array("Child: " . $child);
+//					$status['task-' . $child] = self::_getStatusChild($child);
 				}
 			}
 		}
@@ -52,7 +54,7 @@ class State {
 	protected static function _getStatusChild($childPid) {
 		$status = array('childPid' => $childPid);
 		
-		if (file_exists(TMP_PATH . '/manager-' . $childPid . '.shm')) {
+		if (file_exists(TMP_PATH . '/task-' . $childPid . '.shm')) {
 			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('manager-' . $childPid);
 			$shmKeys = $shm->getKeys();
 			$status['memKeys'] = count($shmKeys); 
