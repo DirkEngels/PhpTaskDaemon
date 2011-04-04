@@ -101,7 +101,7 @@ abstract class AbstractClass {
 			$parentPid
 		);
 		$this->_shm= new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
-			'manager-' . $this->_pidManager->getCurrent()
+			'task-' . $this->_pidManager->getCurrent()
 		);
 //		$this->_shm->setVar('name', $this->getName());
 	}
@@ -236,7 +236,7 @@ abstract class AbstractClass {
 		}
 		$this->setShm(
 			new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
-				'manager-' . $this->_pidManager->getCurrent()
+				'task-' . $this->_pidManager->getCurrent()
 			)
 		);
 		$this->execute();

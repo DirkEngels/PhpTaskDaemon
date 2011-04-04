@@ -65,7 +65,7 @@ class Interval extends AbstractClass implements InterfaceClass {
 	 */
 	protected function _sleep() {
 		// Sleep
-		$this->log("Sleeping <interval> for : " . $this->_sleepTime . " micro seconds", \Zend_Log::INFO);
+		$this->log("Sleeping <interval> for : " . $this->_sleepTime . " micro seconds", \Zend_Log::DEBUG);
 		sleep($this->_sleepTime);
 	}
 

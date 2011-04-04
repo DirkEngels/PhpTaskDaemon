@@ -193,12 +193,12 @@ class Console {
 	 */
 	public function status() {
 		
-		$status = Daemon::getStatus();
+		$status = State::getStatus();
 		if ($status['pid'] === null) {
 			echo "Daemon not running\n";
 			exit;
 		}
-		
+
 		echo "PhpTaskDaemon - Status\n";
 		echo "==========================\n";
 		echo "\n";
@@ -206,15 +206,17 @@ class Console {
 			echo "No processes!\n";
 		} else {
 			echo "Processes (" . count($status['childs']) . ")\n";
+
 		
 			foreach ($status['childs'] as $childPid) {
-				$managerData = $status['manager-' . $childPid];
+				$managerData = $status['task-' . $childPid];
 				foreach ($managerData as $managerDataKey => $managerDataValue) {
-					if (preg_match('/^task-/', $managerDataKey)) {
-						echo "  - " . ucfirst($managerData['name']) . " Task\t\t- " . $managerDataValue . "\n";
-					}
+//					if (preg_match('/^task-/', $managerDataKey)) {
+						echo "  - [" . $childPid . "]: " . $status['status-' . $childPid] . " Manager\t\t- " . $managerDataValue . "\n";
+//					}
 				}
 			}
+
 		}
 		return true;
 	}
