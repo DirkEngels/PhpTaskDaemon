@@ -15,7 +15,7 @@ class Queue extends PTDTQ\AbstractClass implements PTDTQ\InterfaceClass {
 		for ($i=0; $i<rand(0,30); $i++) {
 			$job = new Job(
 				'pocjob-' . $i, 
-				array('sleepTime' => rand(100000, 500000))
+				array('sleepTime' => rand(100000, 5000000))
 			);
 			array_push($queue, $job);
 		}

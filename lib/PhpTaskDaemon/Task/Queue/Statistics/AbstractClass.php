@@ -7,17 +7,21 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Queue\Statistics;
+namespace PhpTaskDaemon\Task\Queue\Statistics;
 
-abstract class AbstractClass {
+abstract class AbstractClass {	
 	protected $_statistics = array();
 	protected $_sharedMemory;
 	
+	const STATUS_QUEUED = 'Queued';
+	const STATUS_RUNNING = 'Running';
 	const STATUS_DONE = 'Done';
 	const STATUS_FAILED = 'Failed';
 
 	public function __construct(\PhpTaskDaemon\SharedMemory $sharedMemory = null) {
 		$this->setSharedMemory($sharedMemory);
+		$this->_initializeStatus(self::STATUS_QUEUED);
+		$this->_initializeStatus(self::STATUS_RUNNING);
 		$this->_initializeStatus(self::STATUS_DONE);
 		$this->_initializeStatus(self::STATUS_FAILED);
 	}
@@ -34,10 +38,13 @@ abstract class AbstractClass {
 	/**
 	 *
 	 * Sets a shared memory object
-	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
+	 * @param \PhpTaskDaemon\Daemon\Ipc\SharedMemory $sharedMemory
 	 * @return $this
 	 */
-	public function setSharedMemory(\PhpTaskDaemon\SharedMemory $sharedMemory) {
+	public function setSharedMemory($sharedMemory) {
+		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
+			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('test');
+		}
 		$this->_sharedMemory = $sharedMemory;
 		return $this;
 	}
@@ -78,8 +85,8 @@ abstract class AbstractClass {
      * @return bool
      */
     private function _initializeStatus($status) {
-
-    	if (!$this->_sharedMemory->hasKey($status)) {
+    	$keys = $this->_sharedMemory->get();
+    	if (!in_array($status, $keys)) {
     		$this->_sharedMemory->setVar($status, 0);
     		return true;
     	}

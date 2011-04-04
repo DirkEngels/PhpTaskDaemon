@@ -7,7 +7,7 @@
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Executor\Status;
+namespace PhpTaskDaemon\Task\Executor\Status;
 
 interface InterfaceClass {
 
