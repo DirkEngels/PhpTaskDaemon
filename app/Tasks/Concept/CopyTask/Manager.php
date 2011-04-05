@@ -2,6 +2,6 @@
 
 namespace Tasks\Concept\CopyTask;
 
-class Manager extends \PhpTaskDaemon\Task\Manager\Interval {
+class Manager extends \PhpTaskDaemon\Task\Manager\Cron {
 	protected $_sleepTime = 2;
 }

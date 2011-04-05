@@ -12,10 +12,10 @@ class Queue extends PTDTQ\AbstractClass implements PTDTQ\InterfaceClass {
 	 */
 	public function load() {
 		$queue = array();
-		for ($i=0; $i<rand(0,30); $i++) {
+		for ($i=0; $i<rand(500,5000); $i++) {
 			$job = new Job(
 				'copyjob-' . $i, 
-				array('sleepTime' => rand(100000, 5000000))
+				array('sleepTime' => rand(10000, 50000))
 			);
 			array_push($queue, $job);
 		}
