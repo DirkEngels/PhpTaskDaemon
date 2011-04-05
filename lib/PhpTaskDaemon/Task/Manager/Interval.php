@@ -29,28 +29,34 @@ class Interval extends AbstractClass implements InterfaceClass {
 			// Load Tasks in Queue
 			$jobs = $this->getQueue()->load();
 			$executor = $this->getExecutor();
+			$queue = $this->getQueue();
 
 			if (count($jobs)==0) {
-				$this->log("Queue checked: empty!!!", \Zend_Log::INFO);
+				$this->log("Queue checked: empty!!!", \Zend_Log::DEBUG);
+				$executor->updateStatus(100, 'Queue empty');
 			} else {
 				$this->log("Queue loaded: " . count($jobs) . " elements", \Zend_Log::INFO);
+				$queue->updateQueue(count($jobs));
 	
 				while ($job = array_shift($jobs)) {
 					// Set manager input and start the manager
- 					$this->log("Job started: " . $job->getJobId(), \Zend_Log::DEBUG);
+ 					$this->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
 					$executor->setJob($job);
 					$executor->updateStatus(0);
 					$output = $executor->run(); 
 					$executor->updateStatus(100);
 
-					$this->log("Job done: " . $job->getJobId(), \Zend_Log::DEBUG);
+					$this->log($job->getOutputVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);
 					
 					usleep(10);
-					$this->getQueue()->updateStatistics(
+					$queue->updateStatistics(
 						$job->getOutputVar('returnStatus')
 					);
 					$executor->updateStatus(0);
+					$queue->updateQueue();
 				}
+				$this->log('Queue finished', \Zend_Log::DEBUG);
+				$executor->updateStatus(100, 'Queue finished');
 			}
 			
 			// Take a small rest after so much work. This also prevents 

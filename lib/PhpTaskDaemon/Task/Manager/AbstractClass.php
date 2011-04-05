@@ -57,7 +57,7 @@ abstract class AbstractClass {
 	 * Shared memory object
 	 * @var \PhpTaskDaemon\SharedMemory
 	 */
-	protected $_shm = null;
+//	protected $_shm = null;
 	
 	/**
 	 * Queue object
@@ -80,6 +80,9 @@ abstract class AbstractClass {
 
 
 	public function __construct($executor, $queue = null) {
+		$statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
+//		$queue->setStatistics($statistics);
+		
 		$this->setQueue($queue);
 		$this->setExecutor($executor);
 	}
@@ -89,9 +92,9 @@ abstract class AbstractClass {
 	 * Destroy the shared memory object
 	 */	
 	public function __destruct() {
-		if (isset($this->_shm)) {
-			unset($this->_shm);
-		}
+//		if (isset($this->_shm)) {
+//			unset($this->_shm);
+//		}
 	}
 
 
@@ -100,9 +103,9 @@ abstract class AbstractClass {
 			getmypid(), 
 			$parentPid
 		);
-		$this->_shm= new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
-			'task-' . $this->_pidManager->getCurrent()
-		);
+//		$this->_shm= new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
+//			'task-' . $this->_pidManager->getCurrent()
+//		);
 //		$this->_shm->setVar('name', $this->getName());
 	}
 
@@ -151,18 +154,18 @@ abstract class AbstractClass {
 	 * Returns the shared memory object
 	 * @return Dew_Daemon_Shm
 	 */
-	public function getShm() {
-		return $this->_shm;
-	}
+//	public function getShm() {
+//		return $this->_shm;
+//	}
 
 	/**
 	 * 
 	 * Sets a shared memory object
 	 * @param Dew_Daemon_Shm $shm
 	 */
-	public function setShm($shm) {
-		$this->_shm = $shm;
-	}
+//	public function setShm($shm) {
+//		$this->_shm = $shm;
+//	}
 
 	/**
 	 * 
@@ -213,7 +216,7 @@ abstract class AbstractClass {
 	}
 
 	public function log($message, $level = \Zend_Log::INFO) {
-		echo $message . "\n";
+//		echo $message . "\n";
 		if (is_a($this->_log, 'Zend_Log')) {
 			return $this->_log->log($message, $level);
 		}
@@ -234,11 +237,11 @@ abstract class AbstractClass {
 		if ($this->getPidManager() === null) {
 			$this->setPidManager($this->_pidManager);
 		}
-		$this->setShm(
-			new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
-				'task-' . $this->_pidManager->getCurrent()
-			)
-		);
+//		$this->setShm(
+//			new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
+//				'task-' . $this->_pidManager->getCurrent()
+//			)
+//		);
 		$this->execute();
 	}
 
@@ -261,7 +264,7 @@ abstract class AbstractClass {
 			case SIGINT:
 				// Shutdown
 				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
-				$this->_shm->remove();
+//				$this->_shm->remove();
 //				exit;
 				break;
 			default:
