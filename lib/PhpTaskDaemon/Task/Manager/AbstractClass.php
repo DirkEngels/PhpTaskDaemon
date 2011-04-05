@@ -1,4 +1,11 @@
 <?php
+/**
+ * @package PhpTaskDaemon
+ * @subpackage Task\Manager
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ */
 
 namespace PhpTaskDaemon\Task\Manager;
 
@@ -6,9 +13,6 @@ namespace PhpTaskDaemon\Task\Manager;
  * 
  * This is the abstract class of a Daemon_Manager. It provides the basic 
  * methods needed for almost all managers. 
- * 
- * @author DirkEngels <d.engels@dirkengels.com>
- *
  */
 abstract class AbstractClass {
 
@@ -48,26 +52,19 @@ abstract class AbstractClass {
 	 * 
 	 * Pid manager object. This class is repsonsible for storing the current, 
 	 * parent and child process IDs.
-	 * @var \PhpTaskDaemon\Pid\Manager
+	 * @var \PhpTaskDaemon\Daemon\Pid\Manager
 	 */
 	protected $_pidManager = null;
-
-	/**
-	 * 
-	 * Shared memory object
-	 * @var \PhpTaskDaemon\SharedMemory
-	 */
-//	protected $_shm = null;
 	
 	/**
 	 * Queue object
-	 * @var Dew_Daemon_Queue_AbstractClass
+	 * @var \PhpTaskDaemon\Task\Queue\AbstractClass
 	 */
 	protected $_queue = null;
 	
 	/**
 	 * Executor object
-	 * @var Dew_Daemon_Executo_AbstractClass
+	 * @var \PhpTaskDaemon\Task\Executor\AbstractClass
 	 */
 	protected $_executor = null;
 
@@ -79,10 +76,14 @@ abstract class AbstractClass {
 	protected $_waitTime = 10;
 
 
-	public function __construct($executor, $queue = null) {
-		$statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
-//		$queue->setStatistics($statistics);
-		
+	/**
+	 * 
+	 * A manager requires a executor and queue object. In case of a gearman
+	 * worker the queue object is optional. 
+	 * @param \PhpTaskDaemon\Task\Executor\AbstractClass $executor
+	 * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
+	 */
+	public function __construct($executor, $queue = null) {		
 		$this->setQueue($queue);
 		$this->setExecutor($executor);
 	}
@@ -92,21 +93,18 @@ abstract class AbstractClass {
 	 * Destroy the shared memory object
 	 */	
 	public function __destruct() {
-//		if (isset($this->_shm)) {
-//			unset($this->_shm);
-//		}
 	}
 
-
+	/**
+	 * 
+	 * Initializes the pid manager
+	 * @param int $parentPid
+	 */
 	public function init($parentPid = null) {
 		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
 			getmypid(), 
 			$parentPid
 		);
-//		$this->_shm= new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
-//			'task-' . $this->_pidManager->getCurrent()
-//		);
-//		$this->_shm->setVar('name', $this->getName());
 	}
 
 	/**
@@ -148,24 +146,6 @@ abstract class AbstractClass {
 		$this->_pidManager = $pidManager;
 		return $this;
 	}
-	
-	/**
-	 * 
-	 * Returns the shared memory object
-	 * @return Dew_Daemon_Shm
-	 */
-//	public function getShm() {
-//		return $this->_shm;
-//	}
-
-	/**
-	 * 
-	 * Sets a shared memory object
-	 * @param Dew_Daemon_Shm $shm
-	 */
-//	public function setShm($shm) {
-//		$this->_shm = $shm;
-//	}
 
 	/**
 	 * 
@@ -215,14 +195,23 @@ abstract class AbstractClass {
 		return $this;
 	}
 
+	/**
+	 * 
+	 * Logs a message to the log object, if set.
+	 * @param string $message
+	 * @param integer $level
+	 */
 	public function log($message, $level = \Zend_Log::INFO) {
-//		echo $message . "\n";
 		if (is_a($this->_log, 'Zend_Log')) {
 			return $this->_log->log($message, $level);
 		}
 		return false;
 	}
 
+	/**
+	 * 
+	 * Starts the manager
+	 */
 	public function runManager() {
 		// Override signal handler
 		$this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
@@ -237,11 +226,6 @@ abstract class AbstractClass {
 		if ($this->getPidManager() === null) {
 			$this->setPidManager($this->_pidManager);
 		}
-//		$this->setShm(
-//			new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
-//				'task-' . $this->_pidManager->getCurrent()
-//			)
-//		);
 		$this->execute();
 	}
 
@@ -264,8 +248,6 @@ abstract class AbstractClass {
 			case SIGINT:
 				// Shutdown
 				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
-//				$this->_shm->remove();
-//				exit;
 				break;
 			default:
 				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);

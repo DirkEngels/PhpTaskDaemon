@@ -1,8 +1,8 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Core
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Daemon\Interrupt
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -34,7 +34,10 @@ class Signal {
 	/**
 	 * 
 	 * Register POSIX Signals
-	 * @param $sig
+	 * @param $identifier
+	 * @param $log
+	 * @param $callback
+	 * @param $signals
 	 */
 	public function __construct($identifier, $log = null, $callback = null, $signals = null) {
 		$this->_identifier = $identifier;
@@ -56,6 +59,7 @@ class Signal {
 	 * 
 	 * System log 
 	 * @param string $message
+	 * @param integer $level
 	 */
 	public function log($message, $level = Zend_Log::INFO) {
 		if (is_object($this->_log)) {

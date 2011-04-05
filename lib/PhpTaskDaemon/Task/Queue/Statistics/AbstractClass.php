@@ -1,14 +1,20 @@
 <?php
-
 /**
  * @package PhpTaskDaemon
- * @subpackage Statistics
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Task\Queue\Statistics
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+
 namespace PhpTaskDaemon\Task\Queue\Statistics;
 
+/**
+ * 
+ * The abstract queue statistics class implements methods for setting/change
+ * the status count of executed jobs and the number of loaded and processed
+ * items in the queue.
+ */
 abstract class AbstractClass {	
 	protected $_statistics = array();
 	protected $_sharedMemory;
@@ -19,9 +25,20 @@ abstract class AbstractClass {
 	const STATUS_DONE = 'Done';
 	const STATUS_FAILED = 'Failed';
 
+	/**
+	 * 
+	 * The constructor sets the shared memory object. A default shared memory
+	 * object instance will be created when none provided.
+	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
+	 */
 	public function __construct(\PhpTaskDaemon\SharedMemory $sharedMemory = null) {
 		$this->setSharedMemory($sharedMemory);
 	}
+	
+	/**
+	 * 
+	 * Unset the shared memory at destruction time.
+	 */
 	public function __destruct() {
 		$this->_sharedMemory->remove();
 		unset($this->_sharedMemory); 
@@ -87,10 +104,8 @@ abstract class AbstractClass {
 	 */
     public function incrementStatus($status = self::STATUS_DONE) {
     	$this->_initializeStatus($status);
-    	echo $status;
-    	echo "INCREMENT UPDATING STATUS: " . $status . "\n";
     	// Update shared memory key +1
-    	$this->_sharedMemory->incrementVar($status);
+    	return $this->_sharedMemory->incrementVar($status);
     }
 
     /**
@@ -107,7 +122,7 @@ abstract class AbstractClass {
      * Decrements the queue count (after finishing a single job).
      */
     public function decrementQueue() {
-    	$this->_sharedMemory->decrementVar(self::STATUS_QUEUED);
+    	return $this->_sharedMemory->decrementVar(self::STATUS_QUEUED);
     }
     
     /**

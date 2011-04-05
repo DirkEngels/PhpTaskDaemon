@@ -30,11 +30,7 @@ function autoload($className) {
 			include_once ($classNamespaced);
 		} elseif (file_exists($classConvention)) {
 			include_once($classConvention);
-		} else { 
-//		  echo "file does not exists: " . $classConvention . "\n";
-//		  echo "file does not exists: " . $classNamespaced . "\n";
-		} 
-//		echo "\n";
+		}
 	}
 }
 spl_autoload_register('autoload');

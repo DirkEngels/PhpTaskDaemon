@@ -19,8 +19,12 @@ namespace PhpTaskDaemon\Task\Manager;
 class Forked extends AbstractClass implements InterfaceClass {
 	
 	protected $_sleepTime = 3;
-	
-	public function executeManager() {
+
+	/**
+	 * Runs the manager
+	 * @see PhpTaskDaemon\Task\Manager.InterfaceClass::execute()
+	 */
+	public function execute() {
 		while (true) {
 			// Load Tasks
 			$this->_queue = $this->_task->loadTasks();

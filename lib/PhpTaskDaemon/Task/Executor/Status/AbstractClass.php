@@ -1,24 +1,39 @@
 <?php
-
 /**
  * @package PhpTaskDaemon
- * @subpackage Executor\Status
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Task\Executor\Status
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+
 namespace PhpTaskDaemon\Task\Executor\Status;
 
+/**
+ * 
+ * The abstract class encapsulate a set of methods of the SharedMemory class. 
+ *
+ */
 abstract class AbstractClass {
 	/**
 	 * @var \PhpTaskDaemon\SharedMemory
 	 */
 	protected $_sharedMemory;
-	
+
+	/**
+	 * 
+	 * The constructor sets the shared memory object. A default shared memory
+	 * object instance will be created when none provided.
+	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
+	 */
 	public function __construct(\PhpTaskDaemon\SharedMemory $sharedMemory = null) {
 		$this->setSharedMemory($sharedMemory);
 	}
 	
+	/**
+	 * 
+	 * Unset the shared memory at destruction time.
+	 */
 	public function __destruct() {
 		$this->_sharedMemory->remove();
 		unset($this->_sharedMemory); 
@@ -46,8 +61,14 @@ abstract class AbstractClass {
 		}
 		return $this;
 	}
-	
 
+	/**
+	 * 
+	 * Get one or more status variables. When a key is provided and exists, the
+	 * corresponding value will be returning. If no key is given, all
+	 * registered keys and values will be returned. 
+	 * @param string|null $key
+	 */
 	public function get($key = null) {
     	if (!is_a($this->_sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
     		return false;
@@ -57,6 +78,14 @@ abstract class AbstractClass {
 		}
 		return $this->_sharedMemory->getKeys();
 	}
+	
+	/**
+	 * 
+	 * Store the status of variable of using a shared memory segment. 
+	 * @param integer $percentage
+	 * @param string $message
+	 * @return bool
+	 */
     public function set($percentage, $message = null) {
     	if (!is_a($this->_sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
     		return false;
@@ -64,6 +93,7 @@ abstract class AbstractClass {
     	$this->_sharedMemory->setVar('percentage', $percentage);
     	if ($message != null) {
     		$this->_sharedMemory->setVar('message', $message);
-    	}	
+    	}
+    	return true;
     }
 }

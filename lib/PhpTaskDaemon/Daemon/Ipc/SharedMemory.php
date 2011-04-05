@@ -1,8 +1,8 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Ipc
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Daemon\Ipc
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -105,7 +105,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
 		}
 		sem_release($this->_semaphoreLock);
-//echo "Retrieving SHM: " . $key . " => " . $value . "\n";		
+		
 		return $value;
 	}
 
@@ -139,10 +139,15 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
 		sem_release($this->_semaphoreLock);
 		
-//echo "Settings SHM: " . $key . " => " . print_r($value, true) . "\n";
 		return $retInit && $retPut;
 	}
 
+	/**
+	 * 
+	 * Increments the value of a shared variable.
+	 * @param string $key
+	 * @return bool|int
+	 */
 	public function incrementVar($key) {
 		sem_acquire($this->_semaphoreLock);
 		// Check the first variable for keys
@@ -162,19 +167,22 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 			}
 			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
 			$value = 1;
-//			echo "RESETTING KEY : " . $key . "\n";
 		} else {
 			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
 			$value++;
-//			echo "INCREME KEY : " . $key . " => " . $value . "\n";
 		}
 		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
 		sem_release($this->_semaphoreLock);
 		
-//echo "Incrementing SHM: " . $key . " => " . print_r($value, true) . "\n";
 		return $retInit && $retPut;
 	}
 
+	/**
+	 * 
+	 * Decrements the value of a shared variable.
+	 * @param string $key
+	 * @return bool|int
+	 */
 	public function decrementVar($key) {
 		sem_acquire($this->_semaphoreLock);
 		// Check the first variable for keys
@@ -201,7 +209,6 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
 		sem_release($this->_semaphoreLock);
 		
-//echo "Incrementing SHM: " . $key . " => " . print_r($value, true) . "\n";
 		return $retInit && $retPut;
 	}
 	/**
@@ -220,7 +227,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 			unset($this->_keys[$key]);
 		}
 		sem_release($this->_semaphoreLock);
-//echo "Remove SHM Key: " . $key . "\n";
+
 		return $ret;
 	}
 	
@@ -248,7 +255,6 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 			unlink($this->_pathNameWithPid . '.sem');
 		}
 
-//echo "Remove SHM: \n";
 		return ($retShm && $retSem);
 	}
 }

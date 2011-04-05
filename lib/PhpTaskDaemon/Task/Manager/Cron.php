@@ -1,9 +1,8 @@
 <?php
-
 /**
- * @package SiteSpeed
- * @subpackage Daemon\Manager
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @package PhpTaskDaemon
+ * @subpackage Task\Manager
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -39,7 +38,12 @@ class Cron extends Interval {
 		}
 		time_sleep_until($sleepTime);
 	}
-	
+
+	/**
+	 * 
+	 * Calculate the next time to run.
+	 * @return integer
+	 */
 	protected function _getNextTime() {
 		$cron['second'] = ($this->_second !== null) ? $this->_second : date('s');
 		$cron['minute'] = ($this->_minute !== null) ? $this->_minute : date('i');
