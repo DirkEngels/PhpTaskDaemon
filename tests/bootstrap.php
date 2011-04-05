@@ -1,32 +1,5 @@
 <?php
 
-// Define path to application directory
-//defined('APPLICATION_PATH')
-//    || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
-//
-//// Define application environment
-//defined('APPLICATION_ENV')
-//    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
-//
-//// Set include paths
-//define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
-////define('APPLICATION_PATH', realpath(PROJECT_ROOT .'/application'));
-//define('LIBRARY_PATH', realpath(PROJECT_ROOT .'/library'));
-//define('TMP_PATH', realpath(PROJECT_ROOT .'/../tmp'));
-
-// Include Paths
-//$includePaths = array(
-//    get_include_path(),
-//    LIBRARY_PATH, 
-//    '/usr/share/php/libzend-framework-php/'
-//);
-//set_include_path(
-//    implode(
-//        PATH_SEPARATOR,
-//        $includePaths
-//    )
-//);
-
 define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
 define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/application'));
 define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/lib'));
@@ -50,9 +23,6 @@ function autoload($className) {
 	foreach($GLOBALS['includePaths'] as $path) {
 		$classNamespaced = $path .'/' . str_replace('\\', '/', $className) . '.php';
 		$classConvention = $path . '/' . str_replace('_','/',$className) . '.php';
-//		echo $classNamespaced . "\n";
-//		echo $classConvention . "\n";
-//		echo "\n";
 		if (file_exists($classNamespaced)) {
 			include_once ($classNamespaced);
 		} elseif (file_exists($classConvention)) {

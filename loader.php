@@ -25,8 +25,6 @@ function autoload($className) {
 	foreach($GLOBALS['includePaths'] as $path) {
 		$classNamespaced = $path .'/' . str_replace('\\', '/', $className) . '.php';
 		$classConvention = $path . '/' . str_replace('_','/',$className) . '.php';
-//		echo $classConvention . "\n";
-//		echo $classNamespaced . "\n";
 		if (file_exists($classNamespaced)) {
 			include_once ($classNamespaced);
 		} elseif (file_exists($classConvention)) {
