@@ -57,8 +57,7 @@ class Instance {
 		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid(), $parent);
 		$this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
 		
-		$this->_shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('daemon');
-		$this->_shm->setVar('state', 'running');
+		$this->_shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
 		
 		$this->_initLogSetup();
 	}
@@ -68,10 +67,9 @@ class Instance {
 	 * Unset variables at destruct to hopefully free some memory. 
 	 */
 	public function __destruct() {
-//		$this->_shm->setVar('state', 'stopped');
 		unset($this->_pidManager);
 		unset($this->_pidFile);
-//		unset($this->_shm);
+		unset($this->_shm);
 	}
 
 	/**
@@ -186,20 +184,22 @@ class Instance {
 	public function loadManagerByName($taskName) {
 		$managerClass = '\\Tasks\\' . $taskName . '\\Manager'; 
 		$queueClass = '\\Tasks\\' . $taskName . '\\Queue';
-		$executorClass = '\\Tasks\\' . $taskName . '\\Execuctor';
+		$executorClass = '\\Tasks\\' . $taskName . '\\Executor';
 
+		//Queue
 		$queue = (class_exists($queueClass)) 
 			? new $queueClass()
 			: new \PhpTaskDaemon\Task\Queue\BaseClass();
-
+		
+		// Executuor
 		$executor = (class_exists($executorClass)) 
 			? new $executorClass()
 			: new \PhpTaskDaemon\Task\Executor\BaseClass();
 
+		// Manager
 		$manager = (class_exists($managerClass)) 
 			? new $managerClass($executor, $queue)
 			: new \PhpTaskDaemon\Task\Manager\Interval($executor, $queue);
-		
 		$this->addManager($manager);
 
 		return $manager;
@@ -260,6 +260,7 @@ class Instance {
 			$this->_log->log("No daemon tasks found", \Zend_Log::INFO);
 			exit;
 		}
+		$this->_shm->setVar('childs', array());
 		$this->_log->log("Starting daemon tasks", \Zend_Log::DEBUG);
 		foreach ($this->_managers as $manager) {
 			$manager->setLog(clone($this->_log));
@@ -308,12 +309,20 @@ class Instance {
 		} elseif ($pid) {
 			// Parent
 			$this->_pidManager->addChild($pid);
+			$this->_shm->setVar('status-'. $pid, get_class($manager));
+			
 
 		} else {
 			// Child
 			$newPid = getmypid();
 			$this->_pidManager->forkChild($newPid);
 			$manager->init($this->_pidManager->getParent());
+
+			$statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
+			$manager->getQueue()->setStatistics($statistics);
+			
+			$status = new \PhpTaskDaemon\Task\Executor\Status\BaseClass();
+			$manager->getExecutor()->setStatus($status);
 			
 			$this->_log->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
 			$manager->runManager();
