@@ -55,9 +55,6 @@ class File {
 	 * @return bool
 	 */
 	public function setFilename($filename) {
-		if (!is_null($filename) && !file_exists(\TMP_PATH . $filename)) {
-			touch($filename);
-		}
 		if (file_exists($filename)) {
 			$this->_filename = $filename;
 			return true;
@@ -115,7 +112,7 @@ class File {
 	 * @param string $this->_filename
 	 * @return bool
 	 */
-	public function write($pid = null) {
+	public function write($pid = null) {		
 		if ($pid>0) {
 			if (!file_exists($this->getFilename())) {
 				touch($this->getFilename());
