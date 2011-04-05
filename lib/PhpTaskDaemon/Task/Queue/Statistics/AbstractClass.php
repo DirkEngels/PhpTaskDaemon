@@ -87,8 +87,6 @@ abstract class AbstractClass {
 	 */
     public function incrementStatus($status = self::STATUS_DONE) {
     	$this->_initializeStatus($status);
-    	echo $status;
-    	echo "INCREMENT UPDATING STATUS: " . $status . "\n";
     	// Update shared memory key +1
     	$this->_sharedMemory->incrementVar($status);
     }

@@ -1,8 +1,0 @@
-#!/usr/bin/env php
-<?php
-
-include('bootstrap.php');
-
-// Start the application
-$daemon = new \PhpTaskDaemon\Daemon\State();
-echo var_dump($daemon->getStatus());
