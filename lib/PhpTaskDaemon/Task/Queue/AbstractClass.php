@@ -20,10 +20,25 @@ abstract class AbstractClass {
 	public function setStatistics($statistics) {
 		$this->_statistics = $statistics;
 	}
-	public function updateStatistics($status) {
+	public function updateStatistics($status, $count = null) {
 		if ($this->_statistics != null) {
-			return $this->_statistics->increment($status);
+			if ($count != null) {
+				$this->_statistics->setStatusCount($status, $count);
+			} else {
+				$this->_statistics->incrementStatus($status);
+			}
 		}
 		return false;
 	}
+	public function updateQueue($count = null) {
+		if ($this->_statistics != null) {
+			if ($count != null) {
+				$this->_statistics->setQueueCount($count);
+			} else {
+				$this->_statistics->decrementQueue();
+			}
+		}
+		return true;
+	}
+
 }
