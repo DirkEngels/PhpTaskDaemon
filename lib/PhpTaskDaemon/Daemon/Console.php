@@ -262,12 +262,6 @@ echo "
 				$managerData = $status['task-' . $childPid];
 				echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['Queued'] . "\tDone: " . $managerData['statistics']['Done'] . "\tFailed:" . $managerData['statistics']['Failed'] . ")\n";
 				echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
-//				echo var_dump($managerData['status']);
-				foreach ($managerData as $managerDataKey => $managerDataValue) {
-//					if (preg_match('/^task-/', $managerDataKey)) {
-						
-//					}
-				}
 			}
 
 		}
