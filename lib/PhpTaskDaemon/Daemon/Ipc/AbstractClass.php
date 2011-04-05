@@ -26,15 +26,15 @@ abstract class AbstractClass {
 	}
 
 	/**
-	 * 
-	 * Sets the registered keys
-	 * @param array $keys
-	 * @return $this
+	 * Returns all the registered keys and values
+	 * @return array
 	 */
-	public function setKeys($keys) {
-		if (is_array($keys)) {
-			$this->_keys = $keys;
+	public function get() {
+		$keys = $this->getKeys();
+		$data = array();
+		foreach($keys as $nr => $key) {
+			$data[$nr] = $this->getVar($nr);
 		}
-		return $this;
+		return $data;
 	}
 }	
