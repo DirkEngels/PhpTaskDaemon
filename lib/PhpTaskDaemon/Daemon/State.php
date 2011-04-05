@@ -1,13 +1,20 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Daemon
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
 namespace PhpTaskDaemon\Daemon;
 
+/**
+ * 
+ * The State class can be used to read the current state of the daemon from the
+ * shared memory. It provides statis methods, so it can easily be integrated
+ * within other projects.
+ */
 class State {
 	
 	/**

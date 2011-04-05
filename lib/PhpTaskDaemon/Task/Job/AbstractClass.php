@@ -1,21 +1,34 @@
 <?php
-
 /**
  * @package PhpTaskDaemon
  * @subpackage Task\Job
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+
 namespace PhpTaskDaemon\Task\Job;
 
+/**
+ * 
+ * The job abstract class provides setters and getters for the input and output
+ * variables. The abstract class also implements a check method for the input
+ * used by the managers. 
+ */
 abstract class AbstractClass {
 	protected $_jobId;
 	protected $_input = array();
 	protected $_inputKeys = array();
 	protected $_output = array();
 	
-	
+
+	/**
+	 * The first argument contains the jobId, used for identifying the job. If
+	 * no jobId is provided, an random ID will be generated. The second 
+	 * argument is an array containing the input variables.
+	 * @param string $jobId
+	 * @param array $input 
+	 */
 	public function __construct($jobId = null, $input = array()) {
 		if ($jobId == null) {
 			$jobId = $this::generateJobId();
@@ -74,6 +87,7 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * (Re)Sets a single input key
+	 * @return mixed
 	 */
 	public function getInputVar($var) {
 		return $this->_input[$var];
@@ -82,6 +96,8 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * (Re)Sets a single input key
+	 * @param string $var
+	 * @param mixed $value
 	 */
 	public function setInputVar($var, $value) {
 		$this->_input[$var] = $value;
@@ -90,6 +106,7 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Returns the input field keys
+	 * @return array
 	 */
 	public function getInputKeys() {
 		return $this->_inputKeys;
@@ -125,7 +142,8 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Returns a single output variable
-	 * @param mixed $var
+	 * @param string $var
+	 * @return mixed
 	 */
 	public function getOutputVar($var) {
 		$value = (isset($this->_output[$var])) ? $this->_output[$var] : '?'; 
@@ -134,7 +152,9 @@ abstract class AbstractClass {
 
 	/**
 	 * 
-	 * (Re)Sets a single output key
+	 * (Re)Sets a single output key\
+	 * @param string $var
+	 * @paramt mixed $value
 	 */
 	public function setOutputVar($var, $value) {
 		$this->_output[$var] = $value;

@@ -1,9 +1,8 @@
 <?php
-
 /**
- * @package SiteSpeed
- * @subpackage Daemon\Manager
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @package PhpTaskDaemon
+ * @subpackage Task\Manager
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -14,15 +13,13 @@ namespace PhpTaskDaemon\Task\Manager;
  * 
  * This class represents a manager which runs periodically based on a preset 
  * interval.  
- * 
  */
-
 class Interval extends AbstractClass implements InterfaceClass {
 	protected $_sleepTime = 5;
-	
+
 	/**
-	 * Loads the queue and executes all tasks 
-	 *
+	 * Runs the manager
+	 * @see PhpTaskDaemon\Task\Manager.InterfaceClass::execute()
 	 */
 	public function execute() {
 		while (true) {			

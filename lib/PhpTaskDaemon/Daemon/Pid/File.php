@@ -1,9 +1,8 @@
 <?php
-
 /**
- * @package SiteSpeed
+ * @package PhpTaskDaemon
  * @subpackage Daemon\Pid
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -78,7 +77,6 @@ class File {
 	/**
 	 * 
 	 * Reads the pid file and returns the process ID
-	 * @param string $this->_filename
 	 * @return int
 	 */
 	public function read() {
@@ -95,7 +93,6 @@ class File {
 	 * 
 	 * Removes the pidfile. Returns false if the file does not exists or cannot
 	 * be removed.
-	 * @param unknown_type $this->_filename
 	 * @return bool
 	 */
 	public function unlink() {
@@ -109,7 +106,6 @@ class File {
 	 * 
 	 * Writes a file to disk containing the process ID.
 	 * @param int $pid
-	 * @param string $this->_filename
 	 * @return bool
 	 */
 	public function write($pid = null) {		

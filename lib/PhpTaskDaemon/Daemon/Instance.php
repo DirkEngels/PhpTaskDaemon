@@ -1,8 +1,8 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Core
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Daemon
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -18,25 +18,25 @@ namespace PhpTaskDaemon\Daemon;
 class Instance {
 	/**
 	 * This variable contains pid manager object
-	 * @var Manager $_pidManager
+	 * @var Pid\Manager $_pidManager
 	 */
 	protected $_pidManager = null;
 	
 	/**
 	 * Pid reader object
-	 * @var File $_pidFile
+	 * @var Pid\File $_pidFile
 	 */
 	protected $_pidFile = null;
 	
 	/**
 	 * Shared memory object
-	 * @var SharedMemory $_shm
+	 * @var Ipc\SharedMemory $_shm
 	 */
 	protected $_shm = null;
 	
 	/**
 	 * Logger object
-	 * @var Zend_Log $_log
+	 * @var \Zend_Log $_log
 	 */
 	protected $_log = null;
 	
@@ -75,7 +75,7 @@ class Instance {
 	/**
 	 * 
 	 * Returns the log object
-	 * @return Zend_Log
+	 * @return \Zend_Log
 	 */
 	public function getLog() {
 		return $this->_log;
@@ -84,7 +84,7 @@ class Instance {
 	/**
 	 * 
 	 * Sets the log object
-	 * @param Zend_Log $log
+	 * @param \Zend_Log $log
 	 * @return $this
 	 */
 	public function setLog(Zend_Log $log) {
@@ -108,7 +108,7 @@ class Instance {
 	 * Initialize logger with a null writer. Null writer is needed because this function
 	 * is invoked very early in the bootstrap.
 	 * 
-	 * @param Zend_Log $log
+	 * @param \Zend_Log $log
 	 */
 	protected function _initLogSetup(Zend_Log $log = null) {
 		if (is_null($log)) {
@@ -137,7 +137,11 @@ class Instance {
 		$this->_log->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
 	}
 
-
+	/**
+	 * 
+	 * Return the loaded manager objects.
+	 * @return array
+	 */
 	public function getManagers() {
 		return $this->_managers;
 	}
@@ -145,7 +149,8 @@ class Instance {
 	/**
 	 * 
 	 * Adds a manager object to the managers stack
-	 * @param Manager\AbstractClass $manager
+	 * @param \PhpTaskDaemon\Task\Manager\AbstractClass $manager
+	 * @return bool
 	 */
 	public function addManager($manager) {
 		return array_push($this->_managers, $manager);
@@ -153,9 +158,11 @@ class Instance {
 
 	/**
 	 * 
-	 * Scans a directory for task managers
+	 * Scans a directory for task managers and returns the number of loaded
+	 * tasks.
 	 * 
 	 * @param string $dir
+	 * @return integer
 	 */
 	public function scanTaskDirectory($dir) {
 		$this->_log->log("Scanning directory for tasks: " . $dir, \Zend_Log::DEBUG);

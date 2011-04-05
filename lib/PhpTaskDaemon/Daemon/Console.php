@@ -1,8 +1,8 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Core
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Daemon
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -142,6 +142,10 @@ class Console {
 		exit;
 	}
 
+	/**
+	 * 
+	 * Lists the current loaded tasks. 
+	 */
     public function listActions() {
         $this->getDaemon()->scanTaskDirectory(APPLICATION_PATH . '/Tasks/');
         $tasks = $this->getDaemon()->getManagers();
@@ -199,56 +203,6 @@ class Console {
 			exit;
 		}
 
-echo "
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-";
 		echo "PhpTaskDaemon - Status\n";
 		echo "==========================\n";
 		echo "\n";
