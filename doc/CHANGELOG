@@ -12,10 +12,13 @@ Version 0.x
 
 Verison 0.5
 -----------
-- cleanup code
-- add code documentation
 - refactor cron manager
 - refactor parallel manager
+
+Version 0.4.1
+-------------
++ cleanup code
++ add code documentation
 
 Version 0.4
 ===========
