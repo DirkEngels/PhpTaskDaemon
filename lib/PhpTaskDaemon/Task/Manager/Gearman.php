@@ -40,11 +40,11 @@ class Gearman extends AbstractClass implements InterfaceClass {
 	 */
 	private $_gearmanJob = null;
 	
-	public function __construct() {
-		parent::__construct();
-	}
-
-	public function executeManager() {
+	/**
+	 * Runs the manager
+	 * @see PhpTaskDaemon\Task\Manager.InterfaceClass::execute()
+	 */
+	public function execute() {
 		$this->_task->updateMemoryTask(0);
 		
 		$gmworker= new GearmanWorker();
@@ -61,6 +61,12 @@ class Gearman extends AbstractClass implements InterfaceClass {
 		}
 				
 	}
+	
+	/**
+	 * 
+	 * Accepts the gearman input and prepares the job input.
+	 * @param mixed $gearmanJob
+	 */
 	public function acceptJob($gearmanJob) {
 		$this->_task->setTaskInput($gearmanJob->workload());
 		$this->_task->updateMemoryTask(0);

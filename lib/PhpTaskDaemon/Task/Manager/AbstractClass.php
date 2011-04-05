@@ -1,4 +1,11 @@
 <?php
+/**
+ * @package PhpTaskDaemon
+ * @subpackage Task\Manager
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
+ * @author Dirk Engels <d.engels@dirkengels.com>
+ * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
+ */
 
 namespace PhpTaskDaemon\Task\Manager;
 
@@ -6,9 +13,6 @@ namespace PhpTaskDaemon\Task\Manager;
  * 
  * This is the abstract class of a Daemon_Manager. It provides the basic 
  * methods needed for almost all managers. 
- * 
- * @author DirkEngels <d.engels@dirkengels.com>
- *
  */
 abstract class AbstractClass {
 
@@ -48,19 +52,19 @@ abstract class AbstractClass {
 	 * 
 	 * Pid manager object. This class is repsonsible for storing the current, 
 	 * parent and child process IDs.
-	 * @var \PhpTaskDaemon\Pid\Manager
+	 * @var \PhpTaskDaemon\Daemon\Pid\Manager
 	 */
 	protected $_pidManager = null;
 	
 	/**
 	 * Queue object
-	 * @var Dew_Daemon_Queue_AbstractClass
+	 * @var \PhpTaskDaemon\Task\Queue\AbstractClass
 	 */
 	protected $_queue = null;
 	
 	/**
 	 * Executor object
-	 * @var Dew_Daemon_Executo_AbstractClass
+	 * @var \PhpTaskDaemon\Task\Executor\AbstractClass
 	 */
 	protected $_executor = null;
 
@@ -72,6 +76,13 @@ abstract class AbstractClass {
 	protected $_waitTime = 10;
 
 
+	/**
+	 * 
+	 * A manager requires a executor and queue object. In case of a gearman
+	 * worker the queue object is optional. 
+	 * @param \PhpTaskDaemon\Task\Executor\AbstractClass $executor
+	 * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
+	 */
 	public function __construct($executor, $queue = null) {		
 		$this->setQueue($queue);
 		$this->setExecutor($executor);
@@ -84,7 +95,11 @@ abstract class AbstractClass {
 	public function __destruct() {
 	}
 
-
+	/**
+	 * 
+	 * Initializes the pid manager
+	 * @param int $parentPid
+	 */
 	public function init($parentPid = null) {
 		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
 			getmypid(), 
@@ -180,6 +195,12 @@ abstract class AbstractClass {
 		return $this;
 	}
 
+	/**
+	 * 
+	 * Logs a message to the log object, if set.
+	 * @param string $message
+	 * @param integer $level
+	 */
 	public function log($message, $level = \Zend_Log::INFO) {
 		if (is_a($this->_log, 'Zend_Log')) {
 			return $this->_log->log($message, $level);
@@ -187,6 +208,10 @@ abstract class AbstractClass {
 		return false;
 	}
 
+	/**
+	 * 
+	 * Starts the manager
+	 */
 	public function runManager() {
 		// Override signal handler
 		$this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(

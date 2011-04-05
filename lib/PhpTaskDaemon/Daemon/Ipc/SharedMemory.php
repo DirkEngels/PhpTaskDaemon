@@ -1,8 +1,8 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Ipc
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Daemon\Ipc
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -142,6 +142,12 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		return $retInit && $retPut;
 	}
 
+	/**
+	 * 
+	 * Increments the value of a shared variable.
+	 * @param string $key
+	 * @return bool|int
+	 */
 	public function incrementVar($key) {
 		sem_acquire($this->_semaphoreLock);
 		// Check the first variable for keys
@@ -171,6 +177,12 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		return $retInit && $retPut;
 	}
 
+	/**
+	 * 
+	 * Decrements the value of a shared variable.
+	 * @param string $key
+	 * @return bool|int
+	 */
 	public function decrementVar($key) {
 		sem_acquire($this->_semaphoreLock);
 		// Check the first variable for keys

@@ -1,9 +1,8 @@
 <?php
-
 /**
- * @package SiteSpeed
+ * @package PhpTaskDaemon
  * @subpackage Daemon\Pid
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -120,6 +119,7 @@ class Manager {
 	 * This method should be called by the child when a process has forked. It
 	 * shifts the current process ID to the parent and sets the new child 
 	 * process ID. It also cleans all existing childs.
+	 * @param integer $newPid
 	 */
 	public function forkChild($newPid) {
 		$this->_parent = $this->_current;

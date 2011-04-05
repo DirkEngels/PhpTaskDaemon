@@ -1,13 +1,19 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Executor
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @subpackage Daemon\Ipc
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+
 namespace PhpTaskDaemon\Daemon\Ipc;
 
+/**
+ * The abstract class implements storing the variable keys and provides a
+ * method for retrieving all registered keys.
+ * 
+ */
 abstract class AbstractClass {
 	
 	/**
@@ -18,7 +24,7 @@ abstract class AbstractClass {
 
 	/**
 	 * 
-	 * Returns the registered keys
+	 * Returns the registered keys.
 	 * @return array
 	 */
 	public function getKeys() {
@@ -26,7 +32,7 @@ abstract class AbstractClass {
 	}
 
 	/**
-	 * Returns all the registered keys and values
+	 * Returns all the registered keys with corresponding values.
 	 * @return array
 	 */
 	public function get() {
