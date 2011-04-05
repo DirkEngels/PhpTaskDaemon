@@ -57,6 +57,7 @@ class Console {
 					'logfile|l-s'	=> 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
 					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
 					'action|a=s'	=> 'Action (default: start) (options: start, stop, restart, status, monitor)',
+					'list-tasks|lt' => 'List registered tasks',
 					'print|p'   => 'List Actions',
 					'verbose|v'		=> 'Verbose',
 					'help|h'		=> 'Show help message (this message)',
@@ -120,8 +121,8 @@ class Console {
 		// Set action
 		$action = $this->_consoleOpts->getOption('action');
 
-        if ($this->_consoleOpts->getOption('print')) {
-            $this->listActions();
+        if ($this->_consoleOpts->getOption('list-tasks')) {
+            $this->listTasks();
             exit;
         }
 
@@ -146,7 +147,7 @@ class Console {
 	 * 
 	 * Lists the current loaded tasks. 
 	 */
-    public function listActions() {
+    public function listTasks() {
         $this->getDaemon()->scanTaskDirectory(APPLICATION_PATH . '/Tasks/');
         $tasks = $this->getDaemon()->getManagers();
         echo "Tasks: \n";
