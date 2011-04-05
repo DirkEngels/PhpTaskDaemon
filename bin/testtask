@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+include('bootstrap.php');
+
+// Start a single task
+$queue = new \Tasks\Concept\PocTask\Queue();
+$executor = new \Tasks\Concept\PocTask\Executor();
+
+$task = new \Tasks\Concept\PocTask\Manager();
+$task->setQueue($queue);
+$task->setExecutor($executor);
+$task->execute();
+
+echo "\n";

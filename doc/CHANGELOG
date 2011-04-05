@@ -4,15 +4,16 @@ Change Log
 Verison 0.5
 -----------
 - read and use configuration file
+- refactor cron manager
+- boot script (/etc/init.d/phptaskdaemon)
+- cron restart script (for restarting after critical errors)
 
 Version 0.4
 -----------
 + move web status to seperate project
-- apply unix file system hierarchy standard
-- refactor cron manager
-- boot script (/etc/init.d/phptaskdaemon)
-- cron restart script (for restarting after critical errors)
-- implement verbose logging
++ apply unix file system hierarchy standard
++ implement verbose logging
++ refactor class structure (seperate queue loading and task exection)
 
 Version 0.3
 ===========
