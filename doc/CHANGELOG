@@ -13,7 +13,7 @@ Version 0.4
 + move web status to seperate project
 + apply unix file system hierarchy standard
 + implement verbose logging
-- refactor class structure (seperate queue loading and task exection)
++ refactor class structure (seperate queue loading and task exection)
 
 Version 0.3
 ===========
