@@ -12,65 +12,77 @@ class State {
 	
 	/**
 	 * 
-	 * This static method returns an array with the status of all current
-	 * running tasks.
+	 * This static method returns an array with the state (statistics + 
+	 * statuses of active tasks) of all current running tasks.
 	 * @return array
 	 */
-	public static function getStatus() {
+	public static function getState() {
 		$pidFile = new \PhpTaskDaemon\Daemon\Pid\File(TMP_PATH . '/phptaskdaemond.pid');
 		$pid = $pidFile->read();
 
-		$status = array('pid' => $pid);
+		$state = array('pid' => $pid);
 		
 		if (file_exists(TMP_PATH . '/phptaskdaemond.shm')) {
 			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
 			$shmKeys = $shm->getKeys();
-			$status['memKeys'] = count($shmKeys); 
+			$state['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
-				echo $key .  ' = > ' . $value . "\n";
-				$status[$key] = $shm->getVar($key);
+				$state[$key] = $shm->getVar($key);
 			}
 
 			// Child info
-			if (isset($status['childs'])) {
-				foreach($status['childs'] as $child) {
-					$status['task-' . $child] = array("Child: " . $child);
-//					$status['task-' . $child] = self::_getStatusChild($child);
+			if (isset($state['childs'])) {
+				foreach($state['childs'] as $child) {
+					$state['task-' . $child]['status'] = self::_getStatusChild($child);
+					$state['task-' . $child]['statistics'] = self::_getStaticsChild($child);
 				}
 			}
 		}
-
-		return $status;
+		return $state;
 	}
 	
 	/**
-	 * This statis method is mainly used by the getStatus method and returns an
-	 * array with all statuses of currenly running tasks of a particular
+	 * This statis method is mainly used by the getState method and returns an
+	 * array with all statuses of currently running tasks of a particular
 	 * manager.
 	 *
 	 * @param int $childPid
 	 * @return array
 	 */
 	protected static function _getStatusChild($childPid) {
-		$status = array('childPid' => $childPid);
+		$state = array('childPid' => $childPid);
 		
-		if (file_exists(TMP_PATH . '/task-' . $childPid . '.shm')) {
-			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('manager-' . $childPid);
+		if (file_exists(TMP_PATH . '/status-' . $childPid . '.shm')) {
+			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . $childPid);
 			$shmKeys = $shm->getKeys();
-			$status['memKeys'] = count($shmKeys); 
 			foreach($shm->getKeys() as $key => $value) {
-				$status[$key] = $shm->getVar($key);
+				$state[$key] = $shm->getVar($key);
 			}
 		}
 
-		return $status;
-	}
-	
-	public static function getStatistics() {
-		
-	}
-	protected static function _getStatisticsChild($childPid) {
-		
+		return $state;
 	}
 
+	/**
+	 * This statis method is mainly used by the getState method and returns an
+	 * array with statistics of all currently running tasks of a particular
+	 * manager.
+	 *
+	 * @param int $childPid
+	 * @return array
+	 */
+	protected static function _getStaticsChild($childPid) {
+		$state = array('childPid' => $childPid);
+		
+		if (file_exists(TMP_PATH . '/statistics-' . $childPid . '.shm')) {
+			$shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . $childPid);
+			$shmKeys = $shm->getKeys();
+			foreach($shm->getKeys() as $key => $value) {
+				$state[$key] = $shm->getVar($key);
+			}
+		}
+
+		return $state;
+	}
+	
 }
