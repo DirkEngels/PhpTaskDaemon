@@ -14,14 +14,15 @@ Verison 0.5
 -----------
 - refactor cron manager
 - refactor parallel manager
++ fix broken unit tests
 
 Version 0.4.1
--------------
+=============
 + cleanup code
 + add code documentation
 
 Version 0.4
-===========
+-----------
 + move web status to seperate project
 + apply unix file system hierarchy standard
 + implement verbose logging
