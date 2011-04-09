@@ -19,13 +19,97 @@ class SharedMemoryTest extends \PHPUnit_Framework_Testcase {
 	protected $_sharedMemory;
 	
 	protected function setUp() {
+		$semaphore = __DIR__ . '/_data/id.shm';
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
 	}
 	protected function tearDown() {
+		$this->_sharedMemory->remove();
 	}
 	
 	public function testConstructor() {
+		$this->assertEquals(0, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('a:0:{}', serialize($this->_sharedMemory->get()));
+	}
+
+	public function testSetVarNew() {
 		$semaphore = __DIR__ . '/_data/id.shm';
 		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
-		$this->assertEquals(0, sizeof($this->_sharedMemory->get()));
+		$this->_sharedMemory->setVar('testvar1', '123456');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
 	}
+
+	public function testSetVarUpdate() {
+		$semaphore = __DIR__ . '/_data/id.shm';
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
+		$this->_sharedMemory->setVar('testvar1', '123456');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
+		
+		$this->_sharedMemory->setVar('testvar1', '654321');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('654321', $this->_sharedMemory->getVar('testvar1'));
+	}
+	public function testSetVarMultiple() {
+		$semaphore = __DIR__ . '/_data/id.shm';
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
+		$this->_sharedMemory->setVar('testvar1', '123456');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
+		
+		$this->_sharedMemory->setVar('testvar2', '654321');
+		$this->assertEquals(2, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('654321', $this->_sharedMemory->getVar('testvar2'));
+	}
+	public function testIncrementVar() {
+		$semaphore = __DIR__ . '/_data/id.shm';
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
+		$this->_sharedMemory->setVar('testvar1', '123456');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
+		
+		$this->_sharedMemory->incrementVar('testvar1');
+		$this->assertEquals('123457', $this->_sharedMemory->getVar('testvar1'));
+	}
+	public function testDecrementVar() {
+		$semaphore = __DIR__ . '/_data/id.shm';
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
+		$this->_sharedMemory->setVar('testvar1', '123456');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
+		
+		$this->_sharedMemory->decrementVar('testvar1');
+		$this->assertEquals('123455', $this->_sharedMemory->getVar('testvar1'));
+	}
+	public function testRemoveVar() {
+		$semaphore = __DIR__ . '/_data/id.shm';
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
+		$this->_sharedMemory->setVar('testvar1', '123456');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
+		
+		$this->_sharedMemory->setVar('testvar2', '654321');
+		$this->assertEquals(2, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('654321', $this->_sharedMemory->getVar('testvar2'));
+		
+		$this->_sharedMemory->removeVar('testvar2');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
+		
+	}
+	public function testRemove() {
+		$semaphore = __DIR__ . '/_data/id.shm';
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
+		$this->_sharedMemory->setVar('testvar1', '123456');
+		$this->assertEquals(1, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('123456', $this->_sharedMemory->getVar('testvar1'));
+		
+		$this->_sharedMemory->setVar('testvar2', '654321');
+		$this->assertEquals(2, sizeof($this->_sharedMemory->get()));
+		$this->assertEquals('654321', $this->_sharedMemory->getVar('testvar2'));
+		
+		$this->_sharedMemory->remove();
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
+	}
+	
 }

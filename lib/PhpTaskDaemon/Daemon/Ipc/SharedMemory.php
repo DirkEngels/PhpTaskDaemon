@@ -166,7 +166,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		// Update keys
 		if (in_array($key, array_keys($keys))) {
 			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
-			echo "Retrieving value: " . $value . " for key: " . $key . " (" . $keys[$key] . ")\n";
+//			echo "Retrieving value: " . $value . " for key: " . $key . " (" . $keys[$key] . ")\n";
 			$value++;
 			$ret = shm_put_var($this->_sharedMemory, $keys[$key], $value);
 		} else {
@@ -177,7 +177,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		}
 		sem_release($this->_semaphoreLock);
 
-		echo "Incrementing key " . $key . " (" . $keys[$key] . ") to value: " . $value . "\n";
+//		echo "Incrementing key " . $key . " (" . $keys[$key] . ") to value: " . $value . "\n";
 		return $ret;
 	}
 
@@ -222,15 +222,20 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	public function removeVar($key) {
 		$key = strtolower($key);
 
-		sem_acquire($this->_semaphoreLock);
 		$ret = false;
-		if (isset($this->_keys[$key])) {
-			if (shm_has_var($this->_sharedMemory, $this->_keys[$key])) {
-				$ret = shm_remove_var($this->_sharedMemory, $this->_keys[$key]);
+		$keys = $this->getKeys();
+		if (isset($keys[$key])) {
+			sem_acquire($this->_semaphoreLock);
+			if (shm_has_var($this->_sharedMemory, $keys[$key])) {
+				$ret = shm_remove_var($this->_sharedMemory, $keys[$key]);
+
+				// update 
+				unset($keys[$key]);
+				shm_put_var($this->_sharedMemory, 1, $keys);
 			}
 			unset($this->_keys[$key]);
+			sem_release($this->_semaphoreLock);
 		}
-		sem_release($this->_semaphoreLock);
 
 		return $ret;
 	}
