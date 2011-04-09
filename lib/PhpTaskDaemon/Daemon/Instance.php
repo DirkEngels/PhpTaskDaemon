@@ -316,11 +316,11 @@ class Instance {
 		} elseif ($pid) {
 			// Parent
 			$this->_pidManager->addChild($pid);
-			$this->_shm->setVar('status-'. $pid, get_class($manager));
+			$managerName = substr(substr(get_class($manager), 6), 0, -8);
+			$this->_shm->setVar('status-'. $pid, $managerName);
 			
 
-		} else {
-			// Child
+		} else { 
 			$newPid = getmypid();
 			$this->_pidManager->forkChild($newPid);
 			$manager->init($this->_pidManager->getParent());
