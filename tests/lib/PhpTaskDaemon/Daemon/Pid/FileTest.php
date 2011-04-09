@@ -9,7 +9,7 @@
  * @group PhpTaskDaemon_Pid
  */
 
-namespace PhpTaskDaemon\Pid;
+namespace PhpTaskDaemon\Daemon\Pid;
 
 class FileTest extends \PHPUnit_Framework_Testcase {
 	protected $_file;
@@ -20,11 +20,11 @@ class FileTest extends \PHPUnit_Framework_Testcase {
 	}
 	
 	public function testConstructorNoArguments() {
-		$this->_file = new \PhpTaskDaemon\Pid\File();
+		$this->_file = new \PhpTaskDaemon\Daemon\Pid\File();
 		$this->assertEquals(\TMP_PATH . '/daemon.pid', $this->_file->getFilename());
 	}
 	public function testConstructorWithFileArgument() {
-		$this->_file = new \PhpTaskDaemon\Pid\File('henk.pid');
+		$this->_file = new \PhpTaskDaemon\Daemon\Pid\File('henk.pid');
 		$this->assertEquals(\TMP_PATH . '/henk.pid', $this->_file->getFilename());
 	}
 	
