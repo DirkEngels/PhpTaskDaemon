@@ -19,11 +19,11 @@ abstract class AbstractClass {
 	protected $_statistics = array();
 	protected $_sharedMemory;
 	
-	const STATUS_LOADED = 'Loaded';
-	const STATUS_QUEUED = 'Queued';
-	const STATUS_RUNNING = 'Running';
-	const STATUS_DONE = 'Done';
-	const STATUS_FAILED = 'Failed';
+	const STATUS_LOADED = 'loaded';
+	const STATUS_QUEUED = 'queued';
+	const STATUS_RUNNING = 'running';
+	const STATUS_DONE = 'done';
+	const STATUS_FAILED = 'failed';
 
 	/**
 	 * 
