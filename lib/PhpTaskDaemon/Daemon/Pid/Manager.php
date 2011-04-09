@@ -43,9 +43,10 @@ class Manager {
 	 * @param int $parent
 	 */
 	public function __construct($pid = null, $parent = null) {
-		if ($pid !== null) {
-			$this->_current = $pid;
+		if ($pid === null) {
+			$pid = getmypid();
 		}
+		$this->_current = $pid;
 		if ($parent !== null) {
 			$this->_parent = $parent;
 		}
