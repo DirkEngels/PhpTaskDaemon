@@ -42,7 +42,10 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @param string $id
 	 */
 	public function __construct($id) {
-		$pathname = TMP_PATH . '/' . strtolower($id);
+		$pathname = $id;
+		if (!strstr($id, '/')) {
+			$pathname = TMP_PATH . '/' . strtolower($id);
+		}
 		$this->_pathNameWithPid = $pathname;
 
 		if (!file_exists($this->_pathNameWithPid . '.sem')) {
