@@ -12,11 +12,10 @@ PhpTaskDaemon
 PhpTaskDaemon Introduction
 --------------------------
 PhpTaskDaemon is a library for creating php daemons for unix environments
-(requirement: pcntl and posix extension). It provides a simple api consisting
-of two methods for defining the loading of a task queue and the execution of a
-single task. The tasks are run by a manager, which defines the way when and how
-tasks are executed. A single command line script is used to start, stop and
-monitor the daemon. 
+(requirement: pcntl and posix extension). It provides a simple api for defining
+queues and task executors. Tasks are run by managers, which define the way when
+and how tasks are executed. A single command line script is used to start, stop
+and monitor the daemon. 
 
 
 Features
@@ -27,8 +26,9 @@ Features
 	* Cron
 	* Forked
 	* Gearman
-* Requesting current status of task managers using IPC
-
+* Logs to one or more log files
+* Manages state information of child processes using shared memory.
+* Provides an easy api to request daemon state information.
 
 Requirements
 ------------
@@ -55,28 +55,17 @@ Startup on boot
 
 Restart by cron
 * Add a crontab job:  
-	* * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action keeprunning
-
-Optional: Web Monitor 
-* Edit the file (doc/files/apache.conf) to your needs 
-* Copy the edited apache conf to /etc/apache2/sites-available/phptaskdaemon
-* Enable the phptaskdaemon site: a2enmod phptaskdaemon
-* Restart the apache server
+	* * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action start
 
 
 Usage
 -----
-To use the PhpTaskDaemon you need to add task definitions. A task definition 
-exists of a php class implementing an interface with two methods. The first 
-method 'loadQueue' needs to load a queue of tasks to execute. The return value
-is an array of tasks. A tasks consists of an array with input data. The second
-method is called 'executeTask' and executes a single task. Each task class can
-define a variable for setting a manager. The manager determines how and when 
-the task is executed.
+A command line tool is provided to start, stop and monitor the daemon. Below a 
 
 Command line:
-* Start:		./daemon --verbose --action start
-* Stop:			./daemon --action start
+* Start:        ./daemon --help
+* Start:		./daemon --action start
+* Stop:			./daemon --action stop
 * Status		./daemon --action status
 * Monitor		./daemon --action monitor
 
