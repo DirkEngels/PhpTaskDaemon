@@ -203,6 +203,7 @@ class Console {
 			echo "Daemon not running\n";
 			exit;
 		}
+		echo var_dump($status);
 
 		echo "PhpTaskDaemon - Status\n";
 		echo "==========================\n";
@@ -215,7 +216,7 @@ class Console {
 		
 			foreach ($status['childs'] as $childPid) {
 				$managerData = $status['task-' . $childPid];
-				echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['Queued'] . "\tDone: " . $managerData['statistics']['Done'] . "\tFailed:" . $managerData['statistics']['Failed'] . ")\n";
+				echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
 				echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
 			}
 
