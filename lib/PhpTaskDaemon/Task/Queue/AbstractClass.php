@@ -39,9 +39,13 @@ abstract class AbstractClass {
 	 *
 	 * Sets the statistics object 
 	 * @param \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass $statistics
+	 * @return $this
 	 */
 	public function setStatistics($statistics) {
-		$this->_statistics = $statistics;
+		if (is_a($statistics, "\PhpTaskDaemon\Task\Queue\Statistics\AbstractClass")) {
+			$this->_statistics = $statistics;
+		}
+		return $this;
 	}
 	
 	/**

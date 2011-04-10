@@ -14,7 +14,7 @@
 
 namespace PhpTaskDaemon\Task\Queue;
 
-class QueueTest extends \PHPUnit_Framework_Testcase {
+class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_queue;
 	protected $_statistics;
 	
@@ -45,10 +45,9 @@ class QueueTest extends \PHPUnit_Framework_Testcase {
 	public function testUpdateStatisticsClassAlreadySet() {
 		$this->assertNull($this->_queue->getStatistics());
 		$this->_queue->setStatistics($this->_statistics);
-//		$this->assertEquals($this->_statistics, $this->_queue->getStatistics());
-		
-//		$this->assertEquals($this->_statistics, $this->_queue->getStatistics());
+		$this->assertEquals($this->_statistics, $this->_queue->getStatistics());
 //		$this->assertTrue($this->_queue->updateStatistics('test'));
 	}
+
 	
 }
