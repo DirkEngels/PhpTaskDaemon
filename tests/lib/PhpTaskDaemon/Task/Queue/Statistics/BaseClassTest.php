@@ -19,16 +19,17 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_statistics;
 	
 	protected function setUp() {
+		$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test');
+		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($sharedMemory);
+		
 	}
 	protected function tearDown() {
+		unset($this->_statistics);
 	}
 	
 	public function testNoJobResults() {
-#		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
 		$state = array();
 		$this->assertEquals(0, sizeof($state));
 	}
-    
-	
 	
 }
