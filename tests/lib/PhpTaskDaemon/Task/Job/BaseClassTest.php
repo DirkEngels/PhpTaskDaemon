@@ -14,7 +14,7 @@
 
 namespace PhpTaskDaemon\Task\Job;
 
-class JobTest extends \PHPUnit_Framework_Testcase {
+class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_job;
 	
 	protected function setUp() {
@@ -51,6 +51,12 @@ class JobTest extends \PHPUnit_Framework_Testcase {
 		$this->assertNotNull('', $jobId);
 		$this->_job->setJobId($this->_job->generateJobId());
 		$this->assertNotEquals($jobId, $this->_job->getJobId());
+	}
+
+	public function testSetJobIdGenerate() {
+		$this->_job = new \PhpTaskDaemon\Task\Job\BaseClass('test');
+		$this->_job->setJobId();
+		$this->assertNotNull($this->_job->getJobId());
 	}
 	
 	public function testSetJobId() {
@@ -148,11 +154,15 @@ class JobTest extends \PHPUnit_Framework_Testcase {
 	public function testCheckInput() {
 		$this->_job = new \PhpTaskDaemon\Task\Job\BaseClass('test');
 		$this->_job->setInputKeys(array('inputVar1', 'inputVar2'));
-//		$this->assertTrue($this->_job->checkInput());
-//
-//		$this->_job->setInputVar('inputVar1', '1234');		
-//		$this->assertEquals(1, sizeof($this->_job->getInput()));
-//		$this->assertTrue($this->_job->checkInput());
+		$this->assertFalse($this->_job->checkInput());
+
+		$this->_job->setInputVar('inputVar1', '1234');		
+		$this->assertEquals(1, sizeof($this->_job->getInput()));
+		$this->assertFalse($this->_job->checkInput());
+		
+		$this->_job->setInputVar('inputVar2', '5678');		
+		$this->assertEquals(2, sizeof($this->_job->getInput()));
+		$this->assertTrue($this->_job->checkInput());
 	}
 	
 }
