@@ -61,7 +61,10 @@ abstract class AbstractClass {
 	 * @param string $jobId
 	 * @return $this;
 	 */
-	public function setJobId($jobId) {
+	public function setJobId($jobId = null) {
+		if ($jobId===null) {
+			$jobId = $this->generateJobId();
+		}
 		$this->_jobId = $jobId;
 		return $this;
 	}
@@ -90,7 +93,10 @@ abstract class AbstractClass {
 	 * @return mixed
 	 */
 	public function getInputVar($var) {
-		return $this->_input[$var];
+		if (in_array($var, $this->getInputKeys())) {
+			return $this->_input[$var];
+		}
+		return null;
 	}
 
 	/**
@@ -100,7 +106,11 @@ abstract class AbstractClass {
 	 * @param mixed $value
 	 */
 	public function setInputVar($var, $value) {
-		$this->_input[$var] = $value;
+		if (in_array($var, $this->getInputKeys())) {
+			$this->_input[$var] = $value;
+			return true;
+		}
+		return false;
 	}
 
 	/**

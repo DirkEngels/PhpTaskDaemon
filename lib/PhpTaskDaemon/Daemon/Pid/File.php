@@ -80,11 +80,12 @@ class File {
 	 * @return int
 	 */
 	public function read() {
+		$pid = 0;
 		if (file_exists($this->getFilename())) {
 			$pid = (int) file_get_contents($this->getFilename());
-			if ($pid>0) {
-				return $pid;
-			}
+		}
+		if ($pid>0) {
+			return $pid;
 		}
 		return null;
 	}
