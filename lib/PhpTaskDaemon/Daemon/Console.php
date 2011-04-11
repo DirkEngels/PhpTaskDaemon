@@ -112,12 +112,40 @@ class Console {
 		$this->_instance = $instance;
 		return $this;
 	}
+	
+	/**
+	 * 
+	 * Gets a config object
+	 * @return \Zend_Config
+	 */
+	public function getConfig() {
+		return $this->_config;
+	}
+
+	/**
+	 * 
+	 * Sets a config object
+	 * @param \Zend_Config $config
+	 * @return $this
+	 */
+	public function setConfig($config) {
+		$this->_config = $config;
+	}
 
 	/**
 	 * 
 	 * Reads the command line arguments and invokes the selected action.
 	 */
 	public function run() {
+		// Read config
+		$configFile = $this->_consoleOpts->getOption('config');
+		if (!file_exists($configFile)) {
+			$configFile = PROJECT_ROOT . '/etc/config.ini';
+		}
+		$config = new \Zend_Config_Ini( 
+			$configFile
+		);
+
 		// Set action
 		$action = $this->_consoleOpts->getOption('action');
 
