@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package PhpTaskDaemon
  * @subpackage Task\Executor
