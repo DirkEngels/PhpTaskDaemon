@@ -11,10 +11,12 @@ Version 0.x
 - fully unit tested: Functional tests start a daemon and send interrupt signals
 
 Verison 0.6
------------
+----------- 
 - refactor cron manager
 - refactor parallel manager
-- store batch nr, and status counts
+- add system manager (isolates a process)
++ store batch nr, and status counts
+- update status shared memory variables
 
 Version 0.5
 ===========
