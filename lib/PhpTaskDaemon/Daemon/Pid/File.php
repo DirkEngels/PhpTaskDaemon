@@ -54,7 +54,7 @@ class File {
 	 * @return bool
 	 */
 	public function setFilename($filename) {
-		if (file_exists($filename)) {
+		if (isset($filename)) {
 			$this->_filename = $filename;
 			return true;
 		}
@@ -67,7 +67,7 @@ class File {
 	 * 
 	 */
 	public function isRunning() {
-		$pid = $this->readPidFile();
+		$pid = $this->read();
 		if ($pid>0) {
 			return true;
 		}
@@ -80,11 +80,12 @@ class File {
 	 * @return int
 	 */
 	public function read() {
+		$pid = 0;
 		if (file_exists($this->getFilename())) {
 			$pid = (int) file_get_contents($this->getFilename());
-			if ($pid>0) {
-				return $pid;
-			}
+		}
+		if ($pid>0) {
+			return $pid;
 		}
 		return null;
 	}
@@ -108,7 +109,7 @@ class File {
 	 * @param int $pid
 	 * @return bool
 	 */
-	public function write($pid = null) {		
+	public function write($pid = null) {
 		if ($pid>0) {
 			if (!file_exists($this->getFilename())) {
 				touch($this->getFilename());

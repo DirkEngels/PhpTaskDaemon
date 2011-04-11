@@ -16,14 +16,13 @@ namespace PhpTaskDaemon\Task\Queue\Statistics;
  * items in the queue.
  */
 abstract class AbstractClass {	
-	protected $_statistics = array();
 	protected $_sharedMemory;
 	
-	const STATUS_LOADED = 'Loaded';
-	const STATUS_QUEUED = 'Queued';
-	const STATUS_RUNNING = 'Running';
-	const STATUS_DONE = 'Done';
-	const STATUS_FAILED = 'Failed';
+	const STATUS_LOADED = 'loaded';
+	const STATUS_QUEUED = 'queued';
+	const STATUS_RUNNING = 'running';
+	const STATUS_DONE = 'done';
+	const STATUS_FAILED = 'failed';
 
 	/**
 	 * 
@@ -31,7 +30,7 @@ abstract class AbstractClass {
 	 * object instance will be created when none provided.
 	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
 	 */
-	public function __construct(\PhpTaskDaemon\SharedMemory $sharedMemory = null) {
+	public function __construct(\PhpTaskDaemon\Daemon\Ipc\SharedMemory $sharedMemory = null) {
 		$this->setSharedMemory($sharedMemory);
 	}
 	
@@ -40,8 +39,9 @@ abstract class AbstractClass {
 	 * Unset the shared memory at destruction time.
 	 */
 	public function __destruct() {
-		$this->_sharedMemory->remove();
-		unset($this->_sharedMemory); 
+		if (is_a($this->_sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
+			unset($this->_sharedMemory);
+		} 
 	}
 
 	/**
@@ -62,28 +62,30 @@ abstract class AbstractClass {
 	public function setSharedMemory($sharedMemory) {
 		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
 			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . getmypid());
-			$this->_sharedMemory = $sharedMemory;
-			$this->_initializeStatus(self::STATUS_LOADED);
-			$this->_initializeStatus(self::STATUS_QUEUED);
-			$this->_initializeStatus(self::STATUS_RUNNING);
-			$this->_initializeStatus(self::STATUS_DONE);
-			$this->_initializeStatus(self::STATUS_FAILED);
 		}
-		return $this;
+		$this->_sharedMemory = $sharedMemory;
+		$this->_initializeStatus(self::STATUS_LOADED);
+		$this->_initializeStatus(self::STATUS_QUEUED);
+		$this->_initializeStatus(self::STATUS_RUNNING);
+		$this->_initializeStatus(self::STATUS_DONE);
+		$this->_initializeStatus(self::STATUS_FAILED);
+		return true;
 	}
 	
 	/**
 	 * Returns an array with the number of executed tasks grouped per status.
 	 * 
-	 * @param array $status
+	 * @param string $status
 	 * @return array
 	 */
     public function get($status = null) {
-    	if ($this->_sharedMemory->hasKey($status)) {
-    		$this->_initializeStatus($status);
-    		return $this->_statistics[$status];
+    	if (is_null($status)) {
+    		return $this->_sharedMemory->get();
     	}
-    	return $this->_statistics;
+    	if (!in_array($status, $this->_sharedMemory->getKeys())) {
+    		$this->_initializeStatus($status);
+    	}
+    	return $this->_sharedMemory->getVar($status);
     }
 
     /**
@@ -91,9 +93,13 @@ abstract class AbstractClass {
      * (Re)Sets a status count
      * @param string $status
      * @param integer $count
+     * @return bool
      */
     public function setStatusCount($status = self::STATUS_DONE, $count = 0) {
-    	$this->_sharedMemory->setVar($status, $count);
+    	if (!in_array($status, $this->_sharedMemory->getKeys())) {
+    		$this->_initializeStatus($status);
+    	}
+    	return $this->_sharedMemory->setVar($status, $count);
     }
     
 	/**
@@ -103,7 +109,7 @@ abstract class AbstractClass {
 	 * @return integer
 	 */
     public function incrementStatus($status = self::STATUS_DONE) {
-    	$this->_initializeStatus($status);
+//    	$this->_initializeStatus($status);
     	// Update shared memory key +1
     	return $this->_sharedMemory->incrementVar($status);
     }
@@ -113,9 +119,10 @@ abstract class AbstractClass {
      * (Re)Sets the queue count.
      * @param integer $count
      */
-    public function setQueueCount($count) {
+    public function setQueueCount($count = 0) {
     	$this->setStatusCount(self::STATUS_QUEUED, $count);
     	$this->setStatusCount(self::STATUS_LOADED, $count);
+    	return $count;
     }
     /**
      * 
@@ -132,15 +139,12 @@ abstract class AbstractClass {
      * @return bool
      */
     private function _initializeStatus($status) {
-    	if (!is_a($this->_sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-    		return false;
-    	}
-    	$keys = $this->_sharedMemory->get();
-    	if (!in_array($status, $keys)) {
+    	$keys = $this->_sharedMemory->getKeys();
+    	if (!in_array($status, array_keys($keys))) {
     		$this->_sharedMemory->setVar($status, 0);
     		return true;
     	}
     	return false;
-	}
     
+	}
 }

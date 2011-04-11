@@ -26,7 +26,7 @@ abstract class AbstractClass {
 	 * object instance will be created when none provided.
 	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
 	 */
-	public function __construct(\PhpTaskDaemon\SharedMemory $sharedMemory = null) {
+	public function __construct(\PhpTaskDaemon\Daemon\Ipc\SharedMemory $sharedMemory = null) {
 		$this->setSharedMemory($sharedMemory);
 	}
 	
@@ -56,10 +56,10 @@ abstract class AbstractClass {
 	 */
 	public function setSharedMemory($sharedMemory) {
 		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . getmypid());
-			$this->_sharedMemory = $sharedMemory;
+			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . getmypid());
 		}
-		return $this;
+		$this->_sharedMemory = $sharedMemory;
+		return true;
 	}
 
 	/**
@@ -70,9 +70,6 @@ abstract class AbstractClass {
 	 * @param string|null $key
 	 */
 	public function get($key = null) {
-    	if (!is_a($this->_sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-    		return false;
-    	}
 		if ($key != null) {
 			return $this->_sharedMemory->getVar($key);
 		}
@@ -87,9 +84,6 @@ abstract class AbstractClass {
 	 * @return bool
 	 */
     public function set($percentage, $message = null) {
-    	if (!is_a($this->_sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-    		return false;
-    	}
     	$this->_sharedMemory->setVar('percentage', $percentage);
     	if ($message != null) {
     		$this->_sharedMemory->setVar('message', $message);

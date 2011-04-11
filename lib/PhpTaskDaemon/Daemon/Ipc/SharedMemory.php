@@ -42,7 +42,10 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @param string $id
 	 */
 	public function __construct($id) {
-		$pathname = TMP_PATH . '/' . strtolower($id);
+		$pathname = $id;
+		if (!strstr($id, '/')) {
+			$pathname = TMP_PATH . '/' . strtolower($id);
+		}
 		$this->_pathNameWithPid = $pathname;
 
 		if (!file_exists($this->_pathNameWithPid . '.sem')) {
@@ -84,7 +87,10 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 */
 	public function getKeys() {
 		sem_acquire($this->_semaphoreLock);
-		$keys = shm_get_var($this->_sharedMemory, 1);
+		$keys = parent::getKeys();
+		if (shm_has_var($this->_sharedMemory, 1)) {	
+			$keys = shm_get_var($this->_sharedMemory, 1);
+		}
 		sem_release($this->_semaphoreLock);
 		
 		return $keys;
@@ -98,6 +104,8 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @return mixed|false
 	 */
 	public function getVar($key) {
+		$key = strtolower($key);
+		
 		sem_acquire($this->_semaphoreLock);
 		$value = false;
 		$keys = shm_get_var($this->_sharedMemory, 1);
@@ -118,22 +126,20 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @return bool
 	 */
 	public function setVar($key, $value) {
+		$key = strtolower($key);
+		
+//		echo "Setting var: " . $key . " => " . $value . "\n";
 		sem_acquire($this->_semaphoreLock);
 		// Check the first variable for keys
+		$keys = array('keys' => 1);
 		if (shm_has_var($this->_sharedMemory, 1)) {
 			$keys = shm_get_var($this->_sharedMemory, 1);
-		} else {
-			$keys = array('keys' => 1);
 		}
 		$retInit = true;
-		
+
 		// Update keys
 		if (!in_array($key, array_keys($keys))) {
-			if (count($keys)==0) {
-				$keys[$key] = 2;
-			} else {
-				$keys[$key] = count($keys)+2;
-			}
+			$keys[$key] = count($keys)+2;
 			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
 		}
 		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
@@ -149,32 +155,32 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @return bool|int
 	 */
 	public function incrementVar($key) {
+		$key = strtolower($key);
+
 		sem_acquire($this->_semaphoreLock);
 		// Check the first variable for keys
+		$keys = array('keys' => 1);
 		if (shm_has_var($this->_sharedMemory, 1)) {
 			$keys = shm_get_var($this->_sharedMemory, 1);
-		} else {
-			$keys = array('keys' => 1);
 		}
 		$retInit = true;
 		
 		// Update keys
-		if (!in_array($key, array_keys($keys))) {
-			if (count($keys)==0) {
-				$keys[$key] = 2;
-			} else {
-				$keys[$key] = count($keys)+2;
-			}
-			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
-			$value = 1;
-		} else {
+		if (in_array($key, array_keys($keys))) {
 			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
+//			echo "Retrieving value: " . $value . " for key: " . $key . " (" . $keys[$key] . ")\n";
 			$value++;
+			$ret = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+		} else {
+			$keys[$key] = count($keys)+2;
+			shm_put_var($this->_sharedMemory, 1, $keys);
+			$ret = shm_put_var($this->_sharedMemory, $keys[$key], 1);
+			$value = 1;
 		}
-		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
 		sem_release($this->_semaphoreLock);
-		
-		return $retInit && $retPut;
+
+//		echo "Incrementing key " . $key . " (" . $keys[$key] . ") to value: " . $value . "\n";
+		return $ret;
 	}
 
 	/**
@@ -184,22 +190,19 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @return bool|int
 	 */
 	public function decrementVar($key) {
+		$key = strtolower($key);
+		
 		sem_acquire($this->_semaphoreLock);
 		// Check the first variable for keys
+		$keys = array('keys' => 1);
 		if (shm_has_var($this->_sharedMemory, 1)) {
 			$keys = shm_get_var($this->_sharedMemory, 1);
-		} else {
-			$keys = array('keys' => 1);
 		}
 		$retInit = true;
 		
 		// Update keys
 		if (!in_array($key, array_keys($keys))) {
-			if (count($keys)==0) {
-				$keys[$key] = 2;
-			} else {
-				$keys[$key] = count($keys)+2;
-			}
+			$keys[$key] = count($keys)+2;
 			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
 			$value = 0;
 		} else {
@@ -218,43 +221,64 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @return bool|int
 	 */
 	public function removeVar($key) {
-		sem_acquire($this->_semaphoreLock);
+		$key = strtolower($key);
+
 		$ret = false;
-		if (isset($this->_keys[$key])) {
-			if (shm_has_var($this->_sharedMemory, $this->_keys[$key])) {
-				$ret = shm_remove_var($this->_sharedMemory, $this->_keys[$key]);
+		$keys = $this->getKeys();
+		if (isset($keys[$key])) {
+			sem_acquire($this->_semaphoreLock);
+			if (shm_has_var($this->_sharedMemory, $keys[$key])) {
+				$ret = shm_remove_var($this->_sharedMemory, $keys[$key]);
+
+				// update 
+				unset($keys[$key]);
+				shm_put_var($this->_sharedMemory, 1, $keys);
 			}
 			unset($this->_keys[$key]);
+			sem_release($this->_semaphoreLock);
 		}
-		sem_release($this->_semaphoreLock);
 
 		return $ret;
 	}
 	
 	/**
 	 * 
-	 * Removes a shared memory segment.
+	 * Removes a shared memory segment and semaphore
 	 * @return bool|int
 	 */
 	public function remove() {
-		$retSem = $retShm = false;
+		return ($this->_removeSegment() && $this->_removeSemaphore());
+	}
 
-		// Remove Shared Memory
+	/**
+	 * 
+	 * Removes a shared memory segment
+	 * @return bool|int
+	 */
+	private function _removeSegment() {
+		$ret = false;
 		if (is_resource($this->_sharedMemory)) {
-			$retShm = shm_remove($this->_sharedMemory);
+			if (file_exists($this->_pathNameWithPid . '.shm')) {
+				$ret = shm_remove($this->_sharedMemory);
+				unlink($this->_pathNameWithPid . '.shm');
+			}
 		}
-		if (file_exists($this->_pathNameWithPid . '.shm')) {
-			unlink($this->_pathNameWithPid . '.shm');
-		}
-
-		// Remove Semaphore
+		return $ret;
+	}
+	
+	/**
+	 * 
+	 * Removes a semaphore required for the shared memory segment.
+	 * @return bool|int
+	 */
+	private function _removeSemaphore() {
+		$ret = false;
 		if (is_resource($this->_semaphoreLock)) {
-			$retSem = sem_remove($this->_semaphoreLock);
+			if (file_exists($this->_pathNameWithPid . '.sem')) {
+				$ret = sem_remove($this->_semaphoreLock);
+				unlink($this->_pathNameWithPid . '.sem');
+			}
 		}
-		if (file_exists($this->_pathNameWithPid . '.sem')) {
-			unlink($this->_pathNameWithPid . '.sem');
-		}
-
-		return ($retShm && $retSem);
+		return $ret;
 	}
 }

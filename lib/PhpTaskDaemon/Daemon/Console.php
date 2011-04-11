@@ -57,6 +57,7 @@ class Console {
 					'logfile|l-s'	=> 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
 					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
 					'action|a=s'	=> 'Action (default: start) (options: start, stop, restart, status, monitor)',
+					'list-tasks|lt' => 'List registered tasks',
 					'print|p'   => 'List Actions',
 					'verbose|v'		=> 'Verbose',
 					'help|h'		=> 'Show help message (this message)',
@@ -120,8 +121,8 @@ class Console {
 		// Set action
 		$action = $this->_consoleOpts->getOption('action');
 
-        if ($this->_consoleOpts->getOption('print')) {
-            $this->listActions();
+        if ($this->_consoleOpts->getOption('list-tasks')) {
+            $this->listTasks();
             exit;
         }
 
@@ -146,7 +147,7 @@ class Console {
 	 * 
 	 * Lists the current loaded tasks. 
 	 */
-    public function listActions() {
+    public function listTasks() {
         $this->getDaemon()->scanTaskDirectory(APPLICATION_PATH . '/Tasks/');
         $tasks = $this->getDaemon()->getManagers();
         echo "Tasks: \n";
@@ -202,6 +203,7 @@ class Console {
 			echo "Daemon not running\n";
 			exit;
 		}
+		echo var_dump($status);
 
 		echo "PhpTaskDaemon - Status\n";
 		echo "==========================\n";
@@ -214,7 +216,7 @@ class Console {
 		
 			foreach ($status['childs'] as $childPid) {
 				$managerData = $status['task-' . $childPid];
-				echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['Queued'] . "\tDone: " . $managerData['statistics']['Done'] . "\tFailed:" . $managerData['statistics']['Failed'] . ")\n";
+				echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
 				echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
 			}
 

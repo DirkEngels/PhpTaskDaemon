@@ -19,10 +19,10 @@ class BaseClass extends AbstractClass implements InterfaceClass {
 	public function load() {
 		$queue = array(
 			new \PhpTaskDaemon\Task\Job\BaseClass(
-				'base-' . rand(0,100),
-				array(
-					'sleepTime' => rand(100000, 500000)
-				)
+				'base-1',array('sleepTime' => 100000)
+			),
+			new \PhpTaskDaemon\Task\Job\BaseClass(
+				'base-2',array('sleepTime' => 300000)
 			)
 		);
 		return $queue;
