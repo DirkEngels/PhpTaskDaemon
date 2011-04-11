@@ -18,12 +18,18 @@ class System extends Interval {
 
 	protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
 		$this->log("Starting system task: cd " . \TMP_PATH . " && php system -sj '" . $job . "'", \Zend_Log::INFO);
-		system("cd " . \TMP_PATH . " && php system -sj '" . $job . "'");
+		system("cd " . \APPLICATION_PATH . "/bin && php system -sj '" . $job . "'");
 	}
 	
+	/**
+	 * 
+	 * The method below is used by the system command. The system 
+	 * @param unknown_type $serializedJob
+	 */
 	public function acceptInputFromConsoleAndStartSingleTask($serializedJob) {
 		$this->log("Processing system task: " . $serializedJob, \Zend_Log::DEBUG);
 		echo $serializedJob . "\n";
+//		$ret = parent::_processTask($job);dJob . "\n";
 //		$job = unserialize($serializedJob);
 //		$ret = parent::_processTask($job);
 		return $ret;

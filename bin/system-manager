@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+
+include('bootstrap.php');
+
+// Read console options
+$consoleOpts = new \Zend_Console_Getopt(
+    array(
+        'manager|m=s'           => 'Manager name',
+        'jobdata|d=s'          => 'Serialized job data',
+    )
+);
+
+try {
+    $consoleOpts->parse();
+} catch (Zend_Console_Getopt_Exception $e) {
+    echo $consoleOpts->getUsageMessage();
+    exit;
+}
+
+$managerName = $consoleOpts->getOption('manager');
+$jobData = $consoleOpts->getOption('jobdata');
+if (!class_exists($managerName)) {
+    $consoleOpts->getUsageMessage();
+} else {
+    $manager = new $managerName();
+    return $manager->acceptInputFromConsoleAndStartSingleTask($jobData);
+}
+return false;
