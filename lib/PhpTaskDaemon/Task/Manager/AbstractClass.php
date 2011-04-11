@@ -295,7 +295,7 @@ abstract class AbstractClass {
 	 */
 	protected function _sleep() {
 		// Sleep
-		$this->log("Sleeping <interval> for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
+		$this->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
 		usleep($this->_sleepTimeQueue);
 	}
 }
