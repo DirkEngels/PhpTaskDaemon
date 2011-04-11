@@ -139,9 +139,8 @@ abstract class AbstractClass {
      * @return bool
      */
     private function _initializeStatus($status) {
-    	$keys = $this->_sharedMemory->get();
-    	echo var_dump($keys);
-    	if (!in_array($status, $keys)) {
+    	$keys = $this->_sharedMemory->getKeys();
+    	if (!in_array($status, array_keys($keys))) {
     		$this->_sharedMemory->setVar($status, 0);
     		return true;
     	}
