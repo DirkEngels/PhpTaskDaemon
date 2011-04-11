@@ -67,14 +67,7 @@ class Gearman extends AbstractClass implements InterfaceClass {
 	 * @param mixed $gearmanJob
 	 */
 	public function acceptJob($gearmanJob) {
-		$this->_task->setTaskInput($gearmanJob->workload());
-		$this->_task->updateMemoryTask(0);
-
-		$ret = $this->_task->executeTask();
-
-		$this->_task->updateMemoryTask(100);
-		usleep(10);
-		$this->_task->updateMemoryTask(0);
+		$this->_processTask($gearmanJob->workload());
 		
 		return $ret;
 	}	

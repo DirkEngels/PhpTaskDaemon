@@ -36,7 +36,7 @@ class Cron extends Interval {
 		if ($sleepTime == -1) {
 			$sleepTime = 300;
 		}
-		time_sleep_until($sleepTime);
+		time_sleep_until($sleepTime)*1000*1000;
 	}
 
 	/**
