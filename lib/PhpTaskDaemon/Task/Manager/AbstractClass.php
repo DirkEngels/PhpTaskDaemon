@@ -83,7 +83,7 @@ abstract class AbstractClass {
 	 * @param \PhpTaskDaemon\Task\Executor\AbstractClass $executor
 	 * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
 	 */
-	public function __construct($executor, $queue = null) {		
+	public function __construct($executor, $queue = null) {
 		$this->setQueue($queue);
 		$this->setExecutor($executor);
 	}
@@ -142,7 +142,7 @@ abstract class AbstractClass {
 	 * @param \PhpTaskDaemon\Pid\Manager $pidManager
 	 * @return $this
 	 */
-	public function setPidManager(\PhpTaskDaemon\Pid\Manager $pidManager) {
+	public function setPidManager(\PhpTaskDaemon\Daemon\Pid\Manager $pidManager) {
 		$this->_pidManager = $pidManager;
 		return $this;
 	}
