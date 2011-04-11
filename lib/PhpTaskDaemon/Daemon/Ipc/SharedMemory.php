@@ -168,7 +168,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		// Update keys
 		if (in_array($key, array_keys($keys))) {
 			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
-			echo "Retrieving value: " . $value . " for key: " . $key . " (" . $keys[$key] . ")\n";
+//			echo "Retrieving value: " . $value . " for key: " . $key . " (" . $keys[$key] . ")\n";
 			$value++;
 			$ret = shm_put_var($this->_sharedMemory, $keys[$key], $value);
 		} else {
@@ -256,9 +256,10 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @return bool|int
 	 */
 	private function _removeSegment() {
+		$ret = false;
 		if (is_resource($this->_sharedMemory)) {
-			$ret = shm_remove($this->_sharedMemory);
 			if (file_exists($this->_pathNameWithPid . '.shm')) {
+				$ret = shm_remove($this->_sharedMemory);
 				unlink($this->_pathNameWithPid . '.shm');
 			}
 		}
@@ -271,9 +272,10 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @return bool|int
 	 */
 	private function _removeSemaphore() {
+		$ret = false;
 		if (is_resource($this->_semaphoreLock)) {
-			$ret = sem_remove($this->_semaphoreLock);
 			if (file_exists($this->_pathNameWithPid . '.sem')) {
+				$ret = sem_remove($this->_semaphoreLock);
 				unlink($this->_pathNameWithPid . '.sem');
 			}
 		}

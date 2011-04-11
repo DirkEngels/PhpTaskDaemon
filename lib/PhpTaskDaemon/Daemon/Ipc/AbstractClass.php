@@ -39,9 +39,7 @@ abstract class AbstractClass {
 		$keys = $this->getKeys();
 		$data = array();
 		foreach($keys as $nr => $key) {
-			$value = $this->getVar($nr);
-//			echo "ADDING " . $nr . " => " . $value . "\n";
-			$data[$nr] = $value;
+			$data[$nr] = $this->getVar($nr);
 		}
 		return $data;
 	}
