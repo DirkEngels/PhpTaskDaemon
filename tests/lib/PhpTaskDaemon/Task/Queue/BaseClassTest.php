@@ -21,13 +21,15 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected function setUp() {
 		$semaphore = __DIR__ . '/_data/constructor.shm';
 		$this->_queue = new \PhpTaskDaemon\Task\Queue\BaseClass($semaphore);
-		$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test');
+		$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-queue');
 		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($sharedMemory);
 	}
 	protected function tearDown() {
-		if (is_a($this->_statistics, '\PhpTaskDaemon\Task\Queue\Statistics')) {
-			unset($this->_statistics);
+		$sharedMemory = $this->_statistics->getSharedMemory();
+		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
+			$sharedMemory->remove();
 		}
+		unset($this->_statistics);
 	}
 	
 	public function testConstructor() {
@@ -46,8 +48,24 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertNull($this->_queue->getStatistics());
 		$this->_queue->setStatistics($this->_statistics);
 		$this->assertEquals($this->_statistics, $this->_queue->getStatistics());
-//		$this->assertTrue($this->_queue->updateStatistics('test'));
+		$this->assertTrue($this->_queue->updateStatistics('test'));
+		$this->assertEquals(1, $this->_queue->getStatistics()->get('test'));
+		$this->assertTrue($this->_queue->updateStatistics('test', 10));
+		$this->assertEquals(10, $this->_queue->getStatistics()->get('test'));
 	}
 
+	public function testUpdateQueueNoStatisticsClassSet() {
+		$this->assertNull($this->_queue->getStatistics());
+		$this->assertTrue($this->_queue->updateQueue(10));
+	}
+	public function testUpdateQueueStatisticsClassAlreadySet() {
+		$this->assertNull($this->_queue->getStatistics());
+		$this->_queue->setStatistics($this->_statistics);
+		$this->assertEquals($this->_statistics, $this->_queue->getStatistics());
+		$this->assertTrue($this->_queue->updateQueue(10));
+		$this->assertEquals(10, $this->_queue->getStatistics()->get('queued'));
+		$this->assertTrue($this->_queue->updateQueue());
+		$this->assertEquals(9, $this->_queue->getStatistics()->get('queued'));
+	}
 	
 }

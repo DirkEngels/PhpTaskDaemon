@@ -20,21 +20,29 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_sharedMemory;
 	
 	protected function setUp() {
-		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test');
+		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-statistics');
 		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
 		
 	}
 	protected function tearDown() {
-		unset($this->_statistics);
 		$this->_sharedMemory->remove();
 		unset($this->_sharedMemory);
+		$sharedMemory = $this->_statistics->getSharedMemory();
+		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
+			$sharedMemory->remove();
+		}
+		unset($this->_statistics);
 	}
 	
-	public function testNoJobResults() {
-		$state = array();
-		$this->assertEquals(0, sizeof($state));
+	public function testConstructorNoArguments() {
+		$sharedMemoryCreated = $this->_statistics->getSharedMemory();
+		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
 	}
-
+	public function testConstructorSingleArguments() {
+		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($this->_sharedMemory);
+		$sharedMemoryCreated = $this->_statistics->getSharedMemory();
+		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+	}
 	public function testSetSharedMemory() {
 		$sharedMemoryCreated = $this->_statistics->getSharedMemory();
 		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
@@ -45,11 +53,11 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertType('array', $this->_statistics->get());
 	}
 	public function testGetStatus() {
-		$this->assertFalse($this->_statistics->get('otherstatus'));
+		$this->assertEquals(0, $this->_statistics->get('otherstatus'));
 	}
 	public function testSetStatusCountNoArguments() {
 		$this->assertTrue($this->_statistics->setStatusCount());
-		$this->assertFalse($this->_statistics->get('otherstatus'));
+		$this->assertEquals(0, $this->_statistics->get('otherstatus'));
 		$this->assertEquals(0, $this->_statistics->get('loaded'));
 	}
 	public function testSetStatusCountStatusArgument() {
@@ -70,31 +78,27 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertEquals(1, $this->_statistics->get('done'));
 		$this->assertTrue($this->_statistics->incrementStatus());
 		$this->assertEquals(2, $this->_statistics->get('done'));
-//		echo var_dump($this->_statistics->get());
 	}
 	public function testIncrementStatusStatusArgument() {
-//		$this->assertEquals(0, $this->_statistics->get('failed'));
-//		$this->assertTrue($this->_statistics->incrementStatus('failed'));
-//		$this->assertEquals(1, $this->_statistics->get('failed'));
-//		$this->assertTrue($this->_statistics->incrementStatus('failed'));
-//		$this->assertEquals(2, $this->_statistics->get('failed'));
+		$this->assertEquals(0, $this->_statistics->get('failed'));
+		$this->assertTrue($this->_statistics->incrementStatus('failed'));
+		$this->assertEquals(1, $this->_statistics->get('failed'));
+		$this->assertTrue($this->_statistics->incrementStatus('failed'));
+		$this->assertEquals(2, $this->_statistics->get('failed'));
 	}
-	/*
 	public function testSetQueueCount() {
-		echo var_dump($this->_statistics->get());
-//		$this->assertEquals(0, $this->_statistics->get('queued'));
-		$this->assertTrue($this->_statistics->setQueueCount(10));
+		$this->assertEquals(0, $this->_statistics->get('queued'));
+		$this->assertEquals(10, $this->_statistics->setQueueCount(10));
 		$this->assertEquals(10, $this->_statistics->get('loaded'));
-//		$this->assertEquals(10, $this->_statistics->get('queued'));
+		$this->assertEquals(10, $this->_statistics->get('queued'));
 	}
 	public function testDecrementQueue() {
-//		$this->assertEquals(10, $this->_statistics->setQueueCount(10));
-//		$this->assertEquals(10, $this->_statistics->get('queued'));
-//		$this->assertTrue($this->_statistics->decrementQueue());
-//		$this->assertEquals(9, $this->_statistics->get('queued'));
-//		$this->assertTrue($this->_statistics->decrementQueue());
-//		$this->assertEquals(8, $this->_statistics->get('queued'));
+		$this->assertEquals(10, $this->_statistics->setQueueCount(10));
+		$this->assertEquals(10, $this->_statistics->get('queued'));
+		$this->assertTrue($this->_statistics->decrementQueue());
+		$this->assertEquals(9, $this->_statistics->get('queued'));
+		$this->assertTrue($this->_statistics->decrementQueue());
+		$this->assertEquals(8, $this->_statistics->get('queued'));
 	}
-	*/
 	
 }
