@@ -17,12 +17,12 @@ Verison 0.6
 - store batch nr, and status counts
 
 Version 0.5
------------
+===========
 + add unit tests for all classes, except for some daemon classes (forks)
 + fix broken unit tests caused by the class restructuring in version 0.4
 
 Version 0.4.1
-=============
+-------------
 + cleanup code
 + add code documentation
 
