@@ -58,7 +58,11 @@ class Console {
 					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
 					'action|a=s'	=> 'Action (default: start) (options: start, stop, restart, status, monitor)',
 					'list-tasks|lt' => 'List registered tasks',
-					'print|p'   => 'List Actions',
+					'tasks|t'	 	=> 'Include tasks',
+					'exclude-tasks|et=s'	 	=> 'Exclude tasks',
+					'categories|cat' 	=> 'Include categories',
+					'exclude-categories|ecat=s' 	=> 'Exclude categories',
+					'print|p'   	=> 'List Actions',
 					'verbose|v'		=> 'Verbose',
 					'help|h'		=> 'Show help message (this message)',
 				)
