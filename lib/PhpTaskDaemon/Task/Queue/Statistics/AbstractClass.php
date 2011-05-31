@@ -61,7 +61,9 @@ abstract class AbstractClass {
 	 */
 	public function setSharedMemory($sharedMemory) {
 		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . getmypid());
+			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
+				'statistics-' . getmypid()
+			);
 		}
 		$this->_sharedMemory = $sharedMemory;
 		$this->_initializeStatus(self::STATUS_LOADED);
@@ -109,8 +111,6 @@ abstract class AbstractClass {
 	 * @return integer
 	 */
     public function incrementStatus($status = self::STATUS_DONE) {
-//    	$this->_initializeStatus($status);
-    	// Update shared memory key +1
     	return $this->_sharedMemory->incrementVar($status);
     }
 
