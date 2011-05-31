@@ -274,7 +274,7 @@ abstract class AbstractClass {
 		
 		// Update Status before and after running the task
 		$this->getExecutor()->updateStatus(0);
-		$output = $this->getExecutor()->run(); 
+		$job = $this->getExecutor()->run();
 		$this->getExecutor()->updateStatus(100);
 		
 		// Log and sleep for a while
