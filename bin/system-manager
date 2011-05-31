@@ -20,10 +20,20 @@ try {
 
 $managerName = $consoleOpts->getOption('manager');
 $jobData = $consoleOpts->getOption('jobdata');
-if (!class_exists($managerName)) {
-    $consoleOpts->getUsageMessage();
+if ((!class_exists($managerName)) || (is_null($jobData))) {
+    echo $consoleOpts->getUsageMessage();
 } else {
-    $manager = new $managerName();
+    $executorName = substr($managerName, 0, -7) . 'Executor';
+    if (!class_exists($executorName)) {
+        echo $consoleOpts->getUsageMessage();
+        exit;
+    }
+    $executor = new $executorName();
+    $manager = new $managerName($executor);
+    if (!is_a($manager, "\PhpTaskDaemon\Task\Manager\System")) {
+        echo "Provided manager is not a system manager\n";
+        exit;
+    } 
     return $manager->acceptInputFromConsoleAndStartSingleTask($jobData);
 }
 return false;
