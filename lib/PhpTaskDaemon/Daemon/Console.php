@@ -35,7 +35,7 @@ class Console {
 	/**
 	 * 
 	 * Daemon constructor method
-	 * @param Zend_Console_Getopt $consoleOpts
+	 * @param \Zend_Console_Getopt $consoleOpts
 	 */
 	public function __construct(Daemon $instance = null) {
 		// Initialize command line arguments
@@ -180,13 +180,9 @@ class Console {
 	 * Lists the current loaded tasks. 
 	 */
     public function listTasks() {
-        $this->getDaemon()->scanTaskDirectory(APPLICATION_PATH . '/Tasks/');
-        $tasks = $this->getDaemon()->getManagers();
+        $tasks = $this->scanTasksDirectory(APPLICATION_PATH . '/Tasks/');
         echo "Tasks: \n";
-        foreach($tasks as $task) {
-            $taskName = get_class($task);
-            $taskName = substr($taskName, 6);
-            $taskName = substr($taskName, 0, -8);
+        foreach($tasks as $nr => $taskName) {
             echo "- " . $taskName . "\n";
         }
         echo "\n";
@@ -195,12 +191,60 @@ class Console {
 
 	/**
 	 * 
+	 * Scans a directory for task managers and returns the number of loaded
+	 * tasks.
+	 * 
+	 * @param string $dir
+	 * @return integer
+	 */
+	public function scanTasksDirectory($dir, $group = null) {
+		if (!is_dir($dir . '/' . $group)) {
+			throw new \Exception('Directory does not exists');
+		}
+
+		$items = scandir($dir . '/' . $group);
+		$managers = array();
+		$defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
+		foreach($items as $item) {
+			if ($item== '.' || $item == '..') { continue; }
+			$base = (is_null($group)) ? $item : $group . '/'. $item;
+			if (preg_match('/Manager.php$/', $base)) {
+				// Try manager file
+				echo "Checking manager file: /Tasks/" . $base . "\n";
+				if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
+					array_push($managers, substr($base, 0, -12));
+				}
+			} elseif (is_dir($dir . '/' . $base)) {
+				// Load recursively
+				$managers = array_merge(
+					$managers, 
+					$this->scanTasksDirectory($dir, $base)
+				);
+			}
+		}
+		return $managers;
+	}
+
+	/**
+	 * 
 	 * Action: Start Daemon
 	 */
 	public function start() {
+		$managers = $this->scanTasksDirectory(PROJECT_ROOT . '/app/Tasks/');
+		echo "\n";
+		echo "\n";
+		foreach($managers as $manager) {
+			$this->getDaemon()->loadManagerByName($manager);
+echo $manager . "\n";
+		}
+//		$this->getDaemon()->loadManagerByName('Concept/PocTask');
 		$this->getDaemon()->start();
 	}
 	
+	public function log($message, $other) {
+		echo $message . "\n";
+	}
+
 	/**
 	 * 
 	 * Action: Stop daemon 
@@ -245,7 +289,6 @@ class Console {
 		} else {
 			echo "Processes (" . count($status['childs']) . ")\n";
 
-		
 			foreach ($status['childs'] as $childPid) {
 				$managerData = $status['task-' . $childPid];
 				echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
