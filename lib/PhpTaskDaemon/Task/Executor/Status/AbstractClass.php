@@ -56,7 +56,7 @@ abstract class AbstractClass {
 	 */
 	public function setSharedMemory($sharedMemory) {
 		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . getmypid());
+			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . getmypid());
 		}
 		$this->_sharedMemory = $sharedMemory;
 		return true;

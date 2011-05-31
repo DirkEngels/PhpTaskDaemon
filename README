@@ -1,1 +1,85 @@
-doc/README
+PhpTaskDaemon
+=============
+
+* PhpTaskDaemon Introduction
+* Installation
+* Usage
+* Contribute
+* License
+* Contact Information
+
+
+PhpTaskDaemon Introduction
+--------------------------
+PhpTaskDaemon is a library for creating php daemons for unix environments
+(requirement: pcntl and posix extension). It provides a simple api for defining
+queues and task executors. Tasks are run by managers, which define the way when
+and how tasks are executed. A single command line script is used to start, stop
+and monitor the daemon. 
+
+
+Features
+--------
+* Start multiple workers/instances of tasks
+* Supports multiple task managers:
+	* Interval
+	* Cron
+	* Forked
+	* Gearman
+* Logs to one or more log files
+* Manages state information of child processes using shared memory.
+* Provides an easy api to request daemon state information.
+
+Requirements
+------------
+* PHP 5.3
+	* command line
+	* pcntl extension
+	* shared memory
+* Zend Framework
+	* Zend_Log
+	* Zend_Console_GetOpt
+	* Zend_Config
+
+
+Installation
+------------
+Basic installation 
+* Extract the package
+* Edit the configuration file: src/application/configs/daemon.ini
+* Start the executable in src/bin
+
+Startup on boot
+* Edit the file (doc/files/init-script)
+* Copy the edited init script file to /etc/init.d/phptaskdaemon
+
+Restart by cron
+* Add a crontab job:  
+	* * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action start
+
+
+Usage
+-----
+A command line tool is provided to start, stop and monitor the daemon. Below a 
+
+Command line:
+* Start:        ./daemon --help
+* Start:		./daemon --action start
+* Stop:			./daemon --action stop
+* Status		./daemon --action status
+* Monitor		./daemon --action monitor
+
+PHP API Example:
+
+  $daemon = new Dew_Daemon();
+  $status = $daemon->status();
+  var_dump($status);
+  
+
+Contact Information
+-------------------
+For more info about the PhpTaskDAemonapplication see the website:
+
+GitHub:		https://github.com/DirkEngels/PhpTaskDaemon
+Blog:		http://blog.dirkengels.com/category/phptaskdaemon/
+

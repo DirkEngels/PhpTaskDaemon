@@ -8,6 +8,7 @@
   <filter>
     <blacklist>
       <file>./bootstrap.php</file>
+      <directory>/usr/share/php/libzend-framework-php/</directory>
     </blacklist>
   </filter>
 </phpunit>

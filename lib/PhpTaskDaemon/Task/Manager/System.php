@@ -28,10 +28,23 @@ class System extends Interval {
 	 */
 	public function acceptInputFromConsoleAndStartSingleTask($serializedJob) {
 		$this->log("Processing system task: " . $serializedJob, \Zend_Log::DEBUG);
+		echo "----------------\n";
 		echo $serializedJob . "\n";
-//		$ret = parent::_processTask($job);dJob . "\n";
-//		$job = unserialize($serializedJob);
+		echo "----------------\n";
+		$job = new \Tasks\Concept\CopyTask\Job();
+		$job->setInputVar('sleepTime', 200000);
+		$serializedJob = serialize($job);
+		echo "----------------\n";
+		echo $serializedJob . "\n";
+		echo "----------------\n";
+		$job = unserialize($serializedJob);
+		if (!is_a($job, '\PhpTaskDaemon\Task\Job\AbstractClass')) {
+			echo "Error unserializing job object\n";
+			exit(0);
+		}
+		echo var_dump($job);
 //		$ret = parent::_processTask($job);
+$ret = 1;
 		return $ret;
 	}
 }
