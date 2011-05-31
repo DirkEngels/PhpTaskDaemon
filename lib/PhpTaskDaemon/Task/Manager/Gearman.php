@@ -49,7 +49,8 @@ class Gearman extends AbstractClass implements InterfaceClass {
 		$gmworker= new GearmanWorker();
 		$gmworker->addServer();
 		
-		$name = preg_replace('/Daemon_Manager_/i', '', get_class($this));
+		preg_match('/^PhpTaskDaemon\\Task\\([a-zA-Z]+)\\Manager', get_class($this), $matches);
+		$name = $matches[1];
 		$gmworker->addFunction($name, array($this, 'acceptJob'));
 	
 		while($gmworker->work()) {
