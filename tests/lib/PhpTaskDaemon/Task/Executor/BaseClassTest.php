@@ -13,7 +13,7 @@
 
 namespace PhpTaskDaemon\Task\Executor;
 
-class BaseClassTest extends \PHPUnit_Framework_Testcase {
+class BaseClassTest extends \PHPUnit_Framework_TestCase {
 	protected $_executor;
 	protected $_status;
 	protected $_job;
@@ -40,7 +40,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	}
 	public function testConstructorSingleArgument() {
 		$this->_executor = new \PhpTaskDaemon\Task\Executor\BaseClass($this->_status);
-		$this->assertType('\PhpTaskDaemon\Task\Executor\Status\AbstractClass', $this->_executor->getStatus());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\Status\AbstractClass', $this->_executor->getStatus());
 		$this->assertNull($this->_executor->getJob());
 	}
 	public function testSetJob() {
