@@ -8,9 +8,9 @@
  */
 namespace PhpTaskDaemon\Exception;
 
-class JobOutputInvalid extends \Exception {
+class DaemonRuntimeError extends \Exception {
     
     public function getMessage() {
-        return 'Job output invalid!';
+        return 'Unknown runtime error!';
     }
 }
