@@ -35,21 +35,21 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 
 	public function testConstructorNoArguments() {
 		$sharedMemoryCreated = $this->_status->getSharedMemory();
-		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
 	}
 	public function testConstructorSingleArguments() {
 		$this->_status = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($this->_sharedMemory);
 		$sharedMemoryCreated = $this->_status->getSharedMemory();
-		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
 	}
 	public function testSetSharedMemory() {
 		$sharedMemoryCreated = $this->_status->getSharedMemory();
-		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
 		$this->_status->setSharedMemory($this->_sharedMemory);
 		$this->assertEquals($this->_sharedMemory, $this->_status->getSharedMemory());
 	}
 	public function testGetNoArgument() {
-		$this->assertType('array', $this->_status->get());
+		$this->assertInternalType('array', $this->_status->get());
 		$this->assertEquals(0, sizeof($this->_status->get()));
 	}
 }
