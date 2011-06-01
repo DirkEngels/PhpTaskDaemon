@@ -1,16 +1,16 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Exception
+ * @subpackage Task\Exception
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Exception;
+namespace PhpTaskDaemon\Task\Exception;
 
-class JobOutputInvalid extends \Exception {
+class ManagerTypeInvalid extends \Exception {
     
     public function getMessage() {
-        return 'Job output invalid!';
+        return 'The specified manager type does not exists!';
     }
 }

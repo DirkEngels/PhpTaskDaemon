@@ -1,14 +1,14 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Exception
+ * @subpackage Daemon\Exception
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Exception;
+namespace PhpTaskDaemon\Daemon\Exception;
 
-class DaemonRuntimeError extends \Exception {
+class RuntimeError extends \Exception {
     
     public function getMessage() {
         return 'Unknown runtime error!';

@@ -1,16 +1,16 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Exception
+ * @subpackage Task\Exception
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Exception\DaemonForkFailed;
+namespace PhpTaskDaemon\Task\Exception;
 
-class DaemonForkFailed extends \Exception {
-	
-	public function getMessage() {
-		return 'Forking process failed!';
-	}
+class ExecutorTypeInvalid extends \Exception {
+    
+    public function getMessage() {
+        return 'The specified executor type does not exists!';
+    }
 }
