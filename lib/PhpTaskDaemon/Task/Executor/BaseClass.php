@@ -16,7 +16,6 @@ namespace PhpTaskDaemon\Task\Executor;
 class BaseClass extends AbstractClass implements InterfaceClass {
 	
 	public function run() {
-		$this->getJob()->setOutputVar('returnStatus', 'Failed');
 		return $this->getJob();
 	}
 }
