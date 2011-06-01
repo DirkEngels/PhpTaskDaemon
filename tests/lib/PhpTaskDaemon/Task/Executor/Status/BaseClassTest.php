@@ -19,34 +19,34 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_sharedMemory;
 	
 	protected function setUp() {
-		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-status');
+		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-status');
 		$this->_status = new \PhpTaskDaemon\Task\Executor\Status\BaseClass();
 		
 	}
 	protected function tearDown() {
-		$this->_sharedMemory->remove();
-		unset($this->_sharedMemory);
-		$sharedMemory = $this->_status->getSharedMemory();
-		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			$sharedMemory->remove();
+		$this->_ipc->remove();
+		unset($this->_ipc);
+		$ipc = $this->_status->getIpc();
+		if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+			$ipc->remove();
 		}
 		unset($this->_status);
 	}
 
 	public function testConstructorNoArguments() {
-		$sharedMemoryCreated = $this->_status->getSharedMemory();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+		$ipcCreated = $this->_status->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
 	}
 	public function testConstructorSingleArguments() {
-		$this->_status = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($this->_sharedMemory);
-		$sharedMemoryCreated = $this->_status->getSharedMemory();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+		$this->_status = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($this->_ipc);
+		$ipcCreated = $this->_status->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
 	}
-	public function testSetSharedMemory() {
-		$sharedMemoryCreated = $this->_status->getSharedMemory();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
-		$this->_status->setSharedMemory($this->_sharedMemory);
-		$this->assertEquals($this->_sharedMemory, $this->_status->getSharedMemory());
+	public function testSetIpc() {
+		$ipcCreated = $this->_status->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+		$this->_status->setIpc($this->_ipc);
+		$this->assertEquals($this->_ipc, $this->_status->getIpc());
 	}
 	public function testGetNoArgument() {
 		$this->assertInternalType('array', $this->_status->get());

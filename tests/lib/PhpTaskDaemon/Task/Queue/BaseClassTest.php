@@ -25,8 +25,8 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($sharedMemory);
 	}
 	protected function tearDown() {
-		$sharedMemory = $this->_statistics->getSharedMemory();
-		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
+		$sharedMemory = $this->_statistics->getIpc();
+		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
 			$sharedMemory->remove();
 		}
 		unset($this->_statistics);

@@ -28,8 +28,8 @@ class BaseClassTest extends \PHPUnit_Framework_TestCase {
 		$this->_executor->run();
 	}
 	protected function tearDown() {
-		$sharedMemory = $this->_status->getSharedMemory();
-		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
+		$sharedMemory = $this->_status->getIpc();
+		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
 			$sharedMemory->remove();
 		}
 		unset($this->_status);
