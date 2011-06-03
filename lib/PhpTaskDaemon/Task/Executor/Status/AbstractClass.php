@@ -56,7 +56,7 @@ abstract class AbstractClass {
 	 */
 	public function setIpc($ipc) {
 		if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-			$ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . getmypid());
+			$ipc = new \PhpTaskDaemon\Daemon\Ipc\None('status-' . getmypid());
 		}
 		$this->_ipc = $ipc;
 		return true;
