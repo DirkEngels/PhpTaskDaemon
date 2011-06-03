@@ -48,6 +48,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		}
 		$this->_pathNameWithPid = $pathname;
 
+		// Dommel & Semaphores
 		if (!file_exists($this->_pathNameWithPid . '.sem')) {
 			touch($this->_pathNameWithPid . '.sem');
 		}
@@ -55,7 +56,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 			ftok($this->_pathNameWithPid . '.sem', 1)
 		);
 
-		
+		// Shared Memory Segment
 		if (!file_exists($this->_pathNameWithPid . '.shm')) {
 			touch($this->_pathNameWithPid . '.shm');
 		}
@@ -63,12 +64,14 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 			ftok($this->_pathNameWithPid . '.shm', 2)
 		);
 
+		// Save the shared memory variable
 		sem_acquire($this->_semaphoreLock);
 		if (!shm_has_var($this->_sharedMemory, 1)) {
 			$retInit = shm_put_var($this->_sharedMemory, 1, array());
 		}
 		sem_release($this->_semaphoreLock);
 	}
+
 
 	/**
 	 * 
@@ -79,7 +82,8 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 			shm_detach($this->_sharedMemory);
 		}
 	}
-	
+
+
 	/**
 	 * 
 	 * Returns an array of registered variable keys.
@@ -95,7 +99,8 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		
 		return $keys;
 	}
-	
+
+
 	/**
 	 * 
 	 * Returns the value of a registered shared variable or false if it does 
@@ -147,6 +152,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		
 		return $retInit && $retPut;
 	}
+
 
 	/**
 	 * 
