@@ -11,5 +11,5 @@ namespace PhpTaskDaemon\Task\Manager\Process;
 
 interface InterfaceClass {
 	
-	public function start();
+	public function run();
 }
