@@ -11,4 +11,7 @@ namespace PhpTaskDaemon\Task\Manager\Trigger;
 
 class Gearman implements InterfaceClass {
 
+	public function timeToWait() {
+		return 1;
+	}
 }

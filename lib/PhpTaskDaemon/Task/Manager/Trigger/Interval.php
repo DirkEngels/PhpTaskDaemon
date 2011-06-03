@@ -10,7 +10,7 @@
 namespace PhpTaskDaemon\Task\Manager\Trigger;
 
 class Interval implements InterfaceClass {
-    protected $_timeToWait;
+    protected $_timeToWait = 1;
 
     public function getTimeToWait() {
     	return $this->_timeToWait;

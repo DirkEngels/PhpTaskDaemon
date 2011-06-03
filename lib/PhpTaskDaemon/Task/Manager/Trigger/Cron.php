@@ -11,16 +11,4 @@ namespace PhpTaskDaemon\Task\Manager\Trigger;
 
 class Cron extends Interval {
 
-	public function getTimeToWait() {
-        return $this->_timeToWait;
-    }
-    
-    /**
-     * Sets the time to wait
-     * @param $timeToWait
-     */
-    public function setTimeToWait($timeToWait) {
-        $this->_timeToWait = $timeToWait;
-    }
-
 }
