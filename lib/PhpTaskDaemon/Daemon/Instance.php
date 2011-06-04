@@ -123,22 +123,6 @@ class Instance {
 
 	/**
 	 * 
-	 * Add additional (zend) log writers
-	 */
-	protected function _initLogOutput() {
-		// Add writer: verbose		
-		$logFile = $this->_getLogFile();
-		if (!file_exists($logFile)) {
-			touch($logFile);
-		}
-		
-		$writerFile = new \Zend_Log_Writer_Stream($logFile);
-		$this->_log->addWriter($writerFile);
-		$this->_log->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
-	}
-
-	/**
-	 * 
 	 * Return the loaded manager objects.
 	 * @return array
 	 */
@@ -191,7 +175,6 @@ class Instance {
 	 */
 	public function start() {
 		$this->_pidFile->write($this->_pidManager->getCurrent());
-		$this->_initLogOutput();
 
 		// All valid
 		$this->_run();
