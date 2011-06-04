@@ -8,9 +8,6 @@
  */
 namespace PhpTaskDaemon\Daemon\Exception;
 
-class PidfileNotFound extends \Exception {
+class FileNotFound extends \Exception {
     
-    public function getMessage() {
-        return 'The specified pidfile does not exists!';
-    }
 }

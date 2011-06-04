@@ -189,8 +189,13 @@ class Instance {
 
 	
 	public function stop() {
-		$pidFile = new Pid\File($pidFile = \TMP_PATH . '/phptaskdaemond.pid');
-		$pid = $pidFile->read();
+		try {
+    		$pidFile = new Pid\File($pidFile = \TMP_PATH . '/phptaskdaemond.pid');
+            $pid = $pidFile->read();
+		} catch (Exception $e) {
+			echo $e->getMessage();
+			exit;
+		}
 
 		echo "Killing THIS PID: " . $pid . "\n";
         posix_kill($pid, SIGTERM);

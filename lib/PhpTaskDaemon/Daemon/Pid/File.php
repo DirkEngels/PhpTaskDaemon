@@ -81,10 +81,10 @@ class File {
 	 */
 	public function read() {
 		$pid = 0;
-		if (file_exists($this->getFilename())) {
+		if (!file_exists($this->getFilename())) {
+			throw new \PhpTaskDaemon\Daemon\Exception\FileNotFound('Pidfile not found');
+		} else {
 			$pid = (int) file_get_contents($this->getFilename());
-		}
-		if ($pid>0) {
 			return $pid;
 		}
 		return null;
@@ -97,7 +97,9 @@ class File {
 	 * @return bool
 	 */
 	public function unlink() {
-		if (file_exists($this->getFilename())) {
+		if (!file_exists($this->getFilename())) {
+			throw new \PhpTaskDaemon\Daemon\Exception\FileNotFound('Pidfile not found');
+		} else {
 			return unlink($this->getFilename());
 		}
 		return false;

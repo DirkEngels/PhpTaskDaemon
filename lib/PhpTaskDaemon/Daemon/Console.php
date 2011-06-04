@@ -141,53 +141,58 @@ class Console {
 	 * Reads the command line arguments and invokes the selected action.
 	 */
 	public function run() {
-        // Verbose Output
-        if ($this->_consoleOpts->getOption('verbose')) {
-            $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
-            $this->getDaemon()->getLog()->addWriter($writerVerbose);
-            $this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
-        }
-
-		// Read config
-		$configFile = $this->_consoleOpts->getOption('config');
-		if (!file_exists($configFile)) {
-			$configFile = PROJECT_ROOT . '/etc/config.ini';
-		}
-        $this->getDaemon()->getLog()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
 		try {
-			$config = new \Zend_Config_Ini( 
-				$configFile
-			);
-		} catch (Exception $e) {
-			echo $e->getMessage();
-			exit;
+	        // Verbose Output
+	        if ($this->_consoleOpts->getOption('verbose')) {
+	            $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
+	            $this->getDaemon()->getLog()->addWriter($writerVerbose);
+	            $this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
+	        }
+	
+			// Read config
+			$configFile = $this->_consoleOpts->getOption('config');
+			if (!file_exists($configFile)) {
+				$configFile = PROJECT_ROOT . '/etc/config.ini';
+			}
+	        $this->getDaemon()->getLog()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
+			try {
+				$config = new \Zend_Config_Ini( 
+					$configFile
+				);
+			} catch (Exception $e) {
+				echo $e->getMessage();
+				exit;
+			}
+
+			// Set action
+			$action = $this->_consoleOpts->getOption('action');
+	
+	        if ($this->_consoleOpts->getOption('list-tasks')) {
+	            $this->listTasks();
+	            exit;
+	        }
+	
+			$allActions = array('start', 'stop', 'restart', 'status', 'monitor', 'help');
+			if (!in_array($action, $allActions))  {
+				$this->help();
+				exit;
+			}
+	
+			// Log File
+			$logFile =$this->_consoleOpts->getOption('logfile');
+	        if (isset($logFile)) {
+	            $writerFile = new \Zend_Log_Writer_Stream($logFile);
+	            $this->getDaemon()->getLog()->addWriter($writerFile);
+	            $this->getDaemon()->getLog()->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
+	        }
+			
+			// Perform action
+			$this->$action();
+		} catch (\Exception $e) {
+			echo 'FATAL EXCEPTION: ' . $e->getMessage();
 		}
-
-		// Set action
-		$action = $this->_consoleOpts->getOption('action');
-
-        if ($this->_consoleOpts->getOption('list-tasks')) {
-            $this->listTasks();
-            exit;
-        }
-
-		$allActions = array('start', 'stop', 'restart', 'status', 'monitor', 'help');
-		if (!in_array($action, $allActions))  {
-			$this->help();
-			exit;
-		}
-
-		// Log File
-		$logFile =$this->_consoleOpts->getOption('logfile');
-        if (isset($logFile)) {
-            $writerFile = new \Zend_Log_Writer_Stream($logFile);
-            $this->getDaemon()->getLog()->addWriter($writerFile);
-            $this->getDaemon()->getLog()->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
-        }
-		
-		// Perform action
-		$this->$action();
-		exit;
+        echo "\n";
+        exit;
 	}
 
 	/**

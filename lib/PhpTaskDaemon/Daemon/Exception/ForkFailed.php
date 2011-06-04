@@ -9,8 +9,4 @@
 namespace PhpTaskDaemon\Daemon\Exception;
 
 class ForkFailed extends \Exception {
-	
-	public function getMessage() {
-		return 'Forking process failed!';
-	}
 }
