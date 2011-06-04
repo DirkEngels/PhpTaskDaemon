@@ -13,8 +13,8 @@ interface InterfaceClass {
 
     public function getJobId();
     public function setJobId($jobId);
-    public function getInputVar($key);
-    public function setInputVar($key, $value);
-    public function checkInput();
-
+    public function getInput();
+    public function setInput($input);
+    public function getOutput();
+    public function setOutput($output);
 }
