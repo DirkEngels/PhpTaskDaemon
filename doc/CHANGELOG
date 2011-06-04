@@ -12,12 +12,12 @@ Version 0.x
 - refactor parallel manager
 
 Verison 0.6
------------
+===========
 + read and use configuration file
 + store batch nr, and status counts
 
 Version 0.5
-===========
+-----------
 + add unit tests for all classes, except for some daemon classes (forks)
 + fix broken unit tests caused by the class restructuring in version 0.4
 
