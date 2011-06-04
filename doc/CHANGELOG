@@ -4,13 +4,24 @@ Change Log
 Feature Requests
 ----------------
 - add user documentation
-- add database support
 - fully unit tested: Functional tests start a daemon and send interrupt signals
 - add system manager (isolates a process)
 - refactor cron manager
 - refactor parallel manager
 - boot script (/etc/init.d/phptaskdaemon)
 - cron restart script (for restarting after critical errors)
+
+Version 2.1
+-----------
+- IPC backend: Database
+
+Version 2.0
+-----------
+- add database support
+- add exception handling
+- multiple ipc backends: None & SharedMemory
+- create manager process component
+- create manager trigger component
 
 
 Verison 0.6
