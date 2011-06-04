@@ -15,7 +15,6 @@ namespace PhpTaskDaemon\Task\Manager;
  * methods needed for almost all managers. 
  */
 abstract class AbstractClass {
-
 	/** 
 	 * 
 	 * Manager Type: Tasks are executed by a managers. The manager decide when
@@ -69,13 +68,19 @@ abstract class AbstractClass {
 	protected $_executor = null;
 
 	/**
-	 * Time to wait in milliseconds before the next run.
+	 * Time to wait in milliseconds before running the next task.
 	 * 
 	 * @var integer
 	 */
-	protected $_waitTime = 10;
+	protected $_sleepTimeExecutor = 10;
 
-
+	/**
+	 * Time to wait in milliseconds before loading the queue again.
+	 * 
+	 * @var integer
+	 */
+	protected $_sleepTimeQueue = 3000000;
+	
 	/**
 	 * 
 	 * A manager requires a executor and queue object. In case of a gearman
@@ -255,5 +260,42 @@ abstract class AbstractClass {
 		}
 		exit;
 	}
-	
+
+	/**
+	 * 
+	 * Process a single task: set job input, reset status, run and update
+	 * statistics
+	 * @param \PhpTaskDaemon\Task\Job\AbstractClass $job
+	 */
+	protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
+		// Set manager input
+ 		$this->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
+		$this->getExecutor()->setJob($job);
+		
+		// Update Status before and after running the task
+		$this->getExecutor()->updateStatus(0);
+		$job = $this->getExecutor()->run();
+		$this->getExecutor()->updateStatus(100);
+		
+		// Log and sleep for a while
+		usleep($this->_sleepTimeExecutor);
+		$this->log($job->getOutputVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);			
+		$this->getQueue()->updateStatistics($job->getOutputVar('returnStatus'));
+
+		// Reset status and decrement queue
+		$this->getExecutor()->updateStatus(0);
+		$this->getQueue()->updateQueue();
+
+		return $job->getOutputVar('returnStatus');
+	}
+
+	/**
+	 * 
+	 * The sleep function for an interval manager
+	 */
+	protected function _sleep() {
+		// Sleep
+		$this->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
+		usleep($this->_sleepTimeQueue);
+	}
 }

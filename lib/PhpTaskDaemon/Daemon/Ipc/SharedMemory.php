@@ -201,12 +201,17 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 		$retInit = true;
 		
 		// Update keys
+		$value = 0;
 		if (!in_array($key, array_keys($keys))) {
 			$keys[$key] = count($keys)+2;
 			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
-			$value = 0;
 		} else {
-			$value = shm_get_var($this->_sharedMemory, $keys[$key])-1;
+//			if (shm_has_var($this->_sharedMemory, $keys[$key])) {
+				$value = shm_get_var($this->_sharedMemory, $keys[$key]);
+//			}
+//			echo "Getting KEY: " . $key . " = > " . $keys[$key] . " ==> " . $value . "\n";
+			$value--;
+				
 			if ($value<0) { $value = 0; }
 		}
 		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);

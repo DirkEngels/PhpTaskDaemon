@@ -1,9 +1,8 @@
 <?php
-
 /**
- * @package SiteSpeed
- * @subpackage Daemon\Manager
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @package PhpTaskDaemon
+ * @subpackage Task\Manager
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -50,7 +49,8 @@ class Gearman extends AbstractClass implements InterfaceClass {
 		$gmworker= new GearmanWorker();
 		$gmworker->addServer();
 		
-		$name = preg_replace('/Daemon_Manager_/i', '', get_class($this));
+		preg_match('/^PhpTaskDaemon\\Task\\([a-zA-Z]+)\\Manager', get_class($this), $matches);
+		$name = $matches[1];
 		$gmworker->addFunction($name, array($this, 'acceptJob'));
 	
 		while($gmworker->work()) {
@@ -68,14 +68,7 @@ class Gearman extends AbstractClass implements InterfaceClass {
 	 * @param mixed $gearmanJob
 	 */
 	public function acceptJob($gearmanJob) {
-		$this->_task->setTaskInput($gearmanJob->workload());
-		$this->_task->updateMemoryTask(0);
-
-		$ret = $this->_task->executeTask();
-
-		$this->_task->updateMemoryTask(100);
-		usleep(10);
-		$this->_task->updateMemoryTask(0);
+		$this->_processTask($gearmanJob->workload());
 		
 		return $ret;
 	}	

@@ -10,7 +10,7 @@
 namespace PhpTaskDaemon\Daemon\Interrupt;
 
 /**
-* The SiteSpeed Daemon Signals object can be encapsulated by other classes to 
+* The Daemon Signals object can be encapsulated by other classes to 
 * enable posix signal handlers. These are needed for triggering the cleaning up
 * the daemon, managers and possible active tasks when receiving a posix signal.
 * A callback can be provided to run a method related to the current process. 

@@ -10,10 +10,10 @@
 namespace PhpTaskDaemon\Daemon\Pid;
 
 /**
- * This SiteSpeed Daemon Pid Manager object manages process ID's of the current, 
- * parent and child processes. When forking processes, the forkChild() method
- * of this class can be called to shift the current pid to parent and empty
- * any child pids.
+ * This Pid Manager object manages process ID's of the current, parent and 
+ * child processes. When forking processes, the forkChild() method of this
+ * class can be called to shift the current pid to parent and empty any child 
+ * pids.
  */
 class Manager {
 

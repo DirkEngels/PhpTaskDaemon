@@ -123,22 +123,6 @@ class Instance {
 
 	/**
 	 * 
-	 * Add additional (zend) log writers
-	 */
-	protected function _initLogOutput() {
-		// Add writer: verbose		
-		$logFile = $this->_getLogFile();
-		if (!file_exists($logFile)) {
-			touch($logFile);
-		}
-		
-		$writerFile = new \Zend_Log_Writer_Stream($logFile);
-		$this->_log->addWriter($writerFile);
-		$this->_log->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
-	}
-
-	/**
-	 * 
 	 * Return the loaded manager objects.
 	 * @return array
 	 */
@@ -155,39 +139,6 @@ class Instance {
 	public function addManager($manager) {
 		return array_push($this->_managers, $manager);
 	}
-
-	/**
-	 * 
-	 * Scans a directory for task managers and returns the number of loaded
-	 * tasks.
-	 * 
-	 * @param string $dir
-	 * @return integer
-	 */
-	public function scanTaskDirectory($dir) {
-		$this->_log->log("Scanning directory for tasks: " . $dir, \Zend_Log::DEBUG);
-
-		if (!is_dir($dir)) {
-			throw new \Exception('Directory does not exists');
-		}
-
-		$groups = scandir($dir);
-		$tasks = 0;
-		$countLoadedObjects = 0;
-		foreach($groups as $group) {
-			if ($group == '.' || $group == '..') { continue; }
-
-			$this->_log->log("Scanning dir: " . $dir . $group, \Zend_Log::INFO);
-			$tasks = scandir($dir . '/' . $group);
-			foreach ($tasks as $task) {
-				if ($task == '.' || $task == '..') { continue; }
-
-				$this->_log->log("Found: " . $group . "\\" . $task, \Zend_Log::INFO);
-				$this->loadTaskByName($group . '\\' . $task);			
-			}
-		}
-		return $countLoadedObjects;
-	}
 	
 	/**
 	 * 
@@ -195,25 +146,23 @@ class Instance {
 	 * @param string $taskName
 	 * @return \PhpTaskDaemon\Task\Manager\AbstractClass
 	 */
-	public function loadTaskByName($taskName) {
+	public function loadManagerByName($taskName) {
+		$taskName = preg_replace("/\\//i", '\\\\', $taskName);
 		$managerClass = '\\Tasks\\' . $taskName . '\\Manager'; 
 		$queueClass = '\\Tasks\\' . $taskName . '\\Queue';
 		$executorClass = '\\Tasks\\' . $taskName . '\\Executor';
 
-		//Queue
-		$queue = (class_exists($queueClass)) 
-			? new $queueClass()
-			: new \PhpTaskDaemon\Task\Queue\BaseClass();
+		// Queue
+		$queueClass = (class_exists($queueClass)) ? $queueClass : '\PhpTaskDaemon\Task\Queue\BaseClass';
+		$queue = new $queueClass(); 
 		
 		// Executuor
-		$executor = (class_exists($executorClass)) 
-			? new $executorClass()
-			: new \PhpTaskDaemon\Task\Executor\BaseClass();
+		$executorClass = (class_exists($executorClass)) ? $executorClass : '\PhpTaskDaemon\Task\Executor\BaseClass';
+		$executor = new $executorClass();
 
 		// Manager
-		$manager = (class_exists($managerClass)) 
-			? new $managerClass($executor, $queue)
-			: new \PhpTaskDaemon\Task\Manager\Interval($executor, $queue);
+		$managerClass = (class_exists($managerClass)) ? $managerClass : '\PhpTaskDaemon\Task\Manager\Interval';  
+		$manager = new $managerClass($executor, $queue);
 		$this->addManager($manager);
 
 		return $manager;
@@ -226,15 +175,36 @@ class Instance {
 	 */
 	public function start() {
 		$this->_pidFile->write($this->_pidManager->getCurrent());
-		$this->_initLogOutput();
 
-		// Check input here
-		$this->scanTaskDirectory(APPLICATION_PATH . '/Tasks/');
-		
 		// All valid
 		$this->_run();
 	}
+	
+	/**
+	 * Dispatches the isRunning method to the Pid\File object
+	 */
+	public function isRunning() {
+		return $this->_pidFile->isRunning();
+	}
 
+	
+	public function stop() {
+		$pidFile = new Pid\File($pidFile = \TMP_PATH . '/phptaskdaemond.pid');
+		$pid = $pidFile->read();
+
+		echo "Killing THIS PID: " . $pid . "\n";
+        posix_kill($pid, SIGTERM);
+		
+//		echo "THIS PID: " . $this->_pidManager->getCurrent() . "\n";
+//		echo "Child PIDs\n";
+//		$childs = $this->_pidManager->getChilds();
+//		echo var_dump($childs);
+//		foreach($childs as $child) {
+//			echo " - " . $child . "\n";
+//		}
+//		echo "\n";
+	}
+	
 	/**
 	 * 
 	 * POSIX Signal handler callback

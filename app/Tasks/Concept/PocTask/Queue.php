@@ -1,9 +1,9 @@
 <?php
 
 namespace Tasks\Concept\PocTask;
-use \PhpTaskDaemon\Task\Queue as PTDTQ;
+use \PhpTaskDaemon\Task\Queue as PtdQ;
 
-class Queue extends PTDTQ\AbstractClass implements PTDTQ\InterfaceClass {
+class Queue extends PtdQ\AbstractClass implements PtdQ\InterfaceClass {
 
 	/**
 	 * Fills a queue with a random number of tasks (0 - 30). The input for each
@@ -12,7 +12,7 @@ class Queue extends PTDTQ\AbstractClass implements PTDTQ\InterfaceClass {
 	 */
 	public function load() {
 		$queue = array();
-		for ($i=0; $i<rand(0,30); $i++) {
+		for ($i=0; $i<rand(0,100); $i++) {
 			$job = new Job(
 				'pocjob-' . $i, 
 				array('sleepTime' => rand(100000, 5000000))

@@ -1,9 +1,8 @@
 <?php
-
 /**
- * @package SiteSpeed
- * @subpackage Daemon\Manager
- * @copyright Copyright (C) 2010 Dirk Engels Websolutions. All rights reserved.
+ * @package PhpTaskDaemon
+ * @subpackage Task\Manager
+ * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
@@ -17,43 +16,44 @@ namespace PhpTaskDaemon\Task\Manager;
  * 
  */
 class Forked extends AbstractClass implements InterfaceClass {
-	
-	protected $_sleepTime = 3;
-
 	/**
 	 * Runs the manager
 	 * @see PhpTaskDaemon\Task\Manager.InterfaceClass::execute()
 	 */
 	public function execute() {
 		while (true) {
-			// Load Tasks
-			$this->_queue = $this->_task->loadTasks();
-			$this->updateMemoryQueue(count($this->_queue));
-			
-			if (count($this->_queue)==0) {
-				$this->_log->log("Queue checked: empty!!!", Zend_Log::INFO);
-				
+			// Load Tasks in Queue
+			$jobs = $this->getQueue()->load();
+
+			if (count($jobs)==0) {
+				$this->log("Queue checked: empty!!!", \Zend_Log::DEBUG);
+				$this->getExecutor()->updateStatus(100, 'Queue empty');
 			} else {
-				$this->_log->log("Queue loaded: " . count($this->_queue) . " items!!!", Zend_Log::INFO);
+				$this->log("Queue loaded: " . count($jobs) . " elements", \Zend_Log::INFO);
+				$this->getQueue()->updateQueue(count($jobs));
 	
 				$childs = 0;
-				while ($taskInput = array_shift($this->_queue)) {
-					$this->_forkTask($taskInput);
+				while ($job = array_shift($jobs)) {
+					$this->_forkTask($job);
 				}
-	
+				$this->log('Queue finished', \Zend_Log::DEBUG);
+				$this->getExecutor()->updateStatus(100, 'Queue finished');
+
 				// The manager waits
 				while ($childs>=3) {
 					pcntl_wait($status);
 					$childs--;	
 				}
+				
 			}
-	
-			$this->_log->log('Current queue finished... taking a small sleep ' . $this->_sleepTime, Zend_Log::INFO);
-			sleep($this->_sleepTime);
+			
+			// Take a small rest after so much work. This also prevents 
+			// manageres from using all resources.
+			$this->_sleep();
 		}
 	}	
 	
-	protected function _forkTask($taskInput) {
+	protected function _forkTask($job) {
 		// Fork the manager
 		$pid = pcntl_fork();
 		
@@ -64,8 +64,7 @@ class Forked extends AbstractClass implements InterfaceClass {
 			$childs++;
 		} else {
 			// Set manager input and start the manager
-			$this->_task->setTaskInput($taskInput);
-			$this->_task->executeTask();
+			$this->_processTask($job);
 			
 			// Exit after finishing the forked
 			exit;

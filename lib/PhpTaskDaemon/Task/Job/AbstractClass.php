@@ -93,7 +93,7 @@ abstract class AbstractClass {
 	 * @return mixed
 	 */
 	public function getInputVar($var) {
-		if (in_array($var, $this->getInputKeys())) {
+		if (in_array($var, array_keys($this->_input))) {
 			return $this->_input[$var];
 		}
 		return null;

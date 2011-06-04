@@ -10,7 +10,7 @@
 namespace PhpTaskDaemon\Daemon\Pid;
 
 /**
- * This SiteSpeed Daemon Pid File object is responsible for reading and writing
+ * The Daemon Pid File object is responsible for reading and writing
  * the process ID to a file. Currently only the main daemon and it's managers
  * use this class to store the process IDs to disk. The task do not write a pid
  * to disk.
