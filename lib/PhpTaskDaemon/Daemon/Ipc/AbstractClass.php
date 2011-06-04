@@ -15,6 +15,9 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * 
  */
 abstract class AbstractClass {
+	public function __construct($id) {
+		return true;
+	}
 	
 	/**
 	 * This array contains the keys of all registered variables.
