@@ -11,7 +11,32 @@ namespace PhpTaskDaemon\Task\Manager\Process;
 
 abstract class AbstractClass {
 
+	protected $_executor = null;
 	protected $_jobs = array();
+
+    /**
+     * 
+     * Returns the executor object
+     * @return \PhpTaskDaemon\Executor\AbstractClass
+     */
+    public function getExecutor() {
+        return $this->_executor;
+    }
+
+    /**
+     * 
+     * Sets the current executor object.
+     * @param \PhpTaskDaemon\Executor\AbstractClass $executor
+     * @return $this
+     */
+    public function setExecutor($executor) {
+        if (!is_a($executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
+            $executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
+        }
+        $this->_executor = $executor;
+
+        return $this;
+    }
 
 	/**
 	 * Gets the job
