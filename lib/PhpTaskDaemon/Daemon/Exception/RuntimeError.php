@@ -10,7 +10,4 @@ namespace PhpTaskDaemon\Daemon\Exception;
 
 class RuntimeError extends \Exception {
     
-    public function getMessage() {
-        return 'Unknown runtime error!';
-    }
 }
