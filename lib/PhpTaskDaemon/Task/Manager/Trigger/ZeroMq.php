@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Trigger;
 
-class ZeroMq implements InterfaceClass {
+class ZeroMq extends AbstractClass implements InterfaceClass {
 
 	public function timeToWait() {
 		return 1;

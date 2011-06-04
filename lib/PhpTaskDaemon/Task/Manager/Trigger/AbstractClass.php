@@ -9,6 +9,10 @@
 
 namespace PhpTaskDaemon\Task\Manager\Trigger;
 
-class Gearman extends AbstractClass implements InterfaceClass {
+abstract class AbstractClass {
+    
+    public function timeToWait() {
+    	return 1;
+    }
 
 }
