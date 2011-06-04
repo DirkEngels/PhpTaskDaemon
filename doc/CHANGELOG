@@ -4,17 +4,17 @@ Change Log
 Version 0.x
 -----------
 - add user documentation
-- read and use configuration file
 - boot script (/etc/init.d/phptaskdaemon)
 - cron restart script (for restarting after critical errors)
 - task database support
 - fully unit tested: Functional tests start a daemon and send interrupt signals
+- refactor cron manager
+- refactor parallel manager
 
 Verison 0.6
 -----------
-- refactor cron manager
-- refactor parallel manager
-- store batch nr, and status counts
++ read and use configuration file
++ store batch nr, and status counts
 
 Version 0.5
 ===========
