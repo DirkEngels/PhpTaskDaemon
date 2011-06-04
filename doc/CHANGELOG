@@ -9,19 +9,19 @@ Feature Requests
 - add system manager (isolates a process)
 - refactor cron manager
 - refactor parallel manager
-
+- boot script (/etc/init.d/phptaskdaemon)
+- cron restart script (for restarting after critical errors)
 
 
 Verison 0.6
------------ 
+===========
 + read and use configuration file
-- cron restart script (for restarting after critical errors)
-- boot script (/etc/init.d/phptaskdaemon)
 + store batch nr, and status counts
 + update status shared memory variables
++ store batch nr, and status counts
 
 Version 0.5
-===========
+-----------
 + add unit tests for all classes, except for some daemon classes (forks)
 + fix broken unit tests caused by the class restructuring in version 0.4
 
