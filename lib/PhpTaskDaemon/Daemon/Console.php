@@ -55,14 +55,14 @@ class Console {
 				array(
 					'config|c-s'	=> 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
 					'logfile|l-s'	=> 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
-					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
+//					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
 					'action|a=s'	=> 'Action (default: start) (options: start, stop, restart, status, monitor)',
 					'list-tasks|lt' => 'List registered tasks',
 					'tasks|t'	 	=> 'Include tasks',
-					'exclude-tasks|et=s'	 	=> 'Exclude tasks',
-					'categories|cat' 	=> 'Include categories',
-					'exclude-categories|ecat=s' 	=> 'Exclude categories',
-					'print|p'   	=> 'List Actions',
+//					'exclude-tasks|et=s'	 	=> 'Exclude tasks',
+//					'categories|cat' 	=> 'Include categories',
+//					'exclude-categories|ecat=s' 	=> 'Exclude categories',
+//					'print|p'   	=> 'List Actions',
 					'verbose|v'		=> 'Verbose',
 					'help|h'		=> 'Show help message (this message)',
 				)
@@ -141,14 +141,27 @@ class Console {
 	 * Reads the command line arguments and invokes the selected action.
 	 */
 	public function run() {
+        // Verbose Output
+        if ($this->_consoleOpts->getOption('verbose')) {
+            $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
+            $this->getDaemon()->getLog()->addWriter($writerVerbose);
+            $this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
+        }
+
 		// Read config
 		$configFile = $this->_consoleOpts->getOption('config');
 		if (!file_exists($configFile)) {
 			$configFile = PROJECT_ROOT . '/etc/config.ini';
 		}
-		$config = new \Zend_Config_Ini( 
-			$configFile
-		);
+        $this->getDaemon()->getLog()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
+		try {
+			$config = new \Zend_Config_Ini( 
+				$configFile
+			);
+		} catch (Exception $e) {
+			echo $e->getMessage();
+			exit;
+		}
 
 		// Set action
 		$action = $this->_consoleOpts->getOption('action');
@@ -164,11 +177,13 @@ class Console {
 			exit;
 		}
 
-		if ($this->_consoleOpts->getOption('verbose')) {
-			$writerVerbose = new \Zend_Log_Writer_Stream('php://output');
-			$this->getDaemon()->getLog()->addWriter($writerVerbose);
-			$this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
-		}
+		// Log File
+		$logFile =$this->_consoleOpts->getOption('logfile');
+        if (isset($logFile)) {
+            $writerFile = new \Zend_Log_Writer_Stream($logFile);
+            $this->getDaemon()->getLog()->addWriter($writerFile);
+            $this->getDaemon()->getLog()->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
+        }
 		
 		// Perform action
 		$this->$action();

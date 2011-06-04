@@ -1,22 +1,24 @@
 Change Log
 ==========
 
-Version 0.x
------------
+Feature Requests
+----------------
 - add user documentation
-- read and use configuration file
-- boot script (/etc/init.d/phptaskdaemon)
-- cron restart script (for restarting after critical errors)
-- task database support
+- add database support
 - fully unit tested: Functional tests start a daemon and send interrupt signals
+- add system manager (isolates a process)
+- refactor cron manager
+- refactor parallel manager
+
+
 
 Verison 0.6
 ----------- 
-- refactor cron manager
-- refactor parallel manager
-- add system manager (isolates a process)
++ read and use configuration file
+- cron restart script (for restarting after critical errors)
+- boot script (/etc/init.d/phptaskdaemon)
 + store batch nr, and status counts
-- update status shared memory variables
++ update status shared memory variables
 
 Version 0.5
 ===========
