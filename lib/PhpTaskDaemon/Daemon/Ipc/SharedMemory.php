@@ -42,7 +42,8 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 	 * @param string $id
 	 */
 	public function __construct($id) {
-		$pathname = $id;
+		parent::__construct($id);
+
 		if (!strstr($id, '/')) {
 			$pathname = TMP_PATH . '/' . strtolower($id);
 		}

@@ -15,10 +15,17 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * 
  */
 abstract class AbstractClass {
+	protected $_id = null;
+
 	public function __construct($id) {
+		$this->_id = $id;
 		return true;
 	}
 	
+	public function getId() {
+		return $this->_id;
+	}
+
 	/**
 	 * This array contains the keys of all registered variables.
 	 * @var array
