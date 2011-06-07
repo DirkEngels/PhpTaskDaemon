@@ -126,8 +126,18 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
      */
+    public static function getManager($taskName) {
+        return self::getComponentType($taskName, self::TYPE_MANAGER);
+    }
+
+
+    /**
+     * Returns the manager trigger for the specified task
+     * @param string $taskName
+     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     */
 	public static function getManagerTrigger($taskName) {
-		return self::getComponentType($taskName, self::TYPE_MANAGER);
+		return self::getComponentType($taskName, self::TYPE_TRIGGER);
 	}
 
 
@@ -146,12 +156,22 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Executor\Status\AbstractClass
      */
-	public static function getExecutorStatus($taskName) {
-		return self::getComponentType($taskName, self::TYPE_STATUS);
+	public static function getExecutor($taskName) {
+		return self::getComponentType($taskName, self::TYPE_EXECUTOR);
 	}
 
 
     /**
+     * Returns the executor status for the specified task
+     * @param string $taskName
+     * @return \PhpTaskDaemon\Task\Executor\Status\AbstractClass
+     */
+    public static function getExecutorStatus($taskName) {
+        return self::getComponentType($taskName, self::TYPE_STATUS);
+    }
+
+
+	/**
      * Returns the queue for the specified task
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Queue\AbstractClass
@@ -205,7 +225,16 @@ class Factory {
      * @return null|stdClass
      */
     protected function _getObjectTaskConfig($taskName, $objectType) {
-       return false;
+        $objectType = \PhpTaskDaemon\Daemon\Config::getTaskOption(
+            strtolower($objectType . '.type'), 
+            $taskName
+        );
+        $objectClassName = '\\Tasks\\' . $taskName . '\\' . $objectType;
+        if (class_exists($objectClassName, true)) {
+        	$object = new $objectClassName();
+        	return $object;
+        }
+        return false;
     }
 
 
@@ -216,6 +245,15 @@ class Factory {
      * @return null|stdClass
      */
     protected function _getObjectDefaultConfig($taskName, $objectType) {
+        $objectType = \PhpTaskDaemon\Daemon\Config::getDaemonOption(
+            strtolower($objectType . '.type')
+        );
+        $objectClassName = '\\Tasks\\' . $taskName . '\\' . $objectType;
+        if (class_exists($objectClassName, true)) {
+            $object = new $objectClassName();
+            return $object;
+        }
+        return false;
     }
 
 
