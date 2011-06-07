@@ -244,6 +244,21 @@ class Console {
 		}
 		return $managers;
 	}
+	
+	/**
+     * Loads a task by name. A task should at least contain an executor object.
+     * The manager, job, queue, process, trigger, status and statistics objects
+     * are automatically detected. For each object the method checks if the 
+     * class has been overloaded or defined in the configuration file. 
+     * Otherwise the default object classes will be loaded. The default objects
+     * can also be defined using the configuration file.
+     * 
+     * @param string $taskName The name of the task
+     * @return \PhpTaskDaemon\Task\Manager\AbstractClass 
+	 */
+	public function loadTask($taskName) {
+		
+	}
 
 	/**
 	 * 
