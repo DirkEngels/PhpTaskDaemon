@@ -13,15 +13,34 @@ Feature Requests
 
 Version 2.1
 -----------
-- IPC backend: Database
++ Implement Daemon\Ipc types
+    + Database
++ Implement Task\Manager\Trigger types
+    + Cron
+    + Gearman
++ Implement Task\Manager\Process types
+    + Child
+    + Parallel
+- Load tasks components using the configuration file
 
 Version 2.0
 -----------
 - add database support
 - add exception handling
-- multiple ipc backends: None & SharedMemory
-- create manager process component
-- create manager trigger component
++ Add Daemon\Config component
++ Add Task\Job\Data component
++ Refactor Manager Trigger Component
++ Support for multiple IPC types
++ Implement Daemon\Ipc types
+    + None
+    + SharedMemory
++ Create Manager Trigger Component
++ Implement Task\Manager\Trigger types
+    + Interval
++ Create Manager Process Component
++ Implement Task\Manager\Process types
+    + Same
++ Refactor manager to use processes & triggers
 
 
 Verison 0.6
