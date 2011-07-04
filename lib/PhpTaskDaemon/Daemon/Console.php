@@ -212,7 +212,30 @@ class Console {
                 $this->_consoleOpts->getOption('config')
             )
         );
-        echo "Tasks: \n";
+        echo "Tasks\n";
+        echo "=====\n\n";
+
+        echo "Examples\\Minimal\n";
+        echo "-----------------\n";
+        echo "\tProcess:\t\tSame\t\t\t(default)\n";
+        echo "\tTrigger:\t\tInterval\t\t(default)\n";
+            echo "\t- sleepTime:\t\t3\t\t\t(default)\n";
+        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+        echo "\tLogger:\t\t\tNone\t\t\t(default)\n";
+        echo "\n";
+
+        echo "Examples\\Parallel\n";
+        echo "-----------------\n";
+        echo "\tProcess:\t\tParallel\t\t(config)\n";
+            echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
+        echo "\tTrigger:\t\tCron\t\t\t(default)\n";
+            echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
+        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+        echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
+        echo "\n";
+        
         foreach($tasks as $nr => $taskName) {
             echo "- " . $taskName . "\n";
         }
