@@ -152,24 +152,24 @@ class Console {
 	        if ($this->_consoleOpts->getOption('verbose')) {
 	            $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
 	            $this->getDaemon()->getLog()->addWriter($writerVerbose);
-	            $this->getDaemon()->getLog()->log('Adding log console', \Zend_Log::DEBUG);
+	            $this->getDaemon()->getLog()->log('Adding log verbose console', \Zend_Log::DEBUG);
 	        }
-	
-			// Read config
-			$configFile = $this->_consoleOpts->getOption('config');
-			if (!file_exists($configFile)) {
-				$configFile = PROJECT_ROOT . '/etc/config.ini';
-			}
-	        $this->getDaemon()->getLog()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
-			try {
-				$config = new \Zend_Config_Ini( 
-					$configFile
-				);
-			} catch (Exception $e) {
-				echo $e->getMessage();
-				exit;
-			}
 
+	        // Prepare configuration files
+	        $configFiles = array();
+	        if ($this->_consoleOpts->getOption('config')!='') {
+	        	$configArguments = explode(',', $this->_consoleOpts->getOption('config'));
+	        	foreach ($configArguments as $configArgument) {
+	        		if (!strstr($configArgument, '/')) {
+	        			$configArgument = \APPLICATION_PATH . '/' . $configArgument;
+	        		}
+	        		array_push($configFiles, $configArgument);
+	        	} 
+	        }
+
+            // Initiate config
+	        $config = \PhpTaskDaemon\Daemon\Config::get($configFiles);
+            
 			// Set action
 			$action = $this->_consoleOpts->getOption('action');
 	
@@ -283,6 +283,24 @@ class Console {
 		return array();
 	}
 
+
+	protected function _readConfig () {
+        // Read config
+        $configFile = $this->_consoleOpts->getOption('config');
+        if (!file_exists($configFile)) {
+            $configFile = PROJECT_ROOT . '/etc/daemon.ini';
+        }
+
+        $this->getDaemon()->getLog()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
+        try {
+            $config = new \Zend_Config_Ini( 
+                $configFile
+            );
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            exit;
+        }
+    }
 	/**
      * Loads a task by name. A task should at least contain an executor object.
      * The manager, job, queue, process, trigger, status and statistics objects
