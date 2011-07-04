@@ -19,24 +19,64 @@ namespace PhpTaskDaemon\Daemon;
  */
 class Config {
 	protected static $_instance = null;
+	
+	/**
+	 * Zend_Config object instance
+	 * @var \Zend_Config
+	 */
     protected $_config = null;
 	
 	/** 
 	 * Protected constructor for singleton pattern
 	 */
-	protected function __construct() {
+	protected function __construct($configFiles = array()) {
+		$this->_initConfig($configFiles);
 	}
 
+	protected function _initConfig($configFiles) {
+        // Add default configuration
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/app.ini'));
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/daemon.ini'));
+        
+        foreach($configFiles as $configFile) {
+            echo "Trying config file: " . $configFile . "\n";
+            if (!file_exists($configFile)) {
+                echo "ERR: Config file does not exists: " . $configFile . "\n";
+                continue;
+            }
+
+            if (!is_a($this->_config, '\Zend_Config')) {
+                // First config
+                $this->_config = new \Zend_Config_Ini(
+                    $configFile,
+                    \APPLICATION_ENV,
+                    array('allowModifications' => true)
+                );
+            } else {
+                // Merge config file
+                $this->_config->merge(
+                    new \Zend_Config_Ini(
+                        $configFile, 
+                        \APPLICATION_ENV
+                    )
+                );
+            }
+            echo "Loaded config file: " . $configFile . "\n";
+        }
+        $this->_config->setReadonly();
+	}
 
 	/**
 	 * Singleton getter
+	 * @return \PhpTaskDaemon\Daemon\Config
 	 */
-	public function get() {
-        if (self::$_instance) {
-            return self::$_instance;
+	public function get($configFiles = array()) {
+        if (!self::$_instance) {
+        	echo "Creating new config object\n";
+            self::$_instance = new self($configFiles);
         }
 
-        return self::$_instance = self::createInstance();
+        return self::$_instance;
 	}
 
 
