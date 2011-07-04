@@ -19,6 +19,12 @@ namespace PhpTaskDaemon\Daemon;
 */
 class Console {
 	
+    /**
+     * Configuration Object
+     * @var Zend_Config
+     */
+    protected $_config;
+    
 	/**
 	 * Console options object
 	 * @var Zend_Console_Getopt
@@ -200,7 +206,12 @@ class Console {
 	 * Lists the current loaded tasks. 
 	 */
     public function listTasks() {
-        $tasks = $this->scanTasksDirectory(APPLICATION_PATH . '/Tasks/');
+        $tasks = array_merge(
+            $this->scanDirectoryForTasks(APPLICATION_PATH . '/Tasks/'),
+            $this->scanConfigForTasks(
+                $this->_consoleOpts->getOption('config')
+            )
+        );
         echo "Tasks: \n";
         foreach($tasks as $nr => $taskName) {
             echo "- " . $taskName . "\n";
@@ -217,7 +228,7 @@ class Console {
 	 * @param string $dir
 	 * @return integer
 	 */
-	public function scanTasksDirectory($dir, $group = null) {
+	public function scanDirectoryForTasks($dir, $group = null) {
 		if (!is_dir($dir . '/' . $group)) {
 			throw new \Exception('Directory does not exists');
 		}
@@ -238,13 +249,17 @@ class Console {
 				// Load recursively
 				$managers = array_merge(
 					$managers, 
-					$this->scanTasksDirectory($dir, $base)
+					$this->scanDirectoryForTasks($dir, $base)
 				);
 			}
 		}
 		return $managers;
 	}
 	
+	public function scanConfigForTasks($configFile) {
+		return array();
+	}
+
 	/**
      * Loads a task by name. A task should at least contain an executor object.
      * The manager, job, queue, process, trigger, status and statistics objects
@@ -265,12 +280,12 @@ class Console {
 	 * Action: Start Daemon
 	 */
 	public function start() {
-		$managers = $this->scanTasksDirectory(PROJECT_ROOT . '/app/Tasks/');
+		$managers = $this->scanDirectoryForTasks(PROJECT_ROOT . '/app/Tasks/');
 		echo "\n";
 		echo "\n";
 		foreach($managers as $manager) {
 			$this->getDaemon()->loadManagerByName($manager);
-echo $manager . "\n";
+            echo $manager . "\n";
 		}
 //		$this->getDaemon()->loadManagerByName('Concept/PocTask');
 		$this->getDaemon()->start();
