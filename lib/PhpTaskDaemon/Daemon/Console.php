@@ -142,62 +142,83 @@ class Console {
 		$this->_config = $config;
 	}
 
+	protected function _initConfig() {
+        // Prepare configuration files
+        $configFiles = array();
+        if ($this->_consoleOpts->getOption('config')!='') {
+            $configArguments = explode(',', $this->_consoleOpts->getOption('config'));
+            foreach ($configArguments as $configArgument) {
+                if (!strstr($configArgument, '/')) {
+                    $configArgument = \APPLICATION_PATH . '/' . $configArgument;
+                }
+                array_push($configFiles, $configArgument);
+            } 
+        }
+
+        // Initiate config
+        $config = \PhpTaskDaemon\Daemon\Config::get($configFiles);
+	}
+	
+	protected function _initLogVerbose() {
+		$writerVerbose = new \Zend_Log_Writer_Stream('php://output');
+        \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
+        \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: verbose', \Zend_Log::DEBUG);
+	}
+	
+	protected function _initLogFile($logFile) {
+		if (file_exists($logFile)) {
+	        $writerFile = new \Zend_Log_Writer_Stream($logFile);
+	        \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
+	        \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
+		} else {
+			\PhpTaskDaemon\Daemon\Logger::get()->log('Logfile does not exists: ' . $logFile, \Zend_Log::ERR);
+		}
+	}
+
 	/**
 	 * 
 	 * Reads the command line arguments and invokes the selected action.
 	 */
 	public function run() {
 		try {
-	        // Verbose Output
+	        // Log Verbose Output
 	        if ($this->_consoleOpts->getOption('verbose')) {
-	            $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
-	            $this->getDaemon()->getLog()->addWriter($writerVerbose);
-	            $this->getDaemon()->getLog()->log('Adding log verbose console', \Zend_Log::DEBUG);
+	        	$this->_initLogVerbose();
 	        }
 
-	        // Prepare configuration files
-	        $configFiles = array();
-	        if ($this->_consoleOpts->getOption('config')!='') {
-	        	$configArguments = explode(',', $this->_consoleOpts->getOption('config'));
-	        	foreach ($configArguments as $configArgument) {
-	        		if (!strstr($configArgument, '/')) {
-	        			$configArgument = \APPLICATION_PATH . '/' . $configArgument;
-	        		}
-	        		array_push($configFiles, $configArgument);
-	        	} 
-	        }
-
-            // Initiate config
-	        $config = \PhpTaskDaemon\Daemon\Config::get($configFiles);
+	        // Initialize Configuration
+	        $this->_initConfig();
             
-			// Set action
-			$action = $this->_consoleOpts->getOption('action');
-	
+	        // Add Log Files
+            if ($this->_consoleOpts->getOption('logfile')) {
+                $this->_initLogFile(
+                    getcwd() . '/' . $this->_consoleOpts->getOption('logfile')
+                );
+            } else {
+            	$this->_initLogFile(
+                    Config::get()->getDaemonOption('logfile')
+                );
+            }
+	        
+	        // List Tasks
 	        if ($this->_consoleOpts->getOption('list-tasks')) {
 	            $this->listTasks();
 	            exit;
 	        }
 	
-			$allActions = array('start', 'stop', 'restart', 'status', 'monitor', 'help');
+            // Check action
+            $action = $this->_consoleOpts->getOption('action');
+	        $allActions = array('start', 'stop', 'restart', 'status', 'monitor', 'help');
 			if (!in_array($action, $allActions))  {
 				$this->help();
 				exit;
 			}
 	
-			// Log File
-			$logFile =$this->_consoleOpts->getOption('logfile');
-	        if (isset($logFile)) {
-	            $writerFile = new \Zend_Log_Writer_Stream($logFile);
-	            $this->getDaemon()->getLog()->addWriter($writerFile);
-	            $this->getDaemon()->getLog()->log('Adding log file: ' . $logFile, \Zend_Log::DEBUG);
-	        }
-			
 			// Perform action
 			$this->$action();
 		} catch (\Exception $e) {
-			echo 'FATAL EXCEPTION: ' . $e->getMessage();
+			Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
 		}
-        echo "\n";
         exit;
 	}
 
@@ -291,7 +312,7 @@ class Console {
             $configFile = PROJECT_ROOT . '/etc/daemon.ini';
         }
 
-        $this->getDaemon()->getLog()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
+        Logger::get()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
         try {
             $config = new \Zend_Config_Ini( 
                 $configFile
@@ -301,6 +322,8 @@ class Console {
             exit;
         }
     }
+
+
 	/**
      * Loads a task by name. A task should at least contain an executor object.
      * The manager, job, queue, process, trigger, status and statistics objects
