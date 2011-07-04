@@ -32,7 +32,9 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return null
      */
     public function getVar($key) {
-        return null;
+    	$sql = "SELECT value FROM ipc WHERE key='" . $key . "'";
+    	$row = mysql_fetch_array($this->_queryDataBase($sql));
+    	return $row['value'];
     }
 
     /**
@@ -43,7 +45,8 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function setVar($key, $value) {
-        return true;
+    	$sql = "REPLACE INTO ipc (key, value) VALUES ('" . $key . "','" . $value . "')";
+    	return $this->_queryDataBase($sql);
     }
 
     /**
@@ -53,7 +56,8 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function incrementVar($key) {
-        return true;
+    	$sql = "UPDATE ipc SET value=value+1 WHERE key='" . $key . "'";
+        return $this->_queryDataBase($sql);
     }
 
     /**
@@ -63,7 +67,8 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function decrementVar($key) {
-        return true;
+        $sql = "UPDATE ipc SET value=value-1 WHERE key='" . $key . "'";
+        return $this->_queryDataBase($sql);
     }
 
     /**
@@ -73,7 +78,8 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function removeVar($key) {
-        return true;
+    	$sql = "DELETE FROM ipc WHERE key='" . $key . "'";
+        return $this->_queryDataBase($sql);
     }
     
     /**
@@ -82,6 +88,15 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function remove() {
-        return true;
+        $sql = "DELETE FROM ipc";
+    	return $this->_queryDataBase($sql);
+    }
+    
+    /**
+     * Executes a single query
+     * @param string $query
+     */
+    protected function _queryDataBase($query) {
+    	return mysql_query($query);
     }
 }
