@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Daemon;
 
+use \PhpTaskDaemon\Daemon\Logger;
+
 /**
  * The config component uses a Zend_Config object to store and retrieve
  * configuration options. For task specific configuration options the 
@@ -39,9 +41,9 @@ class Config {
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/daemon.ini'));
         
         foreach($configFiles as $configFile) {
-            echo "Trying config file: " . $configFile . "\n";
+        	Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
             if (!file_exists($configFile)) {
-                echo "ERR: Config file does not exists: " . $configFile . "\n";
+                Logger::get()->log("Config file does not exists: " . $configFile, \Zend_Log::ERR);
                 continue;
             }
 
@@ -61,7 +63,7 @@ class Config {
                     )
                 );
             }
-            echo "Loaded config file: " . $configFile . "\n";
+            Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::DEBUG);
         }
         $this->_config->setReadonly();
 	}
@@ -72,7 +74,7 @@ class Config {
 	 */
 	public function get($configFiles = array()) {
         if (!self::$_instance) {
-        	echo "Creating new config object\n";
+        	Logger::get()->log("Creating new config object", \Zend_Log::DEBUG);
             self::$_instance = new self($configFiles);
         }
 
