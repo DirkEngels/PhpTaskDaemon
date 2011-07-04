@@ -67,14 +67,14 @@ class Config {
      * @param null|string
      */
 	public function getOption($option, $taskName = null) {
-		$option = null;
+		$value = null;
 		if (!is_null($taskName)) {
-			$option = $this->getTaskSetting($option, $taskName);
+			$value = $this->getTaskSetting($option, $taskName);
 		}
 		if (is_null($option)) {
-			$option = $this->getDaemonSetting($option);
+			$value = $this->getDaemonSetting($option);
 		}
-		return $option;
+		return $value;
 	}
 
 
@@ -96,8 +96,7 @@ class Config {
 	 */
     public function getTaskOption($option, $taskName) {
         $option = null;
-        $taskConfig = $this->_config->get($taskName);
-        return $taskConfig->get($option);
+        return $this->_config->get($taskName)->getOption($option);
     }
 
 }
