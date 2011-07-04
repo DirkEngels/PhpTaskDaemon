@@ -6,7 +6,10 @@ define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/app'));
 define('TASKDIR_PATH', realpath(\PROJECT_ROOT .'/app/Tasks'));
 define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/lib'));
 define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
-define('APPLICATION_ENV', 'development');
+
+// Define application environment
+defined('APPLICATION_ENV')
+    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
 
 // Include Paths
 $includePaths = array(
