@@ -4,32 +4,33 @@ Change Log
 Features (requested)
 --------------------
 - Add new Manager Trigger 
-	- Event (uses eventloop)
+    - Event (uses eventloop)
 - Add new Manager Process
-	- System (isolates a process)
+    - System (isolates a process)
 
 Version 1.0 (planned)
 ---------------------
-- Add new Manager Trigger 
-    	- Gearman (uses gearman)
 - fully unit tested: Functional tests start a daemon and send interrupt signals
 - Add tools
-	- cron restart script (for restarting after critical errors)
-	- boot script (/etc/init.d/phptaskdaemon)
-- add user documentation
+    - cron restart script (for restarting after critical errors)
+    - boot script (/etc/init.d/phptaskdaemon)
+- Create user documentation (website/wiki)
+
+Version 0.9 (planned) 
+---------------------
+- Implement Task\Manager\Trigger type: Cron
+- Implement Task\Manager\Trigger type: Gearman
+- Implement Task\Manager\Process type: Child
+- Implement Task\Manager\Process type: Parallel
 
 Version 0.8 (planned)
 ---------------------
-- Add exception handling
-- Add database support
-+ Implement Daemon\Ipc types
-	+ Database
-+ Implement Task\Manager\Trigger types
-    - Cron
-+ Implement Task\Manager\Process types
-    + Child
-    + Parallel
-- Load tasks components using the configuration file
+- Implement Task\Factory component (factory)
+    - Using classes (factory-class)
+    - Using config file (factory-config)
+- Add exception handling (exception)
+- Add database support (database)
+    - Implement Daemon\Ipc type: Database (ipc-db)
 
 Version 0.7 (05-07-2011)
 ========================
