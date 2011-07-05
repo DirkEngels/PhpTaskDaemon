@@ -11,23 +11,23 @@ namespace PhpTaskDaemon\Task\Executor\Status;
 
 /**
  * 
- * The abstract class encapsulate a set of methods of the SharedMemory class. 
+ * The abstract class encapsulate a set of methods of the Ipc class. 
  *
  */
 abstract class AbstractClass {
 	/**
-	 * @var \PhpTaskDaemon\SharedMemory
+	 * @var \PhpTaskDaemon\Ipc
 	 */
-	protected $_sharedMemory;
+	protected $_ipc;
 
 	/**
 	 * 
 	 * The constructor sets the shared memory object. A default shared memory
 	 * object instance will be created when none provided.
-	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
+	 * @param \PhpTaskDaemon\Ipc $ipc
 	 */
-	public function __construct(\PhpTaskDaemon\Daemon\Ipc\SharedMemory $sharedMemory = null) {
-		$this->setSharedMemory($sharedMemory);
+	public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = null) {
+		$this->setIpc($ipc);
 	}
 	
 	/**
@@ -35,30 +35,30 @@ abstract class AbstractClass {
 	 * Unset the shared memory at destruction time.
 	 */
 	public function __destruct() {
-		$this->_sharedMemory->remove();
-		unset($this->_sharedMemory); 
+		$this->_ipc->remove();
+		unset($this->_ipc); 
 	}
 		
 	/**
 	 *
 	 * Returns the shared memory object
-	 * @return PhpTaskDaemon\SharedMemory
+	 * @return PhpTaskDaemon\Ipc
 	 */
-	public function getSharedMemory() {
-		return $this->_sharedMemory;
+	public function getIpc() {
+		return $this->_ipc;
 	}
 
 	/**
 	 *
 	 * Sets a shared memory object
-	 * @param \PhpTaskDaemon\Daemon\Ipc\SharedMemory $sharedMemory
+	 * @param \PhpTaskDaemon\Daemon\Ipc\Ipc $ipc
 	 * @return $this
 	 */
-	public function setSharedMemory($sharedMemory) {
-		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . getmypid());
+	public function setIpc($ipc) {
+		if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+			$ipc = new \PhpTaskDaemon\Daemon\Ipc\None('status-' . getmypid());
 		}
-		$this->_sharedMemory = $sharedMemory;
+		$this->_ipc = $ipc;
 		return true;
 	}
 
@@ -71,9 +71,9 @@ abstract class AbstractClass {
 	 */
 	public function get($key = null) {
 		if ($key != null) {
-			return $this->_sharedMemory->getVar($key);
+			return $this->_ipc->getVar($key);
 		}
-		return $this->_sharedMemory->getKeys();
+		return $this->_ipc->getKeys();
 	}
 	
 	/**
@@ -84,9 +84,9 @@ abstract class AbstractClass {
 	 * @return bool
 	 */
     public function set($percentage, $message = null) {
-    	$this->_sharedMemory->setVar('percentage', $percentage);
+    	$this->_ipc->setVar('percentage', $percentage);
     	if ($message != null) {
-    		$this->_sharedMemory->setVar('message', $message);
+    		$this->_ipc->setVar('message', $message);
     	}
     	return true;
     }

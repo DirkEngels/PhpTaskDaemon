@@ -1,58 +1,95 @@
 Change Log
 ==========
 
-Feature Requests
-----------------
-- add user documentation
-- add database support
+Features (requested)
+--------------------
+- Add new Manager Trigger 
+	- Event (uses eventloop)
+- Add new Manager Process
+	- System (isolates a process)
+
+Version 1.0 (planned)
+---------------------
+- Add new Manager Trigger 
+    	- Gearman (uses gearman)
 - fully unit tested: Functional tests start a daemon and send interrupt signals
-- add system manager (isolates a process)
-- refactor cron manager
-- refactor parallel manager
-- boot script (/etc/init.d/phptaskdaemon)
-- cron restart script (for restarting after critical errors)
+- Add tools
+	- cron restart script (for restarting after critical errors)
+	- boot script (/etc/init.d/phptaskdaemon)
+- add user documentation
+
+Version 0.8 (planned)
+---------------------
+- Add exception handling
+- Add database support
++ Implement Daemon\Ipc types
+	+ Database
++ Implement Task\Manager\Trigger types
+    - Cron
++ Implement Task\Manager\Process types
+    + Child
+    + Parallel
+- Load tasks components using the configuration file
+
+Version 0.7 (working)
+---------------------
++ Add Daemon\Logger component
++ Add Daemon\Config component
++ Add Task\Job\Data component
++ Refactor Manager Trigger Component
++ Support for multiple IPC types
++ Implement Daemon\Ipc types
+    + None
+    + SharedMemory
++ Create Manager Trigger Component
++ Implement Task\Manager\Trigger types
+    + Interval
++ Create Manager Process Component
++ Implement Task\Manager\Process types
+    + Same
++ Refactor manager to use processes & triggers
 
 
-Verison 0.6
-===========
+Verison 0.6 (04-06-2011)
+========================
 + read and use configuration file
 + store batch nr, and status counts
 + update status shared memory variables
 + store batch nr, and status counts
 
-Version 0.5
------------
+Version 0.5 (11-04-2011)
+------------------------
 + add unit tests for all classes, except for some daemon classes (forks)
 + fix broken unit tests caused by the class restructuring in version 0.4
 
-Version 0.4.1
--------------
+Version 0.4.1 (06-04-2011)
+--------------------------
 + cleanup code
 + add code documentation
 
-Version 0.4
------------
+Version 0.4 (06-04-2011)
+------------------------
 + move web status to seperate project
 + apply unix file system hierarchy standard
 + implement verbose logging
 + refactor class structure (seperate queue loading and task exection)
 
-Version 0.3
------------
+Version 0.3 (04-02-2011)
+------------------------
 + namespaces
 + restructure shared memory variables
 
-Version 0.2
------------
+Version 0.2 (22-01-2011)
+------------------------
 + simple concept of web interface for monitoring the daemon
 + move files according zend framework structure
 
-Version 0.1.1
--------------
+Version 0.1.1 (21-01-2011)
+--------------------------
 + Added this line
 
-Version 0.1
------------
+Version 0.1 (21-01-2011)
+------------------------
 +/- understaning and playing with git
 + added initial documentation
 + inital import

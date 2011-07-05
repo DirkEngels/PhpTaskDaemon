@@ -9,6 +9,7 @@ define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
 $includePaths = array(
     get_include_path(),
     \LIBRARY_PATH, 
+    '/usr/share/php/',
     '/usr/share/php/libzend-framework-php/'
 );
 set_include_path(

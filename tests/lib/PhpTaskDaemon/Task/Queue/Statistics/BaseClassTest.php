@@ -16,40 +16,40 @@ namespace PhpTaskDaemon\Task\Queue\Statistics;
 
 class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_statistics;
-	protected $_sharedMemory;
+	protected $_ipc;
 	
 	protected function setUp() {
-		$this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-statistics');
+		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-statistics');
 		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
 		
 	}
 	protected function tearDown() {
-		$this->_sharedMemory->remove();
-		unset($this->_sharedMemory);
-		$sharedMemory = $this->_statistics->getSharedMemory();
-		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
+		$this->_ipc->remove();
+		unset($this->_ipc);
+		$sharedMemory = $this->_statistics->getIpc();
+		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
 			$sharedMemory->remove();
 		}
 		unset($this->_statistics);
 	}
 	
 	public function testConstructorNoArguments() {
-		$sharedMemoryCreated = $this->_statistics->getSharedMemory();
-		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+		$sharedMemoryCreated = $this->_statistics->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $sharedMemoryCreated);
 	}
 	public function testConstructorSingleArguments() {
-		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($this->_sharedMemory);
-		$sharedMemoryCreated = $this->_statistics->getSharedMemory();
-		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
+		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($this->_ipc);
+		$sharedMemoryCreated = $this->_statistics->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $sharedMemoryCreated);
 	}
-	public function testSetSharedMemory() {
-		$sharedMemoryCreated = $this->_statistics->getSharedMemory();
-		$this->assertType('\PhpTaskDaemon\Daemon\Ipc\SharedMemory', $sharedMemoryCreated);
-		$this->_statistics->setSharedMemory($this->_sharedMemory);
-		$this->assertEquals($this->_sharedMemory, $this->_statistics->getSharedMemory());
+	public function testSetIpc() {
+		$ipcCreated = $this->_statistics->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+		$this->_statistics->setIpc($this->_ipc);
+		$this->assertEquals($this->_ipc, $this->_statistics->getIpc());
 	}
 	public function testGetAll() {
-		$this->assertType('array', $this->_statistics->get());
+		$this->assertInternalType('array', $this->_statistics->get());
 	}
 	public function testGetStatus() {
 		$this->assertEquals(0, $this->_statistics->get('otherstatus'));
@@ -70,7 +70,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertEquals(0, $this->_statistics->get('loaded'));
 	}
 	public function testIncrementStatusNoArguments() {
-		$this->_statistics->setSharedMemory($this->_sharedMemory);
+		$this->_statistics->setIpc($this->_ipc);
 		$this->assertEquals(0, $this->_statistics->get('loaded'));
 		$this->assertEquals(0, $this->_statistics->get('done'));
 		$this->assertTrue($this->_statistics->incrementStatus());

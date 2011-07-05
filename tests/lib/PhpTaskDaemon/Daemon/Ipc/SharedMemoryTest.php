@@ -32,7 +32,7 @@ class SharedMemoryTest extends \PHPUnit_Framework_Testcase {
 	}
 	public function testGetKeys() {
 		$this->assertEquals(0, sizeof($this->_sharedMemory->getKeys()));
-		$this->assertType('array', $this->_sharedMemory->getKeys());
+		$this->assertInternalType('array', $this->_sharedMemory->getKeys());
 	}
 	public function testConstructorRelativeId() {
 		$this->_sharedMemory->remove();

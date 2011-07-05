@@ -16,7 +16,7 @@ namespace PhpTaskDaemon\Task\Queue\Statistics;
  * items in the queue.
  */
 abstract class AbstractClass {	
-	protected $_sharedMemory;
+	protected $_ipc;
 	
 	const STATUS_LOADED = 'loaded';
 	const STATUS_QUEUED = 'queued';
@@ -28,10 +28,10 @@ abstract class AbstractClass {
 	 * 
 	 * The constructor sets the shared memory object. A default shared memory
 	 * object instance will be created when none provided.
-	 * @param \PhpTaskDaemon\SharedMemory $sharedMemory
+	 * @param \PhpTaskDaemon\Ipc $ipc
 	 */
-	public function __construct(\PhpTaskDaemon\Daemon\Ipc\SharedMemory $sharedMemory = null) {
-		$this->setSharedMemory($sharedMemory);
+	public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = null) {
+		$this->setIpc($ipc);
 	}
 	
 	/**
@@ -39,33 +39,33 @@ abstract class AbstractClass {
 	 * Unset the shared memory at destruction time.
 	 */
 	public function __destruct() {
-		if (is_a($this->_sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			unset($this->_sharedMemory);
+		if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\Ipc')) {
+			unset($this->_ipc);
 		} 
 	}
 
 	/**
 	 *
 	 * Returns the shared memory object
-	 * @return PhpTaskDaemon\SharedMemory
+	 * @return PhpTaskDaemon\Ipc
 	 */
-	public function getSharedMemory() {
-		return $this->_sharedMemory;
+	public function getIpc() {
+		return $this->_ipc;
 	}
 
 	/**
 	 *
 	 * Sets a shared memory object
-	 * @param \PhpTaskDaemon\Daemon\Ipc\SharedMemory $sharedMemory
+	 * @param \PhpTaskDaemon\Daemon\Ipc\Ipc $ipc
 	 * @return $this
 	 */
-	public function setSharedMemory($sharedMemory) {
-		if (!is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\SharedMemory')) {
-			$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(
+	public function setIpc($ipc) {
+		if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+			$ipc = new \PhpTaskDaemon\Daemon\Ipc\None(
 				'statistics-' . getmypid()
 			);
 		}
-		$this->_sharedMemory = $sharedMemory;
+		$this->_ipc = $ipc;
 		$this->_initializeStatus(self::STATUS_LOADED);
 		$this->_initializeStatus(self::STATUS_QUEUED);
 		$this->_initializeStatus(self::STATUS_RUNNING);
@@ -82,12 +82,12 @@ abstract class AbstractClass {
 	 */
     public function get($status = null) {
     	if (is_null($status)) {
-    		return $this->_sharedMemory->get();
+    		return $this->_ipc->get();
     	}
-    	if (!in_array($status, $this->_sharedMemory->getKeys())) {
+    	if (!in_array($status, $this->_ipc->getKeys())) {
     		$this->_initializeStatus($status);
     	}
-    	return $this->_sharedMemory->getVar($status);
+    	return $this->_ipc->getVar($status);
     }
 
     /**
@@ -98,10 +98,10 @@ abstract class AbstractClass {
      * @return bool
      */
     public function setStatusCount($status = self::STATUS_DONE, $count = 0) {
-    	if (!in_array($status, $this->_sharedMemory->getKeys())) {
+    	if (!in_array($status, $this->_ipc->getKeys())) {
     		$this->_initializeStatus($status);
     	}
-    	return $this->_sharedMemory->setVar($status, $count);
+    	return $this->_ipc->setVar($status, $count);
     }
     
 	/**
@@ -111,7 +111,7 @@ abstract class AbstractClass {
 	 * @return integer
 	 */
     public function incrementStatus($status = self::STATUS_DONE) {
-    	return $this->_sharedMemory->incrementVar($status);
+    	return $this->_ipc->incrementVar($status);
     }
 
     /**
@@ -129,7 +129,7 @@ abstract class AbstractClass {
      * Decrements the queue count (after finishing a single job).
      */
     public function decrementQueue() {
-    	return $this->_sharedMemory->decrementVar(self::STATUS_QUEUED);
+    	return $this->_ipc->decrementVar(self::STATUS_QUEUED);
     }
     
     /**
@@ -139,9 +139,9 @@ abstract class AbstractClass {
      * @return bool
      */
     private function _initializeStatus($status) {
-    	$keys = $this->_sharedMemory->getKeys();
+    	$keys = $this->_ipc->getKeys();
     	if (!in_array($status, array_keys($keys))) {
-    		$this->_sharedMemory->setVar($status, 0);
+    		$this->_ipc->setVar($status, 0);
     		return true;
     	}
     	return false;

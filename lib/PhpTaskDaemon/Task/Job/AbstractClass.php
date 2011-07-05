@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Task\Job;
 
+use \PhpTaskDaemon\Task\Job\Data as Data;
+
 /**
  * 
  * The job abstract class provides setters and getters for the input and output
@@ -17,9 +19,8 @@ namespace PhpTaskDaemon\Task\Job;
  */
 abstract class AbstractClass {
 	protected $_jobId;
-	protected $_input = array();
-	protected $_inputKeys = array();
-	protected $_output = array();
+	protected $_input = null;
+	protected $_output = null;
 	
 
 	/**
@@ -29,9 +30,12 @@ abstract class AbstractClass {
 	 * @param string $jobId
 	 * @param array $input 
 	 */
-	public function __construct($jobId = null, $input = array()) {
-		if ($jobId == null) {
+	public function __construct($jobId = null, Data\AbstractClass $input = null) {
+		if ($jobId === null) {
 			$jobId = $this::generateJobId();
+		}
+		if ($input === null) {
+			$input = new Data\BaseClass();
 		}
 		$this->setJobId($jobId);
 		$this->setInput($input);
@@ -84,53 +88,9 @@ abstract class AbstractClass {
 	 * @param array $input
 	 */
 	public function setInput($input) {
-		$this->_input = $input;
+		$this->_input->set($input);
 	}
 
-	/**
-	 * 
-	 * (Re)Sets a single input key
-	 * @return mixed
-	 */
-	public function getInputVar($var) {
-		if (in_array($var, array_keys($this->_input))) {
-			return $this->_input[$var];
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * (Re)Sets a single input key
-	 * @param string $var
-	 * @param mixed $value
-	 */
-	public function setInputVar($var, $value) {
-		if (in_array($var, $this->getInputKeys())) {
-			$this->_input[$var] = $value;
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * 
-	 * Returns the input field keys
-	 * @return array
-	 */
-	public function getInputKeys() {
-		return $this->_inputKeys;
-	}
-
-	/**
-	 * 
-	 * Sets the input field keys
-	 * @param array $inputKeys
-	 */
-	public function setInputKeys($inputKeys) {
-		$this->_inputKeys = $inputKeys;
-	}
-	
 	/**
 	 * 
 	 * Returns an array with output variables
@@ -145,43 +105,9 @@ abstract class AbstractClass {
 	 * (Re)Sets the output array 
 	 * @param array $output
 	 */
-	public function setOutput($output) {
-		$this->_output = $output;
+	public function setOutput(Data\AbstractClass $output) {
+		$this->_output->set($output);
 	}
 	
-	/**
-	 * 
-	 * Returns a single output variable
-	 * @param string $var
-	 * @return mixed
-	 */
-	public function getOutputVar($var) {
-		$value = (isset($this->_output[$var])) ? $this->_output[$var] : '?'; 
-		return $value;
-	}
 
-	/**
-	 * 
-	 * (Re)Sets a single output key\
-	 * @param string $var
-	 * @paramt mixed $value
-	 */
-	public function setOutputVar($var, $value) {
-		$this->_output[$var] = $value;
-	}
-
-	/**
-	 * 
-	 * Check the input array for the needed keys; in this case only a sleepTime
-	 * variable is expected
-	 * @return bool;`
-	 */
-	public function checkInput() {
-		foreach($this->_inputKeys as $key) {
-			if (!array_key_exists($key, $this->_input)) {
-				return false;
-			}
-		}
-		return true;
-	}
 }
