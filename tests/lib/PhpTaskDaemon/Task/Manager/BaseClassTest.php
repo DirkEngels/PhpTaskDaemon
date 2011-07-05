@@ -30,20 +30,20 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 }
 	
 	public function testConstructor() {
-		$this->assertType('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
 		$this->assertEquals($this->_executor, $this->_manager->getExecutor());
-		$this->assertType('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getQueue());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getQueue());
 		$this->assertEquals($this->_queue, $this->_manager->getQueue());
 	}
 	public function testInitNoArguments() {
 		$this->_manager->init();
-		$this->assertType('\PhpTaskDaemon\Daemon\Pid\Manager', $this->_manager->getPidManager());
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Pid\Manager', $this->_manager->getPidManager());
 		$this->assertEquals(getmypid(), $this->_manager->getPidManager()->getCurrent());
 		$this->assertNull($this->_manager->getPidManager()->getParent());
 	}
 	public function testInitWithParentPid() {
 		$this->_manager->init(1234);
-		$this->assertType('\PhpTaskDaemon\Daemon\Pid\Manager', $this->_manager->getPidManager());
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Pid\Manager', $this->_manager->getPidManager());
 		$this->assertEquals(getmypid(), $this->_manager->getPidManager()->getCurrent());
 		$this->assertEquals(1234, $this->_manager->getPidManager()->getParent());
 	}
@@ -60,18 +60,18 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertEquals($pidManager, $this->_manager->getPidManager());
 	}
 	public function testSetQueue() {
-		$this->assertType('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getQueue());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getQueue());
 		$this->_manager->setQueue($this->_queue);
 		$this->assertEquals($this->_queue, $this->_manager->getQueue());
 	}
 	public function testSetExecutor() {
-		$this->assertType('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
 		$this->_manager->setExecutor($this->_executor);
 		$this->assertEquals($this->_executor, $this->_manager->getExecutor());
 	}
 	public function testSetExecutorIncorrectExecutor() {
 		$this->_manager->setExecutor('no executor object');
-		$this->assertType('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
 		$this->assertEquals($this->_executor, $this->_manager->getExecutor());
 	}
 	public function testLog() {

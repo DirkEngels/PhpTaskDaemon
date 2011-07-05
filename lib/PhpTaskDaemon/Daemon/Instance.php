@@ -189,8 +189,13 @@ class Instance {
 
 	
 	public function stop() {
-		$pidFile = new Pid\File($pidFile = \TMP_PATH . '/phptaskdaemond.pid');
-		$pid = $pidFile->read();
+		try {
+    		$pidFile = new Pid\File($pidFile = \TMP_PATH . '/phptaskdaemond.pid');
+            $pid = $pidFile->read();
+		} catch (Exception $e) {
+			echo $e->getMessage();
+			exit;
+		}
 
 		echo "Killing THIS PID: " . $pid . "\n";
         posix_kill($pid, SIGTERM);
@@ -249,7 +254,12 @@ class Instance {
 		foreach ($this->_managers as $manager) {
 			$manager->setLog(clone($this->_log));
 			$this->_log->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
-			$this->_forkManager($manager);
+			try {
+                $this->_forkManager($manager);
+			} catch (Exception $e) {
+				echo $e->getMessage();
+				exit;
+			}
 		}
 		
 		// Default sigHandler
@@ -288,6 +298,10 @@ class Instance {
 		if ($pid === -1) {
 			// Error
 			$this->_log->log('Managers could not be forked!!!', \Zend_Log::CRIT);
+			
+			// Throw exception: Fork Failed
+            throw new \PhpTaskDaemon\Daemon\Exception\ForkFailed();
+
 			return false;
 
 		} elseif ($pid) {

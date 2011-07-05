@@ -15,31 +15,6 @@ namespace PhpTaskDaemon\Task\Manager;
  * methods needed for almost all managers. 
  */
 abstract class AbstractClass {
-	/** 
-	 * 
-	 * Manager Type: Tasks are executed by a managers. The manager decide when
-	 * and how to run tasks. The following standard managers are available.
-	 * 
-	 * - Interval:	This managers loads the queue and executes the tasks 
-	 * 				sequentially. After finishing all tasks the managers waits 
-	 * 				for an adjustable interval.
-	 * - Cron:		The cron manager is similar to the interval managers, 
-	 * 				except after finishing it waits for a predefined time in 
-	 * 				stead of an interval.
-	 * - Forked:	This manager loads a queue and forks the process one or 
-	 * 				more times to execute a set of tasks in parallel. The 
-	 * 				managers forks the process to execute a single task. The 
-	 * 				maximum of forked processes at a single time can be 
-	 * 				controlled by the manager.
-	 * - Gearman:	The gearman manager starts one or more gearman workers. It
-	 * 				re-uses the forked manager and extend the execute method by
-	 * 				starting a gearman worker.
-	 */
-	const PROCESS_TYPE_INTERVAL = 'interval';
-	const PROCESS_TYPE_CRON = 'cron';
-	const PROCESS_TYPE_GEARMAN = 'gearman';
-	const PROCESS_TYPE_FORKED = 'forked';
-
 	/**
 	 * 
 	 * The log file object
@@ -155,34 +130,34 @@ abstract class AbstractClass {
 	/**
 	 * 
 	 * Returns the current loaded queue array
-	 * @return \PhpTaskDaemon\Queue\AbstractClass
+	 * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
 	 */
-	public function getQueue() {
-		return $this->_queue;
+	public function getTrigger() {
+		return $this->_trigger;
 	}
 
 	/**
 	 * 
 	 * Sets the current queue to process.
-	 * @param \PhpTaskDaemon\Queue\AbstractClass $queue
+	 * @param \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass $trigger
 	 * @return $this
 	 */
-	public function setQueue($queue) {
-		if (!is_a($queue, '\PhpTaskDaemon\Task\Queue\AbstractClass')) {
-			$queue = new \PhpTaskDaemon\Task\Queue\BaseClass();
+	public function setTrigger($trigger) {
+		if (!is_a($trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
+			$trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
 		}
-		$this->_queue = $queue;
+		$this->_trigger = $trigger;
 
 		return $this;
 	}
 
 	/**
 	 * 
-	 * Returns the executor object
-	 * @return \PhpTaskDaemon\Executor\AbstractClass
+	 * Returns the process object
+	 * @return \PhpTaskDaemon\Task\Manager\AbstractClass
 	 */
-	public function getExecutor() {
-		return $this->_executor;
+	public function getProcess() {
+		return $this->_process;
 	}
 
 	/**
@@ -191,11 +166,11 @@ abstract class AbstractClass {
 	 * @param \PhpTaskDaemon\Executor\AbstractClass $executor
 	 * @return $this
 	 */
-	public function setExecutor($executor) {
-		if (!is_a($executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
-			$executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
+	public function setProcess($process) {
+		if (!is_a($process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
+			$process = new \PhpTaskDaemon\Task\Manager\Process\BaseClass();
 		}
-		$this->_executor = $executor;
+		$this->_process = $process;
 
 		return $this;
 	}
