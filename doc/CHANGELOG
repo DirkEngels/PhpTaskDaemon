@@ -31,8 +31,8 @@ Version 0.8 (planned)
     + Parallel
 - Load tasks components using the configuration file
 
-Version 0.7 (working)
----------------------
+Version 0.7 (05-07-2011)
+========================
 + Add Daemon\Logger component
 + Add Daemon\Config component
 + Add Task\Job\Data component
@@ -51,7 +51,7 @@ Version 0.7 (working)
 
 
 Verison 0.6 (04-06-2011)
-========================
+---------------------
 + read and use configuration file
 + store batch nr, and status counts
 + update status shared memory variables
