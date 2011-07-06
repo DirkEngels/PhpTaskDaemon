@@ -26,8 +26,9 @@ Version 0.9 (planned)
 Version 0.8 (planned)
 ---------------------
 - Implement Task\Factory component (factory)
-    - Using classes (factory-class)
-    - Using config file (factory-config)
+    - Using classes
+    - Using config file
++ Implement Daemon\Ipc\Factory component (factory)
 - Add exception handling (exception)
 - Add database support (database)
     - Implement Daemon\Ipc type: Database (ipc-db)
