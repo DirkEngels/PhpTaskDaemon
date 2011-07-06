@@ -344,17 +344,21 @@ class Console {
 	 * Action: Start Daemon
 	 */
 	public function start() {
-		$managers = $this->scanDirectoryForTasks(PROJECT_ROOT . '/app/Tasks/');
-		echo "\n";
-		echo "\n";
-		foreach($managers as $manager) {
-			$this->getDaemon()->loadManagerByName($manager);
-            echo $manager . "\n";
+		$tasks = $this->scanDirectoryForTasks(PROJECT_ROOT . '/app/Tasks/');
+		
+		// Initialize daemon
+		foreach($tasks as $task) {
+			try {
+                $taskManager = \PhpTaskDaemon\Task\Factory::get($task);
+			} catch (\Exception $e) {
+				throw new \Exception('Failed loading task: ' . $task);
+			}
 		}
-//		$this->getDaemon()->loadManagerByName('Concept/PocTask');
+		// Start the Daemon
 		$this->getDaemon()->start();
 	}
 	
+
 	public function log($message, $other) {
 		echo $message . "\n";
 	}
@@ -373,7 +377,8 @@ class Console {
 
 		exit();
 	}
-	
+
+
 	/**
 	 * Alias for stopping and restarting the daemon.
 	 */
@@ -381,7 +386,8 @@ class Console {
 		$this->stop();
 		$this->start();
 	}
-	
+
+
 	/**
 	 * 
 	 * Action: Get daemon status
@@ -413,6 +419,7 @@ class Console {
 		return true;
 	}
 
+
 	/**
 	 * 
 	 * Displays the current tasks and activities of the daemon. The monitor 
@@ -424,6 +431,7 @@ class Console {
 		echo "Function not yet implemented\n";
 	}
 
+
 	/**
 	 * 
 	 * Displays a help message containing usage instructions.
@@ -432,5 +440,5 @@ class Console {
 		echo $this->_consoleOpts->getUsageMessage();
 		exit;
 	}
-	
+
 }
