@@ -26,6 +26,7 @@ Version 0.9 (planned)
 
 Version 0.8 (planned)
 ---------------------
+- Refactor code to use Logger component
 - Implement Task\Factory component (factory)
     - Using classes (factory-class)
     - Using config file (factory-config)
