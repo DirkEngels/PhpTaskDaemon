@@ -77,22 +77,31 @@ class Factory {
 		// First: Check if the class has been overloaded
 		$class = $this->_getObjectClass($taskName, $objectType);
 		if (is_object($class)) {
+			$msg = 'Created ' . $objectType . ' component using Class for task: ' . $taskName;
+			\PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 			return $class;
 		}
-		
+
 		// Second: Check if the task has a specific configuration part
 		$config = $this->_getObjectApplicationConfig($taskName, $objectType);
 		if (is_object($config)) {
+            $msg = 'Created ' . $objectType . ' component using Application config for task: ' . $taskName;
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 			return $config;
 		}
 		
 		// Third: Check the default config
 		$default = $this->_getObjectDefaultConfig($taskName, $objectType);
 		if (is_object($default)) {
+            $msg = 'Created ' . $objectType . ' component using Default config for task: ' . $taskName;
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 			return $default;
 		}
 		
 		// Finally: Get the hard code default
+        $msg = 'Created ' . $objectType . ' component using hard coded default for task: ' . $taskName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+		
 		$hardcoded = $this->_getObjectHardCoded($objectType);
 		return $hardcoded;
     }
