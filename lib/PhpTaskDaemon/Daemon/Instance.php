@@ -30,9 +30,9 @@ class Instance {
 	
 	/**
 	 * Shared memory object
-	 * @var Ipc\SharedMemory $_shm
+	 * @var Ipc\SharedMemory $_ipc
 	 */
-	protected $_shm = null;
+	protected $_ipc = null;
 	
 	/**
 	 * Logger object
@@ -57,7 +57,7 @@ class Instance {
 		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid(), $parent);
 		$this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
 		
-		$this->_shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
+		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
 		
 		$this->_initLogSetup();
 	}
@@ -69,7 +69,7 @@ class Instance {
 	public function __destruct() {
 		unset($this->_pidManager);
 		unset($this->_pidFile);
-		unset($this->_shm);
+		unset($this->_ipc);
 	}
 
 	/**
@@ -147,6 +147,9 @@ class Instance {
 	 * @return \PhpTaskDaemon\Task\Manager\AbstractClass
 	 */
 	public function loadManagerByName($taskName) {
+		return $taskManager = \PhpTaskDaemon\Task\Factory::get($taskName);
+        
+
 		$taskName = preg_replace("/\\//i", '\\\\', $taskName);
 		$managerClass = '\\Tasks\\' . $taskName . '\\Manager'; 
 		$queueClass = '\\Tasks\\' . $taskName . '\\Queue';
@@ -249,7 +252,7 @@ class Instance {
 			$this->_log->log("No daemon tasks found", \Zend_Log::INFO);
 			exit;
 		}
-		$this->_shm->setVar('childs', array());
+		$this->_ipc->setVar('childs', array());
 		$this->_log->log("Starting daemon tasks", \Zend_Log::DEBUG);
 		foreach ($this->_managers as $manager) {
 			$manager->setLog(clone($this->_log));
@@ -271,7 +274,7 @@ class Instance {
 		);
 		
 		// Write pids to shared memory
-		$this->_shm->setVar('childs', $this->_pidManager->getChilds());
+		$this->_ipc->setVar('childs', $this->_pidManager->getChilds());
 	
 		// Wait till all childs are done
 	    while (pcntl_waitpid(0, $status) != -1) {
@@ -281,7 +284,7 @@ class Instance {
 		$this->_log->log("Running done.", \Zend_Log::NOTICE);
 
 		$this->_pidFile->unlink();
-		$this->_shm->remove();
+		$this->_ipc->remove();
 
 		exit;
 	}
@@ -308,7 +311,7 @@ class Instance {
 			// Parent
 			$this->_pidManager->addChild($pid);
 			$managerName = substr(substr(get_class($manager), 6), 0, -8);
-			$this->_shm->setVar('status-'. $pid, $managerName);
+			$this->_ipc->setVar('status-'. $pid, $managerName);
 			
 
 		} else { 
