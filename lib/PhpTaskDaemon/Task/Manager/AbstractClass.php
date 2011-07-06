@@ -15,12 +15,6 @@ namespace PhpTaskDaemon\Task\Manager;
  * methods needed for almost all managers. 
  */
 abstract class AbstractClass {
-	/**
-	 * 
-	 * The log file object
-	 * @var Zend_Log
-	 */
-	protected $_log = null;
 
 	/**
 	 * 
@@ -85,26 +79,6 @@ abstract class AbstractClass {
 			getmypid(), 
 			$parentPid
 		);
-	}
-
-	/**
-	 * 
-	 * Returns the log object
-	 * @return Zend_Log
-	 */
-	public function getLog() {
-		return $this->_log;
-	}
-
-	/**
-	 * 
-	 * Sets the log object
-	 * @param Zend_Log $log
-	 * @return $this
-	 */
-	public function setLog(\Zend_Log $log) {
-		$this->_log = $log;
-		return $this;
 	}
 
 	/**
@@ -175,18 +149,6 @@ abstract class AbstractClass {
 		return $this;
 	}
 
-	/**
-	 * 
-	 * Logs a message to the log object, if set.
-	 * @param string $message
-	 * @param integer $level
-	 */
-	public function log($message, $level = \Zend_Log::INFO) {
-		if (is_a($this->_log, 'Zend_Log')) {
-			return $this->_log->log($message, $level);
-		}
-		return false;
-	}
 
 	/**
 	 * 
@@ -196,13 +158,9 @@ abstract class AbstractClass {
 		// Override signal handler
 		$this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
 			get_class($this),
-			$this->_log, 
 			array(&$this, 'sigHandler')
 		);
 
-		if ($this->getLog() === null) {
-			$this->setLog($this->_log);
-		}
 		if ($this->getPidManager() === null) {
 			$this->setPidManager($this->_pidManager);
 		}
@@ -218,19 +176,19 @@ abstract class AbstractClass {
 		switch ($sig) {
 			case SIGTERM:
 				// Shutdown
-				$this->_log->log('Application (TASK) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
+				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
 				break;
 			case SIGCHLD:
 				// Halt
-				$this->_log->log('Application (TASK) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
+				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
 				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
 				break;
 			case SIGINT:
 				// Shutdown
-				$this->_log->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
+				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
 				break;
 			default:
-				$this->_log->log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
+				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
 				break;
 		}
 		exit;
