@@ -23,6 +23,7 @@ Version 0.9 (planned)
 - Implement Task\Manager\Process type: Child
 - Implement Task\Manager\Process type: Parallel
 
+
 Version 0.8 (planned)
 ---------------------
 - Implement Task\Factory component (factory)
@@ -31,6 +32,9 @@ Version 0.8 (planned)
 - Add exception handling (exception)
 - Add database support (database)
     - Implement Daemon\Ipc type: Database (ipc-db)
+- Add minimal example (examples)
+- Deliver a runnable project (demo)
+
 
 Version 0.7 (05-07-2011)
 ========================
@@ -49,7 +53,6 @@ Version 0.7 (05-07-2011)
 + Implement Task\Manager\Process types
     + Same
 + Refactor manager to use processes & triggers
-
 
 Verison 0.6 (04-06-2011)
 ---------------------
