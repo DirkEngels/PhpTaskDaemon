@@ -326,25 +326,6 @@ class Console {
 	}
 
 
-	protected function _readConfig () {
-        // Read config
-        $configFile = $this->_consoleOpts->getOption('config-file');
-        if (!file_exists($configFile)) {
-            $configFile = PROJECT_ROOT . '/etc/daemon.ini';
-        }
-
-        Logger::get()->log('Reading configuration file: ' . $configFile, \Zend_Log::DEBUG);
-        try {
-            $config = new \Zend_Config_Ini( 
-                $configFile
-            );
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            exit;
-        }
-    }
-
-
 	/**
      * Loads a task by name. A task should at least contain an executor object.
      * The manager, job, queue, process, trigger, status and statistics objects
