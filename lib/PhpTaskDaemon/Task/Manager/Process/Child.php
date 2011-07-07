@@ -31,7 +31,7 @@ class Child extends AbstractClass implements InterfaceClass {
 	            $this->_forkTask($this->getJob());
 	            
         	}
-            $this->log('Finished current set of tasks!!!!');
+            \PhpTaskDaemon\Daemon\Logger::get()->log('Finished current set of tasks!!!!', \Zend_Log::INFO);
         	
             // Exit after finishing the forked
             exit;

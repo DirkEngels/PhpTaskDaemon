@@ -16,6 +16,6 @@ class Same extends AbstractClass implements InterfaceClass {
             $this->_processTask($this->getJob());
         }
 
-        $this->log('Finished current set of tasks!!!!');
+        \PhpTaskDaemon\Daemon\Logger::get()->log('Finished current set of tasks!', \Zend_Log::INFO);
 	}
 }
