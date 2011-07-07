@@ -176,6 +176,7 @@ class Console {
         }
 	}
 	
+	
 	protected function _initLogFile() {
 		$logFile = ($this->_consoleOpts->getOption('log-file'))
             ? getcwd() . '/' . $this->_consoleOpts->getOption('log-file')
@@ -199,6 +200,21 @@ class Console {
 	}
 
 
+	public function scanTasks() {
+        $tasks = array_merge(
+            // Configuration
+            $this->scanTasksInConfig(
+                \PhpTaskDaemon\Daemon\Config::get()
+            ),
+            // Directories
+            $this->scanDirectoryForTasks(
+                APPLICATION_PATH . '/Tasks/'
+            )
+        );
+        return $tasks;
+    }
+
+
     /**
      * 
      * Scans a directory for task managers and returns the number of loaded
@@ -207,32 +223,32 @@ class Console {
      * @param string $dir
      * @return integer
      */
-    public function scanTasksInDirs($dir, $group = null) {
-        if (!is_dir($dir . '/' . $group)) {
+    public function scanTasksInDirs($dir, $subdir = null) {
+        if (!is_dir($dir . '/' . $subdir)) {
             throw new \Exception('Directory does not exists');
         }
 
-        $items = scandir($dir . '/' . $group);
-        $managers = array();
+        $items = scandir($dir . '/' . $subdir);
+        $tasks = array();
         $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
         foreach($items as $item) {
             if ($item== '.' || $item == '..') { continue; }
-            $base = (is_null($group)) ? $item : $group . '/'. $item;
+            $base = (is_null($subdir)) ? $item : $subdir . '/'. $item;
             if (preg_match('/Manager.php$/', $base)) {
                 // Try manager file
                 echo "Checking manager file: /Tasks/" . $base . "\n";
                 if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
-                    array_push($managers, substr($base, 0, -12));
+                    array_push($tasks, substr($base, 0, -12));
                 }
             } elseif (is_dir($dir . '/' . $base)) {
                 // Load recursively
-                $managers = array_merge(
-                    $managers, 
+                $tasks = array_merge(
+                    $tasks, 
                     $this->scanDirectoryForTasks($dir, $base)
                 );
             }
         }
-        return $managers;
+        return $tasks;
     }
 
 
@@ -284,12 +300,7 @@ class Console {
 	 */
     public function listTasks() {
         if ($this->_consoleOpts->getOption('list-tasks')) {
-	        $tasks = array_merge(
-	            $this->scanDirectoryForTasks(APPLICATION_PATH . '/Tasks/'),
-	            $this->scanConfigForTasks(
-	                $this->_consoleOpts->getOption('config-file')
-	            )
-	        );
+        	$tasks = $this->scanTasks();
 	    	exit;
         }
     }
