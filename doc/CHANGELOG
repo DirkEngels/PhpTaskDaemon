@@ -36,7 +36,8 @@ Version 0.8 (planned)
 - Add exception handling (exception)
 - Add example application (example)
     - Minimal
-- Deliver a runnable project (demo)
+- Deliver a runnable project (runnable)
+- Review/Fix current unit tests (tests)
 
 
 Version 0.7 (05-07-2011)
