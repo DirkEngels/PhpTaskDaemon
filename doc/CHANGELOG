@@ -22,18 +22,20 @@ Version 0.9 (planned)
 - Implement Task\Manager\Trigger type: Gearman
 - Implement Task\Manager\Process type: Child
 - Implement Task\Manager\Process type: Parallel
+- Add database support (database)
+    - Implement Daemon\Ipc type: Database (ipc-db)
 
 
 Version 0.8 (planned)
 ---------------------
-- Refactor code to use Logger component
-- Implement Task\Factory component (factory)
-    - Using classes (factory-class)
-    - Using config file (factory-config)
+- Refactor code to use Logger component (logger)
++ Implement Task\Factory component (factory)
+- Implement task loading (loader)
+    - Using classes
+    - Using config file
 - Add exception handling (exception)
-- Add database support (database)
-    - Implement Daemon\Ipc type: Database (ipc-db)
-- Add minimal example (examples)
+- Add example application (example)
+    - Minimal
 - Deliver a runnable project (demo)
 
 
