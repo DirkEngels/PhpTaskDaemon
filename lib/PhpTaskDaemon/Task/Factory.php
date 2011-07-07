@@ -21,7 +21,7 @@ use \PhpTaskDaemon\Task\Exception as Exception;
  */
 class Factory {
 	const TYPE_MANAGER = 'manager';
-	
+
     const TYPE_TRIGGER = 'trigger';
     const TYPE_QUEUE = 'queue';
     const TYPE_STATISTICS = 'statistics';
@@ -31,36 +31,13 @@ class Factory {
     const TYPE_STATUS = 'status';
 
 
+    /**
+     * Instantiates a new Manager object and injects all needed components 
+     * based on the class definitions, configurations settings and defaults.
+     * @param $taskName
+     * @return \PhpTaskDaemon\Task\Manager\AbstractClass
+     */
 	public static function get($taskName) {
-		return self::get2($taskName);
-	}
-
-
-	public static function get1($taskName) {
-		// Instantiate Executor
-		$executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
-		$executor->setStatus(
-            self::getComponentType($taskName, self::TYPE_STATUS)
-		);
-		
-		// Instantiate Queue
-		$queue = self::getComponentType($taskName, self::TYPE_QUEUE);
-		$queue->setStatistics(
-            self::getComponentType($taskName, self::TYPE_STATISTICS)
-		);
-
-		// Instantiate Manager
-        $managerProcess = self::getComponentType($taskName, self::TYPE_PROCESS);
-        $managerProcess->setExecutor($executor);
-                
-		$managerTrigger = self::getComponentType($taskName, self::TYPE_TRIGGER);
-        $managerTrigger->setQueue($queue);
-        
-        return $manager;
-	}
-
-
-	public function get2($taskName) {
 		// Base Manager
 		$manager = self::getComponentType($taskName, self::TYPE_MANAGER);
 		
@@ -100,22 +77,31 @@ class Factory {
 		// First: Check if the class has been overloaded
 		$class = $this->_getObjectClass($taskName, $objectType);
 		if (is_object($class)) {
+			$msg = 'Created ' . $objectType . ' component using Class for task: ' . $taskName;
+			\PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 			return $class;
 		}
-		
+
 		// Second: Check if the task has a specific configuration part
-		$config = $this->_getObjectTaskConfig($taskName, $objectType);
+		$config = $this->_getObjectApplicationConfig($taskName, $objectType);
 		if (is_object($config)) {
+            $msg = 'Created ' . $objectType . ' component using Application config for task: ' . $taskName;
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 			return $config;
 		}
 		
 		// Third: Check the default config
 		$default = $this->_getObjectDefaultConfig($taskName, $objectType);
 		if (is_object($default)) {
+            $msg = 'Created ' . $objectType . ' component using Default config for task: ' . $taskName;
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 			return $default;
 		}
 		
 		// Finally: Get the hard code default
+        $msg = 'Created ' . $objectType . ' component using hard coded default for task: ' . $taskName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+		
 		$hardcoded = $this->_getObjectHardCoded($objectType);
 		return $hardcoded;
     }
@@ -224,7 +210,7 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectTaskConfig($taskName, $objectType) {
+    protected function _getObjectApplicationConfig($taskName, $objectType) {
         $objectType = \PhpTaskDaemon\Daemon\Config::getTaskOption(
             strtolower($objectType . '.type'), 
             $taskName
