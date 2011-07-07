@@ -214,14 +214,14 @@ class Console {
             // Display Settings & exit (--settings)
             $this->displaySettings();
 
-            // Check action
+            // Check action, otherwise display help
             $action = $this->_consoleOpts->getOption('action');
-	        $allActions = array('start', 'stop', 'restart', 'status', 'monitor', 'help');
+	        $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
 			if (!in_array($action, $allActions))  {
 				$this->help();
 				exit;
 			}
-	
+
 			// Perform action
 			$this->$action();
 		} catch (\Exception $e) {
