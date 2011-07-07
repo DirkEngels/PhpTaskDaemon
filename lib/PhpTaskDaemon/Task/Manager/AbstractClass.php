@@ -202,7 +202,7 @@ abstract class AbstractClass {
 	 */
 	protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
 		// Set manager input
- 		$this->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
+ 		\PhpTaskDaemon\Daemon\Logger::get()->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
 		$this->getExecutor()->setJob($job);
 		
 		// Update Status before and after running the task
@@ -212,7 +212,7 @@ abstract class AbstractClass {
 		
 		// Log and sleep for a while
 		usleep($this->_sleepTimeExecutor);
-		$this->log($job->getOutputVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);			
+		\PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutputVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);			
 		$this->getQueue()->updateStatistics($job->getOutputVar('returnStatus'));
 
 		// Reset status and decrement queue
@@ -228,7 +228,7 @@ abstract class AbstractClass {
 	 */
 	protected function _sleep() {
 		// Sleep
-		$this->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
+		\PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
 		usleep($this->_sleepTimeQueue);
 	}
 }
