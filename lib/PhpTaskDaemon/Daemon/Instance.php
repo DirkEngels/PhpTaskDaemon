@@ -30,7 +30,7 @@ class Instance {
 	
 	/**
 	 * Shared memory object
-	 * @var Ipc\SharedMemory $_ipc
+	 * @var Ipc\AbstractClass $_ipc
 	 */
 	protected $_ipc = null;
 	
@@ -52,9 +52,9 @@ class Instance {
 	 * ID. 
 	 * @param int $parent
 	 */
-	public function __construct($parent = null) {
+	public function __construct() {
 		$pidFile = \TMP_PATH . '/phptaskdaemond.pid';
-		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid(), $parent);
+		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid());
 		$this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
 		
 		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
