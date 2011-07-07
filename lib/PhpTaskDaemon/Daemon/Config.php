@@ -111,10 +111,10 @@ class Config {
 	public function getOption($option, $taskName = null) {
 		$value = null;
 		if (!is_null($taskName)) {
-			$value = $this->getTaskSetting($option, $taskName);
+			$value = $this->getOptionByTaskConfig($option, $taskName);
 		}
 		if (is_null($option)) {
-			$value = $this->getDaemonSetting($option);
+			$value = $this->getOptionByDaemonConfig($option);
 		}
 		return $value;
 	}
@@ -125,7 +125,7 @@ class Config {
 	 * @param string $option
 	 * @return null|string
 	 */
-	public function getDaemonOption($option) {
+	public function getOptionByDaemonConfig($option) {
 		return $this->_config->daemon->get($option);
 	}
 
@@ -136,7 +136,7 @@ class Config {
 	 * @param string $taskName
 	 * @return null|string
 	 */
-    public function getTaskOption($option, $taskName) {
+    public function getOptionByTaskConfig($option, $taskName) {
         $option = null;
         return $this->_config->get($taskName)->getOption($option);
     }
