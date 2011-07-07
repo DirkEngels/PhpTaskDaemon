@@ -293,7 +293,7 @@ class Console {
 	 * @param string $dir
 	 * @return integer
 	 */
-	public function scanDirectoryForTasks($dir, $group = null) {
+	public function scanTasksInDirs($dir, $group = null) {
 		if (!is_dir($dir . '/' . $group)) {
 			throw new \Exception('Directory does not exists');
 		}
@@ -321,7 +321,7 @@ class Console {
 		return $managers;
 	}
 	
-	public function scanConfigForTasks($configFile) {
+	public function scanTasksInConfig($configFile) {
 		return array();
 	}
 
