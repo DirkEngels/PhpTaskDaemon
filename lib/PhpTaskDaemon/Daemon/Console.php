@@ -142,6 +142,12 @@ class Console {
 	public function setConfig($config) {
 		$this->_config = $config;
 	}
+	
+    
+    public function scanTasksInConfig($configFile) {
+        return array();
+    }
+
 
 	protected function _initConfig() {
         // Prepare configuration files
@@ -191,6 +197,48 @@ class Console {
         \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
         \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
 	}
+
+
+    /**
+     * 
+     * Scans a directory for task managers and returns the number of loaded
+     * tasks.
+     * 
+     * @param string $dir
+     * @return integer
+     */
+    public function scanTasksInDirs($dir, $group = null) {
+        if (!is_dir($dir . '/' . $group)) {
+            throw new \Exception('Directory does not exists');
+        }
+
+        $items = scandir($dir . '/' . $group);
+        $managers = array();
+        $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
+        foreach($items as $item) {
+            if ($item== '.' || $item == '..') { continue; }
+            $base = (is_null($group)) ? $item : $group . '/'. $item;
+            if (preg_match('/Manager.php$/', $base)) {
+                // Try manager file
+                echo "Checking manager file: /Tasks/" . $base . "\n";
+                if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
+                    array_push($managers, substr($base, 0, -12));
+                }
+            } elseif (is_dir($dir . '/' . $base)) {
+                // Load recursively
+                $managers = array_merge(
+                    $managers, 
+                    $this->scanDirectoryForTasks($dir, $base)
+                );
+            }
+        }
+        return $managers;
+    }
+
+
+    public function scanTasksInConfig($config) {
+        
+    }
 
 
 	/**
@@ -282,51 +330,11 @@ class Console {
         }
         echo "\n";
         exit;
-    	
     }
 
-	/**
-	 * 
-	 * Scans a directory for task managers and returns the number of loaded
-	 * tasks.
-	 * 
-	 * @param string $dir
-	 * @return integer
-	 */
-	public function scanTasksInDirs($dir, $group = null) {
-		if (!is_dir($dir . '/' . $group)) {
-			throw new \Exception('Directory does not exists');
-		}
-
-		$items = scandir($dir . '/' . $group);
-		$managers = array();
-		$defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
-		foreach($items as $item) {
-			if ($item== '.' || $item == '..') { continue; }
-			$base = (is_null($group)) ? $item : $group . '/'. $item;
-			if (preg_match('/Manager.php$/', $base)) {
-				// Try manager file
-				echo "Checking manager file: /Tasks/" . $base . "\n";
-				if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
-					array_push($managers, substr($base, 0, -12));
-				}
-			} elseif (is_dir($dir . '/' . $base)) {
-				// Load recursively
-				$managers = array_merge(
-					$managers, 
-					$this->scanDirectoryForTasks($dir, $base)
-				);
-			}
-		}
-		return $managers;
-	}
-	
-	public function scanTasksInConfig($configFile) {
-		return array();
-	}
 
 
-	/**
+    /**
      * Loads a task by name. A task should at least contain an executor object.
      * The manager, job, queue, process, trigger, status and statistics objects
      * are automatically detected. For each object the method checks if the 
