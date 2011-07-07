@@ -59,18 +59,16 @@ class Console {
 		if (is_null($this->_consoleOpts)) {
 			$this->_consoleOpts = new \Zend_Console_Getopt(
 				array(
-					'config|c-s'	=> 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
-					'logfile|l-s'	=> 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
-//					'daemonize|d'	=> 'Run in Daemon mode (default) (fork to background)',
-					'action|a=s'	=> 'Action (default: start) (options: start, stop, restart, status, monitor)',
-					'list-tasks|lt' => 'List registered tasks',
-					'tasks|t'	 	=> 'Include tasks',
-//					'exclude-tasks|et=s'	 	=> 'Exclude tasks',
-//					'categories|cat' 	=> 'Include categories',
-//					'exclude-categories|ecat=s' 	=> 'Exclude categories',
-//					'print|p'   	=> 'List Actions',
-					'verbose|v'		=> 'Verbose',
-					'help|h'		=> 'Show help message (this message)',
+					'config-file|c-s'	=> 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
+					'log-file|l-s'	    => 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
+//                    'tmp-dir|td-s'      => 'Tmp directory (defaults /tmp/,',
+//				    'daemonize|d'	    => 'Run in Daemon mode (default) (fork to background)',
+					'action|a=s'	    => 'Action (default: start) (options: start, stop, restart, status, monitor)',
+                    'list-tasks|lt'     => 'List tasks',
+//                    'settings|s'        => 'Display tasks settings',
+//				    'task|t=s'	 	    => 'Run single task',
+				    'verbose|v'		    => 'Verbose',
+					'help|h'	      	=> 'Show help message (this message)',
 				)
 			);
 		}
@@ -129,6 +127,9 @@ class Console {
 	 * @return \Zend_Config
 	 */
 	public function getConfig() {
+		if ($this->_config === null) {
+			$this->_initConfig(array());
+		}
 		return $this->_config;
 	}
 
@@ -145,8 +146,8 @@ class Console {
 	protected function _initConfig() {
         // Prepare configuration files
         $configFiles = array();
-        if ($this->_consoleOpts->getOption('config')!='') {
-            $configArguments = explode(',', $this->_consoleOpts->getOption('config'));
+        if ($this->_consoleOpts->getOption('config-file')!='') {
+            $configArguments = explode(',', $this->_consoleOpts->getOption('config-file'));
             foreach ($configArguments as $configArgument) {
                 if (!strstr($configArgument, '/')) {
                     $configArgument = \APPLICATION_PATH . '/' . $configArgument;
@@ -166,13 +167,16 @@ class Console {
 	}
 	
 	protected function _initLogFile($logFile) {
-		if (file_exists($logFile)) {
-	        $writerFile = new \Zend_Log_Writer_Stream($logFile);
-	        \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-	        \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
-		} else {
-			\PhpTaskDaemon\Daemon\Logger::get()->log('Logfile does not exists: ' . $logFile, \Zend_Log::ERR);
+		if (!file_exists($logFile)) {
+			try {
+                touch($logFile);
+			} catch (\Exception $e) {
+				throw new \Exception('Cannot create log file');
+			}
 		}
+        $writerFile = new \Zend_Log_Writer_Stream($logFile);
+        \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
+        \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
 	}
 
 	/**
@@ -190,13 +194,13 @@ class Console {
 	        $this->_initConfig();
             
 	        // Add Log Files
-            if ($this->_consoleOpts->getOption('logfile')) {
+            if ($this->_consoleOpts->getOption('log-file')) {
                 $this->_initLogFile(
-                    getcwd() . '/' . $this->_consoleOpts->getOption('logfile')
+                    getcwd() . '/' . $this->_consoleOpts->getOption('log-file')
                 );
             } else {
             	$this->_initLogFile(
-                    Config::get()->getDaemonOption('logfile')
+                    Config::get()->getOptionByDaemonConfig('logfile')
                 );
             }
 	        
@@ -205,7 +209,13 @@ class Console {
 	            $this->listTasks();
 	            exit;
 	        }
-	
+
+            // List Tasks
+            if ($this->_consoleOpts->getOption('settings')) {
+                $this->displaySettings();
+                exit;
+            }
+
             // Check action
             $action = $this->_consoleOpts->getOption('action');
 	        $allActions = array('start', 'stop', 'restart', 'status', 'monitor', 'help');
@@ -230,7 +240,7 @@ class Console {
         $tasks = array_merge(
             $this->scanDirectoryForTasks(APPLICATION_PATH . '/Tasks/'),
             $this->scanConfigForTasks(
-                $this->_consoleOpts->getOption('config')
+                $this->_consoleOpts->getOption('config-file')
             )
         );
         echo "Tasks\n";
@@ -262,6 +272,10 @@ class Console {
         }
         echo "\n";
         exit;
+    }
+
+    public function displaySettings() {
+    	
     }
 
 	/**
@@ -307,7 +321,7 @@ class Console {
 
 	protected function _readConfig () {
         // Read config
-        $configFile = $this->_consoleOpts->getOption('config');
+        $configFile = $this->_consoleOpts->getOption('config-file');
         if (!file_exists($configFile)) {
             $configFile = PROJECT_ROOT . '/etc/daemon.ini';
         }
