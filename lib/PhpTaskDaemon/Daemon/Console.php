@@ -217,13 +217,13 @@ class Console {
             // Check action, otherwise display help
             $action = $this->_consoleOpts->getOption('action');
 	        $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
-			if (!in_array($action, $allActions))  {
-				$this->help();
+			if (in_array($action, $allActions))  {
+	            // Perform action
+	            $this->$action();
 				exit;
 			}
-
-			// Perform action
-			$this->$action();
+            $this->help();
+			
 		} catch (\Exception $e) {
 			Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
 		}
@@ -384,6 +384,7 @@ class Console {
 	public function restart() {
 		$this->stop();
 		$this->start();
+		exit;
 	}
 
 
