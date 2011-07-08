@@ -69,7 +69,7 @@ class Console {
                     'list-tasks|lt'     => 'List tasks',
                     'settings|s'        => 'Display tasks settings',
 //                    'task|t=s'             => 'Run single task',
-                    'verbose|v'            => 'Verbose',
+                    'verbose|v-i'            => 'Verbose (level: 5)',
                     'help|h'              => 'Show help message (this message)',
                 )
             );
@@ -181,8 +181,17 @@ class Console {
        // Log Verbose Output
         if ($this->_consoleOpts->getOption('verbose')) {
             $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
+
+            // Determine Log Level
+            $logLevel = \Zend_Log::NOTICE;
+            if ($this->_consoleOpts->getOption('verbose')>0) {
+                $logLevel = (int) $this->_consoleOpts->getOption('verbose');
+            }
+            $writerVerbose->addFilter($logLevel);
+
             \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: verbose', \Zend_Log::DEBUG);
+            $msg = 'Adding log writer: verbose (level: ' . $logLevel . ')';
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
         }
     }
 
