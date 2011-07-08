@@ -10,7 +10,7 @@
 namespace PhpTaskDaemon\Task\Manager\Trigger;
 
 interface InterfaceClass {
-    
+
     public function timeToWait();
 
 }

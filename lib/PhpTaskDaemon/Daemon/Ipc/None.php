@@ -14,7 +14,7 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * The Daemon\Ipc\None class is responsible for storing and retrieving nothing.
  */
 class None extends AbstractClass implements InterfaceClass {
-    
+
     /**
      * 
      * Returns an empty array
@@ -23,7 +23,8 @@ class None extends AbstractClass implements InterfaceClass {
     public function getKeys() {
         return array();
     }
-    
+
+
     /**
      * 
      * Returns nothing (null) 
@@ -34,6 +35,7 @@ class None extends AbstractClass implements InterfaceClass {
         return null;
     }
 
+
     /**
      * 
      * Sets nothing
@@ -42,8 +44,9 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function setVar($key, $value) {
-    	return true;
+        return true;
     }
+
 
     /**
      * 
@@ -52,8 +55,9 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function incrementVar($key) {
-    	return true;
+        return true;
     }
+
 
     /**
      * 
@@ -62,8 +66,9 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function decrementVar($key) {
-    	return true;
+        return true;
     }
+
 
     /**
      * 
@@ -72,15 +77,17 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function removeVar($key) {
-    	return true;
+        return true;
     }
-    
+
+
     /**
      * 
      * Removes nothing
      * @return bool
      */
     public function remove() {
-    	return true;
+        return true;
     }
+
 }
