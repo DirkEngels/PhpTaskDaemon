@@ -65,7 +65,7 @@ class Console {
 //				    'daemonize|d'	    => 'Run in Daemon mode (default) (fork to background)',
 					'action|a=s'	    => 'Action (default: start) (options: start, stop, restart, status, monitor)',
                     'list-tasks|lt'     => 'List tasks',
-//                    'settings|s'        => 'Display tasks settings',
+                    'settings|s'        => 'Display tasks settings',
 //				    'task|t=s'	 	    => 'Run single task',
 				    'verbose|v'		    => 'Verbose',
 					'help|h'	      	=> 'Show help message (this message)',
@@ -144,11 +144,6 @@ class Console {
 	}
 	
     
-    public function scanTasksInConfig($configFile) {
-        return array();
-    }
-
-
 	protected function _initConfig() {
         // Prepare configuration files
         $configFiles = array();
@@ -164,6 +159,7 @@ class Console {
 
         // Initiate config
         $config = \PhpTaskDaemon\Daemon\Config::get($configFiles);
+        return $config;
 	}
 
 	
@@ -178,18 +174,21 @@ class Console {
 	
 	
 	protected function _initLogFile() {
-		$logFile = ($this->_consoleOpts->getOption('log-file'))
-            ? getcwd() . '/' . $this->_consoleOpts->getOption('log-file')
-            : Config::get()->getOptionByDaemonConfig('logfile');
+        if ($this->_consoleOpts->getOption('log-file')) {
+            $logFile =  getcwd() . '/' . $this->_consoleOpts->getOption('log-file');
+        } else {
+            $logFile = Config::get()->getOption('log.file');
+            if (substr($logFile, 0, 1)!='/') {
+                $logFile = realpath(\APPLICATION_PATH . '/..') . '/' . $logFile;
+            }
+        }
 
-            echo $logFile;
-            exit;
         // Create logfile if not exists
 		if (!file_exists($logFile)) {
 			try {
                 touch($logFile);
 			} catch (\Exception $e) {
-				throw new \Exception('Cannot create log file');
+				throw new \Exception('Cannot create log file: ' . $logFile);
 			}
 		}
 		
@@ -207,10 +206,11 @@ class Console {
                 \PhpTaskDaemon\Daemon\Config::get()
             ),
             // Directories
-            $this->scanDirectoryForTasks(
+            $this->scanTasksInDirs(
                 APPLICATION_PATH . '/Tasks/'
             )
         );
+        \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
         return $tasks;
     }
 
@@ -234,17 +234,20 @@ class Console {
         foreach($items as $item) {
             if ($item== '.' || $item == '..') { continue; }
             $base = (is_null($subdir)) ? $item : $subdir . '/'. $item;
-            if (preg_match('/Manager.php$/', $base)) {
+            if (preg_match('/Executor.php$/', $base)) {
                 // Try manager file
-                echo "Checking manager file: /Tasks/" . $base . "\n";
                 if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
-                    array_push($tasks, substr($base, 0, -12));
+	                \PhpTaskDaemon\Daemon\Logger::get()->log(
+	                    "Found executor file: /Tasks/" . $base, 
+	                    \Zend_Log::DEBUG
+	                );
+                	array_push($tasks, substr($base, 0, -13));
                 }
             } elseif (is_dir($dir . '/' . $base)) {
                 // Load recursively
                 $tasks = array_merge(
                     $tasks, 
-                    $this->scanDirectoryForTasks($dir, $base)
+                    $this->scanTasksInDirs($dir, $base)
                 );
             }
         }
@@ -253,7 +256,7 @@ class Console {
 
 
     public function scanTasksInConfig($config) {
-        
+        return array();
     }
 
 
@@ -269,14 +272,14 @@ class Console {
 	        // Initialize Configuration
 	        $this->_initConfig();
             
-	        // Add Log Files
-	        $this->_initLogFile();
-	        
 	        // List Tasks & exit (--list-tasks)
 	        $this->listTasks();
 
             // Display Settings & exit (--settings)
             $this->displaySettings();
+
+            // Add Log Files
+            $this->_initLogFile();
 
             // Check action, otherwise display help
             $action = $this->_consoleOpts->getOption('action');
@@ -301,46 +304,48 @@ class Console {
     public function listTasks() {
         if ($this->_consoleOpts->getOption('list-tasks')) {
         	$tasks = $this->scanTasks();
+//        	echo var_dump($tasks);
+        	foreach ($tasks as $task) {
+                echo $task . "\n";
+        	}
 	    	exit;
         }
     }
 
     public function displaySettings() {
-        $tasks = array_merge(
-            $this->scanDirectoryForTasks(APPLICATION_PATH . '/Tasks/'),
-            $this->scanConfigForTasks(
-                $this->_consoleOpts->getOption('config-file')
-            )
-        );
-    	echo "Tasks\n";
-        echo "=====\n\n";
-
-        echo "Examples\\Minimal\n";
-        echo "-----------------\n";
-        echo "\tProcess:\t\tSame\t\t\t(default)\n";
-        echo "\tTrigger:\t\tInterval\t\t(default)\n";
-            echo "\t- sleepTime:\t\t3\t\t\t(default)\n";
-        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-        echo "\tLogger:\t\t\tNone\t\t\t(default)\n";
-        echo "\n";
-
-        echo "Examples\\Parallel\n";
-        echo "-----------------\n";
-        echo "\tProcess:\t\tParallel\t\t(config)\n";
-            echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
-        echo "\tTrigger:\t\tCron\t\t\t(default)\n";
-            echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
-        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-        echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
-        echo "\n";
-        
-        foreach($tasks as $nr => $taskName) {
-            echo "- " . $taskName . "\n";
-        }
-        echo "\n";
-        exit;
+    	if ($this->_consoleOpts->getOption('settings')) {
+	        $tasks = $this->scanTasks();
+	
+	    	echo "Tasks\n";
+	        echo "=====\n\n";
+	
+	        echo "Examples\\Minimal\n";
+	        echo "-----------------\n";
+	        echo "\tProcess:\t\tSame\t\t\t(default)\n";
+	        echo "\tTrigger:\t\tInterval\t\t(default)\n";
+	            echo "\t- sleepTime:\t\t3\t\t\t(default)\n";
+	        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+	        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+	        echo "\tLogger:\t\t\tNone\t\t\t(default)\n";
+	        echo "\n";
+	
+	        echo "Examples\\Parallel\n";
+	        echo "-----------------\n";
+	        echo "\tProcess:\t\tParallel\t\t(config)\n";
+	            echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
+	        echo "\tTrigger:\t\tCron\t\t\t(default)\n";
+	            echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
+	        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+	        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+	        echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
+	        echo "\n";
+	        
+	        foreach($tasks as $nr => $taskName) {
+	            echo "- " . $taskName . "\n";
+	        }
+	        echo "\n";
+	        exit;
+    	}
     }
 
 
@@ -366,19 +371,24 @@ class Console {
 	 * Action: Start Daemon
 	 */
 	public function start() {
-		$tasks = $this->scanDirectoryForTasks(PROJECT_ROOT . '/app/Tasks/');
-		
-		// Initialize daemon
-		foreach($tasks as $task) {
-			try {
+        $tasks = $this->scanTasks();
+
+        // Initialize daemon
+        foreach($tasks as $task) {
+            \PhpTaskDaemon\Daemon\Logger::get()->log('Loading task: ' . $task, \Zend_Log::INFO);
+            try {
                 $taskManager = \PhpTaskDaemon\Task\Factory::get($task);
-			} catch (\Exception $e) {
-				throw new \Exception('Failed loading task: ' . $task);
-			}
-		}
-		// Start the Daemon
-		$this->getDaemon()->start();
-	}
+                $this->getDaemon()->addManager($taskManager);
+            } catch (\Exception $e) {
+                throw new \Exception('Failed loading task: ' . $task);
+            }
+        }
+        \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
+
+        // Start the Daemon
+        $this->getDaemon()->start();
+        \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
+    }
 
 
 	/**
