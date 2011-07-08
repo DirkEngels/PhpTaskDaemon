@@ -39,7 +39,7 @@ class Factory {
      */
 	public static function get($taskName) {
 		// Base Manager
-		$manager = self::getComponentType($taskName, self::TYPE_MANAGER);
+		$manager = self::getManager($taskName);
 		
         // Trigger, Queue & Statistics
         $manager->setTrigger(
@@ -75,35 +75,19 @@ class Factory {
 	 */
 	public static function getComponentType($taskName, $objectType) {
 		// First: Check if the class has been overloaded
-		$class = $this->_getObjectClass($taskName, $objectType);
-		if (is_object($class)) {
-			$msg = 'Created ' . $objectType . ' component using Class for task: ' . $taskName;
-			\PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
-			return $class;
-		}
+        $object = self::_getObjectClass($taskName, $objectType);
 
-		// Second: Check if the task has a specific configuration part
-		$config = $this->_getObjectApplicationConfig($taskName, $objectType);
-		if (is_object($config)) {
-            $msg = 'Created ' . $objectType . ' component using Application config for task: ' . $taskName;
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
-			return $config;
-		}
-		
-		// Third: Check the default config
-		$default = $this->_getObjectDefaultConfig($taskName, $objectType);
-		if (is_object($default)) {
-            $msg = 'Created ' . $objectType . ' component using Default config for task: ' . $taskName;
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
-			return $default;
-		}
-		
-		// Finally: Get the hard code default
-        $msg = 'Created ' . $objectType . ' component using hard coded default for task: ' . $taskName;
-        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
-		
-		$hardcoded = $this->_getObjectHardCoded($objectType);
-		return $hardcoded;
+        if (!is_object($object)) {
+            // Second: Check configuration
+            $object = self::_getObjectConfig($taskName, $objectType);
+        }
+
+        if (!is_object($object)) {
+            // Finally: Try the hard code default
+            $object = self::_getObjectDefault($taskName, $objectType);
+        }
+
+        return $object;
     }
 
 
@@ -184,7 +168,16 @@ class Factory {
      * @return string
      */
     protected function _getClassName($taskName, $objectType) {
-        return '\\Tasks\\' . $taskName . '\\' . ucfirst($objectType);
+        return '\\Tasks\\' . str_replace('/', '\\', $taskName) . '\\' . ucfirst($objectType);
+    }
+
+
+    /**
+     * Returns the config name based on the task name.
+     * @param unknown_type $objectType
+     */
+    protected static function _getConfigName($taskName) {
+        return strtolower(str_replace('\\', '.', $taskName));
     }
 
 
@@ -195,9 +188,14 @@ class Factory {
      * @return null|stdClass
      */
     protected function _getObjectClass($taskName, $objectType) {
-        $className = $this->_getClassName($taskName, $objectType);
+        $msg = 'Trying ' . $objectType . ' class component: ' . self::_getClassName($taskName, $objectType);
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+
+        $className = self::_getClassName($taskName, $objectType);
         if (class_exists($className)) {
-            return new $className();
+	        $msg = 'Found ' . $objectType . ' class component: ' . $className;
+	        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+        	return new $className();
         }
         return false;
     }
@@ -210,33 +208,23 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectApplicationConfig($taskName, $objectType) {
-        $objectType = \PhpTaskDaemon\Daemon\Config::getTaskOption(
-            strtolower($objectType . '.type'), 
-            $taskName
+    protected function _getObjectConfig($taskName, $objectType) {
+        $msg = 'Trying ' . $objectType . ' config component: ' . $taskName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+
+        $configType = ucfirst(
+	        \PhpTaskDaemon\Daemon\Config::get()->getTaskOption(
+	            strtolower($objectType) . '.type', 
+	            $taskName
+	        )
         );
-        $objectClassName = '\\Tasks\\' . $taskName . '\\' . $objectType;
+        $objectClassName = '\\PhpTaskDaemon\\Task\\Manager\\' . $configType;
+        $msg = 'Testing class: ' . $objectClassName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
         if (class_exists($objectClassName, true)) {
+	        $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
+	        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
         	$object = new $objectClassName();
-        	return $object;
-        }
-        return false;
-    }
-
-
-    /**
-     * Checks if default configuration options for the objectType are set.
-     * @param string $taskName
-     * @param string $objectType
-     * @return null|stdClass
-     */
-    protected function _getObjectDefaultConfig($taskName, $objectType) {
-        $objectType = \PhpTaskDaemon\Daemon\Config::getDaemonOption(
-            strtolower($objectType . '.type')
-        );
-        $objectClassName = '\\Tasks\\' . $taskName . '\\' . $objectType;
-        if (class_exists($objectClassName, true)) {
-            $object = new $objectClassName();
             return $object;
         }
         return false;
@@ -248,25 +236,30 @@ class Factory {
      * @param string $objectType
      * @return null|StdClass
      */
-    protected function _getObjectHardCoded($objectType) {
+    protected function _getObjectDefault($taskName, $objectType) {
+        $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Base';
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+
         switch($objectType) {
             case 'manager':
-                return new \PhpTaskDaemon\Task\Manager\BaseClass();
+                return new \PhpTaskDaemon\Task\Manager\BaseClass(
+                    self::getComponentType($taskName, self::TYPE_EXECUTOR)
+                );
             case 'trigger':
-                return new \PhpTaskDaemon\Task\Manager\Trigger\BaseClass();
+                return new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
             case 'queue':
                 return new \PhpTaskDaemon\Task\Queue\BaseClass();
             case 'statistics':
                 return new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
             case 'process':
-                return new \PhpTaskDaemon\Task\Manager\Process\BaseClass();
+                return new \PhpTaskDaemon\Task\Manager\Process\Same();
             case 'executor':
                 return new \PhpTaskDaemon\Task\Executor\BaseClass();
             case 'status':
                 return new \PhpTaskDaemon\Task\Executor\Status\BaseClass();
         }
         throw new Exception\UndefinedObjectType('Unknown object type: ' . $objectType);
-        
+
         return null;
     }
 

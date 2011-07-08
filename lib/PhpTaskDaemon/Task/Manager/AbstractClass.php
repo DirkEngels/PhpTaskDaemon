@@ -26,15 +26,15 @@ abstract class AbstractClass {
 	
 	/**
 	 * Queue object
-	 * @var \PhpTaskDaemon\Task\Queue\AbstractClass
+	 * @var \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
 	 */
-	protected $_queue = null;
+	protected $_trigger = null;
 	
 	/**
 	 * Executor object
-	 * @var \PhpTaskDaemon\Task\Executor\AbstractClass
+	 * @var \PhpTaskDaemon\Task\Manager\Process\AbstractClass
 	 */
-	protected $_executor = null;
+	protected $_process = null;
 
 	/**
 	 * Time to wait in milliseconds before running the next task.
@@ -58,8 +58,8 @@ abstract class AbstractClass {
 	 * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
 	 */
 	public function __construct($executor, $queue = null) {
-		$this->setQueue($queue);
-		$this->setExecutor($executor);
+		$this->getTrigger()->setQueue($queue);
+		$this->getProcess()->setExecutor($executor);
 	}
 
 	/**
@@ -107,6 +107,9 @@ abstract class AbstractClass {
 	 * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
 	 */
 	public function getTrigger() {
+        if (!is_a($this->_trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
+            $this->_trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+        }
 		return $this->_trigger;
 	}
 
@@ -131,6 +134,9 @@ abstract class AbstractClass {
 	 * @return \PhpTaskDaemon\Task\Manager\AbstractClass
 	 */
 	public function getProcess() {
+        if (!is_a($this->_process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
+            $this->_process = new \PhpTaskDaemon\Task\Manager\Process\Same();
+        }
 		return $this->_process;
 	}
 
@@ -142,7 +148,7 @@ abstract class AbstractClass {
 	 */
 	public function setProcess($process) {
 		if (!is_a($process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
-			$process = new \PhpTaskDaemon\Task\Manager\Process\BaseClass();
+			$process = new \PhpTaskDaemon\Task\Manager\Process\Same();
 		}
 		$this->_process = $process;
 
