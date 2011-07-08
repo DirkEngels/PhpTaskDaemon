@@ -15,7 +15,7 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * inter process communication data from the database.
  */
 class DataBase extends AbstractClass implements InterfaceClass {
-    
+
     /**
      * 
      * Returns an empty array
@@ -24,7 +24,8 @@ class DataBase extends AbstractClass implements InterfaceClass {
     public function getKeys() {
         return array();
     }
-    
+
+
     /**
      * 
      * Returns nothing (null) 
@@ -32,10 +33,11 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return null
      */
     public function getVar($key) {
-    	$sql = "SELECT value FROM ipc WHERE key='" . $key . "'";
-    	$row = mysql_fetch_array($this->_queryDataBase($sql));
-    	return $row['value'];
+        $sql = "SELECT value FROM ipc WHERE key='" . $key . "'";
+        $row = mysql_fetch_array($this->_queryDataBase($sql));
+        return $row['value'];
     }
+
 
     /**
      * 
@@ -45,9 +47,10 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function setVar($key, $value) {
-    	$sql = "REPLACE INTO ipc (key, value) VALUES ('" . $key . "','" . $value . "')";
-    	return $this->_queryDataBase($sql);
+        $sql = "REPLACE INTO ipc (key, value) VALUES ('" . $key . "','" . $value . "')";
+        return $this->_queryDataBase($sql);
     }
+
 
     /**
      * 
@@ -56,9 +59,10 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function incrementVar($key) {
-    	$sql = "UPDATE ipc SET value=value+1 WHERE key='" . $key . "'";
+        $sql = "UPDATE ipc SET value=value+1 WHERE key='" . $key . "'";
         return $this->_queryDataBase($sql);
     }
+
 
     /**
      * 
@@ -71,6 +75,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
         return $this->_queryDataBase($sql);
     }
 
+
     /**
      * 
      * Removes nothing 
@@ -78,10 +83,11 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function removeVar($key) {
-    	$sql = "DELETE FROM ipc WHERE key='" . $key . "'";
+        $sql = "DELETE FROM ipc WHERE key='" . $key . "'";
         return $this->_queryDataBase($sql);
     }
-    
+
+
     /**
      * 
      * Removes nothing
@@ -89,14 +95,16 @@ class DataBase extends AbstractClass implements InterfaceClass {
      */
     public function remove() {
         $sql = "DELETE FROM ipc";
-    	return $this->_queryDataBase($sql);
+        return $this->_queryDataBase($sql);
     }
-    
+
+
     /**
      * Executes a single query
      * @param string $query
      */
     protected function _queryDataBase($query) {
-    	return mysql_query($query);
+        return mysql_query($query);
     }
+
 }

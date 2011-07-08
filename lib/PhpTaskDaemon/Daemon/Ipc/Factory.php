@@ -26,18 +26,18 @@ class Factory {
      */
     public static function get($ipcType, $id) {
         $ipcObject = null;
-    	switch($ipcType) {
-    		case self::TYPE_SHAREDMEMORY:
-    			$ipcObject = new SharedMemory($id);
-    			break;
+        switch($ipcType) {
+            case self::TYPE_SHAREDMEMORY:
+                $ipcObject = new SharedMemory($id);
+                break;
             case self::TYPE_DATABASE:
                 $ipcObject = new DataBase($id);
                 break;
             case self::TYPE_NONE:
-    		default:
+            default:
                 $ipcObject = new None($id);
                 break;
-    	}
+        }
         return $ipcObject;
     }
 

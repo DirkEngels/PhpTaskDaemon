@@ -15,16 +15,17 @@ namespace PhpTaskDaemon\Task\Queue;
  * be used when no queue object is available for a certain task.
  */
 class BaseClass extends AbstractClass implements InterfaceClass {
-	
-	public function load() {
-		$queue = array(
-			new \PhpTaskDaemon\Task\Job\BaseClass(
-				'base-1',array('sleepTime' => 100000)
-			),
-			new \PhpTaskDaemon\Task\Job\BaseClass(
-				'base-2',array('sleepTime' => 300000)
-			)
-		);
-		return $queue;
-	}
+
+    public function load() {
+        $queue = array(
+            new \PhpTaskDaemon\Task\Job\BaseClass(
+                'base-1',array('sleepTime' => 100000)
+            ),
+            new \PhpTaskDaemon\Task\Job\BaseClass(
+                'base-2',array('sleepTime' => 300000)
+            )
+        );
+        return $queue;
+    }
+
 }
