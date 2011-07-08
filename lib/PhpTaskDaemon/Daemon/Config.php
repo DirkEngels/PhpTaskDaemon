@@ -20,22 +20,24 @@ use \PhpTaskDaemon\Daemon\Logger;
  *
  */
 class Config {
-	protected static $_instance = null;
-	
-	/**
-	 * Zend_Config object instance
-	 * @var \Zend_Config
-	 */
-    protected $_config = null;
-	
-	/** 
-	 * Protected constructor for singleton pattern
-	 */
-	protected function __construct($configFiles = array()) {
-		$this->_initConfig($configFiles);
-	}
+    protected static $_instance = null;
 
-	protected function _initConfig($configFiles) {
+    /**
+     * Zend_Config object instance
+     * @var \Zend_Config
+     */
+    protected $_config = null;
+
+
+    /** 
+     * Protected constructor for singleton pattern
+     */
+    protected function __construct($configFiles = array()) {
+        $this->_initConfig($configFiles);
+    }
+
+
+    protected function _initConfig($configFiles) {
         // Add default configuration
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/app.ini'));
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/daemon.ini'));
@@ -66,38 +68,39 @@ class Config {
             Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::DEBUG);
         }
         $this->_config->setReadonly();
-	}
+}
 
-	/**
-	 * Singleton getter
-	 * @return \PhpTaskDaemon\Daemon\Config
-	 */
-	public function get($configFiles = array()) {
+
+    /**
+     * Singleton getter
+     * @return \PhpTaskDaemon\Daemon\Config
+     */
+    public function get($configFiles = array()) {
         if (!self::$_instance) {
         	Logger::get()->log("Creating new config object", \Zend_Log::DEBUG);
             self::$_instance = new self($configFiles);
         }
 
         return self::$_instance;
-	}
+    }
 
 
-	/**
-	 * Returns the configuration instance
-	 * @returns Zend_Config
-	 */
-	public function getConfig() {
-		return $this->_config;
-	}
+    /**
+     * Returns the configuration instance
+     * @returns Zend_Config
+     */
+    public function getConfig() {
+        return $this->_config;
+    }
 
 
-	/**
-	 * Sets the configuration instance
-	 * @param Zend_Config $config
-	 */
-	public function setConfig($config) {
-		$this->_config = $config;
-	}
+    /**
+     * Sets the configuration instance
+     * @param Zend_Config $config
+     */
+    public function setConfig($config) {
+        $this->_config = $config;
+    }
 
 
     /**
@@ -109,36 +112,44 @@ class Config {
      * @param null|string
      */
 	public function getOption($option, $taskName = null) {
-		$value = null;
-		if (!is_null($taskName)) {
-			$value = $this->getOptionByTaskConfig($option, $taskName);
-		}
-		if (is_null($option)) {
-			$value = $this->getOptionByDaemonConfig($option);
-		}
-		return $value;
-	}
+        $value = null;
+
+        if (!is_null($taskName)) {
+            Logger::get()->log('Trying task config option: ' . $taskName . '.' . $option, \Zend_Log::DEBUG);
+            $value =$this->getConfigKey($taskName . '.' . $option);
+            if (isset($value)) {
+                return $value;
+            }
+        }
+
+        Logger::get()->log('Trying daemon config option: daemon.' . $option, \Zend_Log::DEBUG);
+        $value = $this->getConfigKey('daemon.' . $option);
+        if (isset($value)) {
+            return $value;
+        }
+
+        Logger::get()->log('Trying task config option: ' . $option, \Zend_Log::CRIT);
+        throw new \Exception('Config option not declared!');
+    }
 
 
-	/**
-	 * Returns a daemon and/or system wide configuration option.
-	 * @param string $option
-	 * @return null|string
-	 */
-	public function getOptionByDaemonConfig($option) {
-		return $this->_config->daemon->get($option);
-	}
+    /**
+     * Recursively check if a config value exists untill the required nesting 
+     * level has been reached.
+     * @param $keyString
+     */
+    public function getConfigKey($keyString) {
+        $value = null;
+        $keyPieces = explode('.', $keyString);
+        $config = $this->_config;
+        foreach ($keyPieces as $keyPiece) {
+            $config = $config->get($keyPiece);
+            if (!isset($config)) {
+                throw new \Exception('Config option not found');
+            }
+        }
 
-
-	/**
-	 * Returns a task specific configuration option
-	 * @param string $option
-	 * @param string $taskName
-	 * @return null|string
-	 */
-    public function getOptionByTaskConfig($option, $taskName) {
-        $option = null;
-        return $this->_config->get($taskName)->getOption($option);
+        return $config;
     }
 
 }
