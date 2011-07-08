@@ -52,25 +52,6 @@ abstract class AbstractClass {
 	
 	/**
 	 * 
-	 * A manager requires a executor and queue object. In case of a gearman
-	 * worker the queue object is optional. 
-	 * @param \PhpTaskDaemon\Task\Executor\AbstractClass $executor
-	 * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
-	 */
-	public function __construct($executor, $queue = null) {
-		$this->getTrigger()->setQueue($queue);
-		$this->getProcess()->setExecutor($executor);
-	}
-
-	/**
-	 * 
-	 * Destroy the shared memory object
-	 */	
-	public function __destruct() {
-	}
-
-	/**
-	 * 
 	 * Initializes the pid manager
 	 * @param int $parentPid
 	 */
