@@ -53,7 +53,7 @@ class Instance {
 		
 		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
 		
-		$this->_initLogSetup();
+//		$this->_initLogSetup();
 	}
 	
 	/**
@@ -276,10 +276,10 @@ class Instance {
 			$manager->init($this->_pidManager->getParent());
 
 			$statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
-			$manager->getQueue()->setStatistics($statistics);
+			$manager->getTrigger()->getQueue()->setStatistics($statistics);
 			
 			$status = new \PhpTaskDaemon\Task\Executor\Status\BaseClass();
-			$manager->getExecutor()->setStatus($status);
+			$manager->getProcess()->getExecutor()->setStatus($status);
 			
 			\PhpTaskDaemon\Daemon\Logger::get()->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
 			$manager->runManager();
