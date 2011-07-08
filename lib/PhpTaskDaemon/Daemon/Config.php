@@ -40,6 +40,7 @@ class Config {
     protected function _initConfig($configFiles) {
         // Add default configuration
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/app.ini'));
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/defaults.ini'));
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/daemon.ini'));
         
         foreach($configFiles as $configFile) {
@@ -65,7 +66,7 @@ class Config {
                     )
                 );
             }
-            Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::DEBUG);
+            Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::INFO);
         }
         $this->_config->setReadonly();
 }
@@ -115,21 +116,74 @@ class Config {
         $value = null;
 
         if (!is_null($taskName)) {
-            Logger::get()->log('Trying task config option: ' . $taskName . '.' . $option, \Zend_Log::DEBUG);
-            $value =$this->getConfigKey($taskName . '.' . $option);
+            $value = $this->getTaskOption($option, $taskName);
             if (isset($value)) {
                 return $value;
             }
         }
 
-        Logger::get()->log('Trying daemon config option: daemon.' . $option, \Zend_Log::DEBUG);
-        $value = $this->getConfigKey('daemon.' . $option);
+        $value = $this->getDaemonOption($option);
         if (isset($value)) {
             return $value;
         }
 
-        Logger::get()->log('Trying task config option: ' . $option, \Zend_Log::CRIT);
+        Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::CRIT);
         throw new \Exception('Config option not declared!');
+    }
+
+
+    /**
+     * Returns the Ret
+     * @param $option
+     * @param $taskName
+     */
+    public function getDaemonOption($option) {
+        Logger::get()->log('Trying daemon config option: ' . $option, \Zend_Log::DEBUG);
+        return $this->getRecursiveKey($option);
+    }
+
+
+    public function getTaskOption($option, $taskName = null) {
+    	if (!is_null($taskName)) {
+	    	try {
+	            $value = $this->getTaskSpecificOption($option, $taskName);
+	    	} catch (\Exception $e) {
+	            \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::DEBUG);
+	    	}
+    	}
+
+        if (!isset($value)) {
+            $value = $this->getTaskDefaultOption($option);
+        }
+
+        return $value;
+    }
+
+
+    /**
+     * Returns the default task configuration option
+     * @param $option
+     */
+    public function getTaskDefaultOption($option) {
+        $value = null;
+        Logger::get()->log('Trying default config option: tasks.defaults.' . $option, \Zend_Log::DEBUG);
+        try {
+            $value = $this->getRecursiveKey('tasks.defaults.' . $option);
+        } catch (\Exception $e) {
+            Logger::get()->log('Failed loading default config option: ' . $option, \Zend_Log::DEBUG);
+        }
+        return $value;
+    }
+
+
+    /**
+     * Returns the Ret
+     * @param $option
+     * @param $taskName
+     */
+    public function getTaskSpecificOption($option, $taskName) {
+        Logger::get()->log('Trying task config option: tasks.' . $this->_prepareString($taskName) . '.' . $option, \Zend_Log::DEBUG);
+        return $this->getRecursiveKey('tasks.' . $taskName . '.' . $option);
     }
 
 
@@ -138,7 +192,8 @@ class Config {
      * level has been reached.
      * @param $keyString
      */
-    public function getConfigKey($keyString) {
+    public function getRecursiveKey($keyString) {
+        $keyString = $this->_prepareString($keyString);
         $value = null;
         $keyPieces = explode('.', $keyString);
         $config = $this->_config;
@@ -152,4 +207,7 @@ class Config {
         return $config;
     }
 
+    protected function _prepareString($string) {
+        return strtolower( str_replace('/', '.', $string) );
+    }
 }
