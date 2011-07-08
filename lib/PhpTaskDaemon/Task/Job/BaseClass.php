@@ -10,5 +10,5 @@
 namespace PhpTaskDaemon\Task\Job;
 
 class BaseClass extends AbstractClass implements InterfaceClass {
-	
+
 }

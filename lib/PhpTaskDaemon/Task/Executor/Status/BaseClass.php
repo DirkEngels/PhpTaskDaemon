@@ -13,5 +13,5 @@ namespace PhpTaskDaemon\Task\Executor\Status;
  * The base class can be used as a default status class.
  */
 class BaseClass extends AbstractClass implements InterfaceClass {
-	
+
 }

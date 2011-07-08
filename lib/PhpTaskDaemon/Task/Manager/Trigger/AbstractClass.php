@@ -10,8 +10,10 @@
 namespace PhpTaskDaemon\Task\Manager\Trigger;
 
 abstract class AbstractClass {
-	protected $_queue;
-    
+
+    protected $_queue;
+
+
     /**
      * 
      * Returns the current loaded queue array
@@ -20,6 +22,7 @@ abstract class AbstractClass {
     public function getQueue() {
         return $this->_queue;
     }
+
 
     /**
      * 
@@ -36,8 +39,12 @@ abstract class AbstractClass {
         return $this;
     }
 
+
+    /**
+     * Returns the time to wait before to run again.
+     */
     public function timeToWait() {
-    	return 1;
+        return 1;
     }
 
 }

@@ -10,23 +10,29 @@
 namespace PhpTaskDaemon\Task\Manager\Process;
 
 class Parallel extends AbstractClass implements InterfaceClass {
-	protected $_maxProcess = 3;
+
+    protected $_maxProcess = 3;
 
 
-	public function run() {
-		$currentChilds = 0;
-		
-		while(count($this->_jobs)>0) {
-			if ($currentChilds<$this->_maxProcess) {
-				$job = array_shift($this->_jobs);
-				$this->_forkTask($job);
-			}
-		}
-		for ($i = $currentChilds; $i<$this->_maxProcess; $i++) {
+    /**
+     * (non-PHPdoc)
+     * @see lib/PhpTaskDaemon/Task/Manager/Process/PhpTaskDaemon\Task\Manager\Process.InterfaceClass::run()
+     */
+    public function run() {
+        $currentChilds = 0;
+
+        while(count($this->_jobs)>0) {
+            if ($currentChilds<$this->_maxProcess) {
+                $job = array_shift($this->_jobs);
+                $this->_forkTask($job);
+            }
+        }
+        for ($i = $currentChilds; $i<$this->_maxProcess; $i++) {
             $this->_forkTask($job);
             $currentChilds++;
-		}
-		
-		$this->_executeTask($this->getJob());
-	}
+        }
+
+        $this->_executeTask($this->getJob());
+    }
+
 }

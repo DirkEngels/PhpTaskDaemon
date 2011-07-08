@@ -10,6 +10,7 @@ namespace PhpTaskDaemon\Task\Executor\Status;
 
 interface InterfaceClass {
 
-	public function get();
+    public function get();
     public function set($status);
+
 }

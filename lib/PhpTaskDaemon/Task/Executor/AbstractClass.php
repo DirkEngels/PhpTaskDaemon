@@ -14,65 +14,73 @@ namespace PhpTaskDaemon\Task\Executor;
  * provides setters and getters for the status and job instance. 
  */
 abstract class AbstractClass {
+
 	protected $_job = null;
-	protected $_status = null;
 
-	/**
-	 * 
-	 * Optional a executor status object can be provided. 
-	 * @param \PhpTaskDaemon\Task\Executor\Status $status
-	 */
-	public function __construct($status = null) {
-		$this->setStatus($status);
-	}
-	
-	/**
-	 * 
-	 * Returns the current job.
-	 * @return \PhpTaskDaemon\Task\Job
-	 */
-	public function getJob() {
-		return $this->_job;
-	}
-	
-	/**
-	 * 
-	 * Sets the current job
-	 * @param \PhpTaskDaemon\Task\Job $job
-	 */
-	public function setJob($job) {
-		$this->_job = $job;
-	}
-	
-	/**
-	 * 
-	 * Returns the current status object, if set.
-	 * @return \PhpTaskDaemon\Task\Executor\Status $status
-	 */
-	public function getStatus() {
-		return $this->_status;
-	}
-	
-	/**
-	 * 
-	 * Sets the current status object
-	 * @param \PhpTaskDaemon\Task\Executor\Status $status
-	 */
-	public function setStatus($status) {
-		$this->_status = $status;
-	}
+    protected $_status = null;
 
-	/**
-	 * 
-	 * Updates the status of the current job in shared memory.
-	 * @param integer $percentage
-	 * @param string|null $message
-	 * @return bool
-	 */
-	public function updateStatus($percentage, $message = null) {
-		if ($this->_status != null) {
-			return $this->_status->set($percentage, $message);
-		}
-		return false;
-	}
+    /**
+     * 
+     * Optional a executor status object can be provided. 
+     * @param \PhpTaskDaemon\Task\Executor\Status $status
+     */
+    public function __construct($status = null) {
+        $this->setStatus($status);
+    }
+
+
+    /**
+     * 
+     * Returns the current job.
+     * @return \PhpTaskDaemon\Task\Job
+     */
+    public function getJob() {
+        return $this->_job;
+    }
+
+
+    /**
+     * 
+     * Sets the current job
+     * @param \PhpTaskDaemon\Task\Job $job
+     */
+    public function setJob($job) {
+        $this->_job = $job;
+    }
+
+
+    /**
+     * 
+     * Returns the current status object, if set.
+     * @return \PhpTaskDaemon\Task\Executor\Status $status
+     */
+    public function getStatus() {
+        return $this->_status;
+    }
+
+
+    /**
+     * 
+     * Sets the current status object
+     * @param \PhpTaskDaemon\Task\Executor\Status $status
+     */
+    public function setStatus($status) {
+        $this->_status = $status;
+    }
+
+
+    /**
+     * 
+     * Updates the status of the current job in shared memory.
+     * @param integer $percentage
+     * @param string|null $message
+     * @return bool
+     */
+    public function updateStatus($percentage, $message = null) {
+        if ($this->_status != null) {
+            return $this->_status->set($percentage, $message);
+        }
+        return false;
+    }
+
 }
