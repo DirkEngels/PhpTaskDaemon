@@ -20,7 +20,10 @@ abstract class AbstractClass {
      * @return \PhpTaskDaemon\Executor\AbstractClass
      */
     public function getExecutor() {
-        return $this->_executor;
+        if (!is_a($this->_executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
+            $this->_executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
+        }
+    	return $this->_executor;
     }
 
     /**
@@ -30,10 +33,9 @@ abstract class AbstractClass {
      * @return $this
      */
     public function setExecutor($executor) {
-        if (!is_a($executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
-            $executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
+        if (is_a($executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
+            $this->_executor = $executor;
         }
-        $this->_executor = $executor;
 
         return $this;
     }
