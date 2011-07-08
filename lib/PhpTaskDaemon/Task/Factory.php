@@ -75,7 +75,7 @@ class Factory {
 	 */
 	public static function getComponentType($taskName, $objectType) {
 		// First: Check if the class has been overloaded
-		$class = $this->_getObjectClass($taskName, $objectType);
+		$class = self::_getObjectClass($taskName, $objectType);
 		if (is_object($class)) {
 			$msg = 'Created ' . $objectType . ' component using Class for task: ' . $taskName;
 			\PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
@@ -83,7 +83,7 @@ class Factory {
 		}
 
 		// Second: Check if the task has a specific configuration part
-		$config = $this->_getObjectApplicationConfig($taskName, $objectType);
+		$config = self::_getObjectApplicationConfig($taskName, $objectType);
 		if (is_object($config)) {
             $msg = 'Created ' . $objectType . ' component using Application config for task: ' . $taskName;
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
@@ -91,7 +91,7 @@ class Factory {
 		}
 		
 		// Third: Check the default config
-		$default = $this->_getObjectDefaultConfig($taskName, $objectType);
+		$default = self::_getObjectDefaultConfig($taskName, $objectType);
 		if (is_object($default)) {
             $msg = 'Created ' . $objectType . ' component using Default config for task: ' . $taskName;
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
@@ -102,7 +102,7 @@ class Factory {
         $msg = 'Created ' . $objectType . ' component using hard coded default for task: ' . $taskName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 		
-		$hardcoded = $this->_getObjectHardCoded($objectType);
+		$hardcoded = self::_getObjectHardCoded($objectType);
 		return $hardcoded;
     }
 
@@ -195,7 +195,7 @@ class Factory {
      * @return null|stdClass
      */
     protected function _getObjectClass($taskName, $objectType) {
-        $className = $this->_getClassName($taskName, $objectType);
+        $className = self::_getClassName($taskName, $objectType);
         if (class_exists($className)) {
             return new $className();
         }
@@ -211,7 +211,7 @@ class Factory {
      * @return null|stdClass
      */
     protected function _getObjectApplicationConfig($taskName, $objectType) {
-        $objectType = \PhpTaskDaemon\Daemon\Config::getTaskOption(
+        $objectType = \PhpTaskDaemon\Daemon\Config::get()->getOptionByTaskConfig(
             strtolower($objectType . '.type'), 
             $taskName
         );
