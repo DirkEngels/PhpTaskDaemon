@@ -16,281 +16,279 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * array.
  */
 class SharedMemory extends AbstractClass implements InterfaceClass {
-	/**
-	 * This variable contains the identifier string.
-	 * @var string|null
-	 */
-	protected $_pathNameWithPid = null;
+    /**
+     * This variable contains the identifier string.
+     * @var string|null
+     */
+    protected $_pathNameWithPid = null;
 
-	/**
-	 * The actual resource of the shared memory segment
-	 * @var resource
-	 */
-	protected $_sharedMemory = null;
+    /**
+     * The actual resource of the shared memory segment
+     * @var resource
+     */
+    protected $_sharedMemory = null;
 
-	/**
-	 * The semaphore needed to lock/unlock access to the shared memory
-	 * segment.
-	 * @var resource
-	 */
-	protected $_semaphoreLock = null;
-	
-	/**
-	 * 
-	 * The constructor requires an identifier which is used for attaching to a
-	 * shared memory segment.
-	 * @param string $id
-	 */
-	public function __construct($id) {
-		parent::__construct($id);
-
-		if (!strstr($id, '/')) {
-			$pathname = TMP_PATH . '/' . strtolower($id);
-		}
-		$this->_pathNameWithPid = $pathname;
-
-		// Dommel & Semaphores
-		if (!file_exists($this->_pathNameWithPid . '.sem')) {
-			touch($this->_pathNameWithPid . '.sem');
-		}
-		$this->_semaphoreLock = sem_get(
-			ftok($this->_pathNameWithPid . '.sem', 1)
-		);
-
-		// Shared Memory Segment
-		if (!file_exists($this->_pathNameWithPid . '.shm')) {
-			touch($this->_pathNameWithPid . '.shm');
-		}
-		$this->_sharedMemory = shm_attach(
-			ftok($this->_pathNameWithPid . '.shm', 2)
-		);
-
-		// Save the shared memory variable
-		sem_acquire($this->_semaphoreLock);
-		if (!shm_has_var($this->_sharedMemory, 1)) {
-			$retInit = shm_put_var($this->_sharedMemory, 1, array());
-		}
-		sem_release($this->_semaphoreLock);
-	}
+    /**
+     * The semaphore needed to lock/unlock access to the shared memory
+     * segment.
+     * @var resource
+     */
+    protected $_semaphoreLock = null;
 
 
-	/**
-	 * 
-	 * The destructor detaches the shared memory segment.
-	 */
-	public function __destruct() {
-		if (is_resource($this->_sharedMemory)) {
-			shm_detach($this->_sharedMemory);
-		}
-	}
+    /**
+     * 
+     * The constructor requires an identifier which is used for attaching to a
+     * shared memory segment.
+     * @param string $id
+     */
+    public function __construct($id) {
+        parent::__construct($id);
+
+        if (!strstr($id, '/')) {
+            $pathname = TMP_PATH . '/' . strtolower($id);
+        }
+        $this->_pathNameWithPid = $pathname;
+
+        // Dommel & Semaphores
+        if (!file_exists($this->_pathNameWithPid . '.sem')) {
+            touch($this->_pathNameWithPid . '.sem');
+        }
+        $this->_semaphoreLock = sem_get(
+            ftok($this->_pathNameWithPid . '.sem', 1)
+        );
+
+        // Shared Memory Segment
+        if (!file_exists($this->_pathNameWithPid . '.shm')) {
+            touch($this->_pathNameWithPid . '.shm');
+        }
+        $this->_sharedMemory = shm_attach(
+            ftok($this->_pathNameWithPid . '.shm', 2)
+        );
+
+        // Save the shared memory variable
+        sem_acquire($this->_semaphoreLock);
+        if (!shm_has_var($this->_sharedMemory, 1)) {
+            $retInit = shm_put_var($this->_sharedMemory, 1, array());
+        }
+        sem_release($this->_semaphoreLock);
+    }
 
 
-	/**
-	 * 
-	 * Returns an array of registered variable keys.
-	 * @return array
-	 */
-	public function getKeys() {
-		sem_acquire($this->_semaphoreLock);
-		$keys = parent::getKeys();
-		if (shm_has_var($this->_sharedMemory, 1)) {	
-			$keys = shm_get_var($this->_sharedMemory, 1);
-		}
-		sem_release($this->_semaphoreLock);
-		
-		return $keys;
-	}
+    /**
+     * 
+     * The destructor detaches the shared memory segment.
+     */
+    public function __destruct() {
+        if (is_resource($this->_sharedMemory)) {
+            shm_detach($this->_sharedMemory);
+        }
+    }
 
 
-	/**
-	 * 
-	 * Returns the value of a registered shared variable or false if it does 
-	 * not exists. 
-	 * @param string $key
-	 * @return mixed|false
-	 */
-	public function getVar($key) {
-		$key = strtolower($key);
-		
-		sem_acquire($this->_semaphoreLock);
-		$value = false;
-		$keys = shm_get_var($this->_sharedMemory, 1);
-		if (in_array($key, array_keys($keys))) {
-			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
-		}
-		sem_release($this->_semaphoreLock);
-		
-		return $value;
-	}
+    /**
+     * 
+     * Returns an array of registered variable keys.
+     * @return array
+     */
+    public function getKeys() {
+        sem_acquire($this->_semaphoreLock);
+        $keys = parent::getKeys();
+        if (shm_has_var($this->_sharedMemory, 1)) {    
+            $keys = shm_get_var($this->_sharedMemory, 1);
+        }
+        sem_release($this->_semaphoreLock);
 
-	/**
-	 * 
-	 * Sets the value of a shared variable. It registers the variable key when
-	 * it does not yet exists.
-	 * @param string $key
-	 * @param mixed $value
-	 * @return bool
-	 */
-	public function setVar($key, $value) {
-		$key = strtolower($key);
-		
-//		echo "Setting var: " . $key . " => " . $value . "\n";
-		sem_acquire($this->_semaphoreLock);
-		// Check the first variable for keys
-		$keys = array('keys' => 1);
-		if (shm_has_var($this->_sharedMemory, 1)) {
-			$keys = shm_get_var($this->_sharedMemory, 1);
-		}
-		$retInit = true;
-
-		// Update keys
-		if (!in_array($key, array_keys($keys))) {
-			$keys[$key] = count($keys)+2;
-			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
-		}
-		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
-		sem_release($this->_semaphoreLock);
-		
-		return $retInit && $retPut;
-	}
+        return $keys;
+    }
 
 
-	/**
-	 * 
-	 * Increments the value of a shared variable.
-	 * @param string $key
-	 * @return bool|int
-	 */
-	public function incrementVar($key) {
-		$key = strtolower($key);
+    /**
+     * 
+     * Returns the value of a registered shared variable or false if it does 
+     * not exists. 
+     * @param string $key
+     * @return mixed|false
+     */
+    public function getVar($key) {
+        $key = strtolower($key);
+        sem_acquire($this->_semaphoreLock);
+        $value = false;
+        $keys = shm_get_var($this->_sharedMemory, 1);
+        if (in_array($key, array_keys($keys))) {
+            $value = shm_get_var($this->_sharedMemory, $keys[$key]);
+        }
+        sem_release($this->_semaphoreLock);
 
-		sem_acquire($this->_semaphoreLock);
-		// Check the first variable for keys
-		$keys = array('keys' => 1);
-		if (shm_has_var($this->_sharedMemory, 1)) {
-			$keys = shm_get_var($this->_sharedMemory, 1);
-		}
-		$retInit = true;
-		
-		// Update keys
-		if (in_array($key, array_keys($keys))) {
-			$value = shm_get_var($this->_sharedMemory, $keys[$key]);
-//			echo "Retrieving value: " . $value . " for key: " . $key . " (" . $keys[$key] . ")\n";
-			$value++;
-			$ret = shm_put_var($this->_sharedMemory, $keys[$key], $value);
-		} else {
-			$keys[$key] = count($keys)+2;
-			shm_put_var($this->_sharedMemory, 1, $keys);
-			$ret = shm_put_var($this->_sharedMemory, $keys[$key], 1);
-			$value = 1;
-		}
-		sem_release($this->_semaphoreLock);
+        return $value;
+    }
 
-//		echo "Incrementing key " . $key . " (" . $keys[$key] . ") to value: " . $value . "\n";
-		return $ret;
-	}
 
-	/**
-	 * 
-	 * Decrements the value of a shared variable.
-	 * @param string $key
-	 * @return bool|int
-	 */
-	public function decrementVar($key) {
-		$key = strtolower($key);
-		
-		sem_acquire($this->_semaphoreLock);
-		// Check the first variable for keys
-		$keys = array('keys' => 1);
-		if (shm_has_var($this->_sharedMemory, 1)) {
-			$keys = shm_get_var($this->_sharedMemory, 1);
-		}
-		$retInit = true;
-		
-		// Update keys
-		$value = 0;
-		if (!in_array($key, array_keys($keys))) {
-			$keys[$key] = count($keys)+2;
-			$retInit = shm_put_var($this->_sharedMemory, 1, $keys);
-		} else {
-//			if (shm_has_var($this->_sharedMemory, $keys[$key])) {
-				$value = shm_get_var($this->_sharedMemory, $keys[$key]);
-//			}
-//			echo "Getting KEY: " . $key . " = > " . $keys[$key] . " ==> " . $value . "\n";
-			$value--;
-				
-			if ($value<0) { $value = 0; }
-		}
-		$retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
-		sem_release($this->_semaphoreLock);
-		
-		return $retInit && $retPut;
-	}
-	/**
-	 * 
-	 * Removes and unregisters a registered shared variable key. 
-	 * @param string $key
-	 * @return bool|int
-	 */
-	public function removeVar($key) {
-		$key = strtolower($key);
+    /**
+     * 
+     * Sets the value of a shared variable. It registers the variable key when
+     * it does not yet exists.
+     * @param string $key
+     * @param mixed $value
+     * @return bool
+     */
+    public function setVar($key, $value) {
+        $key = strtolower($key);
+        sem_acquire($this->_semaphoreLock);
+        // Check the first variable for keys
+        $keys = array('keys' => 1);
+        if (shm_has_var($this->_sharedMemory, 1)) {
+            $keys = shm_get_var($this->_sharedMemory, 1);
+        }
+        $retInit = true;
 
-		$ret = false;
-		$keys = $this->getKeys();
-		if (isset($keys[$key])) {
-			sem_acquire($this->_semaphoreLock);
-			if (shm_has_var($this->_sharedMemory, $keys[$key])) {
-				$ret = shm_remove_var($this->_sharedMemory, $keys[$key]);
+        // Update keys
+        if (!in_array($key, array_keys($keys))) {
+            $keys[$key] = count($keys)+2;
+            $retInit = shm_put_var($this->_sharedMemory, 1, $keys);
+        }
+        $retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+        sem_release($this->_semaphoreLock);
 
-				// update 
-				unset($keys[$key]);
-				shm_put_var($this->_sharedMemory, 1, $keys);
-			}
-			unset($this->_keys[$key]);
-			sem_release($this->_semaphoreLock);
-		}
+        return $retInit && $retPut;
+    }
 
-		return $ret;
-	}
-	
-	/**
-	 * 
-	 * Removes a shared memory segment and semaphore
-	 * @return bool|int
-	 */
-	public function remove() {
-		return ($this->_removeSegment() && $this->_removeSemaphore());
-	}
 
-	/**
-	 * 
-	 * Removes a shared memory segment
-	 * @return bool|int
-	 */
-	private function _removeSegment() {
-		$ret = false;
-		if (is_resource($this->_sharedMemory)) {
-			if (file_exists($this->_pathNameWithPid . '.shm')) {
-				$ret = shm_remove($this->_sharedMemory);
-				unlink($this->_pathNameWithPid . '.shm');
-			}
-		}
-		return $ret;
-	}
-	
-	/**
-	 * 
-	 * Removes a semaphore required for the shared memory segment.
-	 * @return bool|int
-	 */
-	private function _removeSemaphore() {
-		$ret = false;
-		if (is_resource($this->_semaphoreLock)) {
-			if (file_exists($this->_pathNameWithPid . '.sem')) {
-				$ret = sem_remove($this->_semaphoreLock);
-				unlink($this->_pathNameWithPid . '.sem');
-			}
-		}
-		return $ret;
-	}
+    /**
+     * 
+     * Increments the value of a shared variable.
+     * @param string $key
+     * @return bool|int
+     */
+    public function incrementVar($key) {
+        $key = strtolower($key);
+
+        sem_acquire($this->_semaphoreLock);
+        // Check the first variable for keys
+        $keys = array('keys' => 1);
+        if (shm_has_var($this->_sharedMemory, 1)) {
+            $keys = shm_get_var($this->_sharedMemory, 1);
+        }
+        $retInit = true;
+
+        // Update keys
+        if (in_array($key, array_keys($keys))) {
+            $value = shm_get_var($this->_sharedMemory, $keys[$key]);
+            $value++;
+            $ret = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+        } else {
+            $keys[$key] = count($keys)+2;
+            shm_put_var($this->_sharedMemory, 1, $keys);
+            $ret = shm_put_var($this->_sharedMemory, $keys[$key], 1);
+            $value = 1;
+        }
+        sem_release($this->_semaphoreLock);
+
+        return $ret;
+    }
+
+
+    /**
+     * 
+     * Decrements the value of a shared variable.
+     * @param string $key
+     * @return bool|int
+     */
+    public function decrementVar($key) {
+        $key = strtolower($key);
+        sem_acquire($this->_semaphoreLock);
+
+        // Check the first variable for keys
+        $keys = array('keys' => 1);
+        if (shm_has_var($this->_sharedMemory, 1)) {
+            $keys = shm_get_var($this->_sharedMemory, 1);
+        }
+        $retInit = true;
+
+        // Update keys
+        $value = 0;
+        if (!in_array($key, array_keys($keys))) {
+            $keys[$key] = count($keys)+2;
+            $retInit = shm_put_var($this->_sharedMemory, 1, $keys);
+        } else {
+            $value = shm_get_var($this->_sharedMemory, $keys[$key]);
+            $value--;
+            if ($value<0) { $value = 0; }
+        }
+        $retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+        sem_release($this->_semaphoreLock);
+        
+        return $retInit && $retPut;
+    }
+
+
+    /**
+     * 
+     * Removes and unregisters a registered shared variable key. 
+     * @param string $key
+     * @return bool|int
+     */
+    public function removeVar($key) {
+        $key = strtolower($key);
+        $ret = false;
+        $keys = $this->getKeys();
+        if (isset($keys[$key])) {
+            sem_acquire($this->_semaphoreLock);
+            if (shm_has_var($this->_sharedMemory, $keys[$key])) {
+                $ret = shm_remove_var($this->_sharedMemory, $keys[$key]);
+
+                // update 
+                unset($keys[$key]);
+                shm_put_var($this->_sharedMemory, 1, $keys);
+            }
+            unset($this->_keys[$key]);
+            sem_release($this->_semaphoreLock);
+        }
+        return $ret;
+    }
+
+
+    /**
+     * 
+     * Removes a shared memory segment and semaphore
+     * @return bool|int
+     */
+    public function remove() {
+        return ($this->_removeSegment() && $this->_removeSemaphore());
+    }
+
+
+    /**
+     * 
+     * Removes a shared memory segment
+     * @return bool|int
+     */
+    private function _removeSegment() {
+        $ret = false;
+        if (is_resource($this->_sharedMemory)) {
+            if (file_exists($this->_pathNameWithPid . '.shm')) {
+                $ret = shm_remove($this->_sharedMemory);
+                unlink($this->_pathNameWithPid . '.shm');
+            }
+        }
+        return $ret;
+    }
+
+
+    /**
+     * 
+     * Removes a semaphore required for the shared memory segment.
+     * @return bool|int
+     */
+    private function _removeSemaphore() {
+        $ret = false;
+        if (is_resource($this->_semaphoreLock)) {
+            if (file_exists($this->_pathNameWithPid . '.sem')) {
+                $ret = sem_remove($this->_semaphoreLock);
+                unlink($this->_pathNameWithPid . '.sem');
+            }
+        }
+        return $ret;
+    }
+
 }

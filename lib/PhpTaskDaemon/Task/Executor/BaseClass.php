@@ -14,8 +14,9 @@ namespace PhpTaskDaemon\Task\Executor;
  * is defined.
  */
 class BaseClass extends AbstractClass implements InterfaceClass {
-	
-	public function run() {
-		return $this->getJob();
-	}
+
+    public function run() {
+        return $this->getJob();
+    }
+
 }

@@ -14,7 +14,8 @@ namespace PhpTaskDaemon\Task\Manager;
  * purposes.
  */
 class BaseClass extends AbstractClass implements InterfaceClass {
-	
-	public function execute() {
-	}
+
+    public function execute() {
+    }
+
 }

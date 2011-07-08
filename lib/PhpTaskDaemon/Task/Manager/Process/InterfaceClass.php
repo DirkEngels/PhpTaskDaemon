@@ -10,6 +10,7 @@
 namespace PhpTaskDaemon\Task\Manager\Process;
 
 interface InterfaceClass {
-	
-	public function run();
+
+    public function run();
+
 }

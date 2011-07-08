@@ -9,7 +9,7 @@
 namespace PhpTaskDaemon\Task\Executor;
 
 interface InterfaceClass {
-	
-	public function run();
+
+    public function run();
 
 }

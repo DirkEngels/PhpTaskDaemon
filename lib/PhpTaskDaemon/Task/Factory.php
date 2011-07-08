@@ -20,13 +20,13 @@ use \PhpTaskDaemon\Task\Exception as Exception;
  *
  */
 class Factory {
-	const TYPE_MANAGER = 'manager';
+    const TYPE_MANAGER = 'manager';
 
     const TYPE_TRIGGER = 'trigger';
     const TYPE_QUEUE = 'queue';
     const TYPE_STATISTICS = 'statistics';
 
-	const TYPE_PROCESS = 'process';
+    const TYPE_PROCESS = 'process';
     const TYPE_EXECUTOR = 'executor';
     const TYPE_STATUS = 'status';
 
@@ -37,10 +37,10 @@ class Factory {
      * @param $taskName
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
-	public static function get($taskName) {
-		// Base Manager
-		$manager = self::getManager($taskName);
-		
+    public static function get($taskName) {
+        // Base Manager
+        $manager = self::getManager($taskName);
+        
         // Trigger, Queue & Statistics
         $manager->setTrigger(
             self::getComponentType($taskName, self::TYPE_TRIGGER)
@@ -51,30 +51,30 @@ class Factory {
         $manager->getTrigger()->getQueue()->setStatistics(
             self::getComponentType($taskName, self::TYPE_STATISTICS)
         );
-		
-		// Process, Executor & Status
-		$manager->setProcess(
+
+        // Process, Executor & Status
+        $manager->setProcess(
             self::getComponentType($taskName, self::TYPE_PROCESS)
-		);
-		$manager->getProcess()->setExecutor(
+        );
+        $manager->getProcess()->setExecutor(
             self::getComponentType($taskName, self::TYPE_EXECUTOR)
-		);
+        );
         $manager->getProcess()->getExecutor()->setStatus(
             self::getComponentType($taskName, self::TYPE_STATUS)
         );
-		
+
         return $manager;
-	}
+    }
 
 
-	/**
-	 * Returns an object of the specified objectType based on the taskName.  
-	 * @param string $taskName
-	 * @param string $objectType
-	 * @return stdClass
-	 */
-	public static function getComponentType($taskName, $objectType) {
-		// First: Check if the class has been overloaded
+    /**
+     * Returns an object of the specified objectType based on the taskName.  
+     * @param string $taskName
+     * @param string $objectType
+     * @return stdClass
+     */
+    public static function getComponentType($taskName, $objectType) {
+        // First: Check if the class has been overloaded
         $object = self::_getObjectClass($taskName, $objectType);
 
         if (!is_object($object)) {
@@ -106,9 +106,9 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
      */
-	public static function getManagerTrigger($taskName) {
-		return self::getComponentType($taskName, self::TYPE_TRIGGER);
-	}
+    public static function getManagerTrigger($taskName) {
+        return self::getComponentType($taskName, self::TYPE_TRIGGER);
+    }
 
 
     /**
@@ -116,9 +116,9 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\Process\AbstractClass
      */
-	public static function getManagerProcess($taskName) {
-		return self::getComponentType($taskName, self::TYPE_PROCESS);
-	}
+    public static function getManagerProcess($taskName) {
+        return self::getComponentType($taskName, self::TYPE_PROCESS);
+    }
 
 
     /**
@@ -126,9 +126,9 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Executor\Status\AbstractClass
      */
-	public static function getExecutor($taskName) {
-		return self::getComponentType($taskName, self::TYPE_EXECUTOR);
-	}
+    public static function getExecutor($taskName) {
+        return self::getComponentType($taskName, self::TYPE_EXECUTOR);
+    }
 
 
     /**
@@ -141,14 +141,14 @@ class Factory {
     }
 
 
-	/**
+    /**
      * Returns the queue for the specified task
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Queue\AbstractClass
      */
-	public static function getQueue($taskName) {
-		return self::getComponentType($taskName, self::TYPE_QUEUE);
-	}
+    public static function getQueue($taskName) {
+        return self::getComponentType($taskName, self::TYPE_QUEUE);
+    }
 
 
     /**
@@ -156,7 +156,7 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass
      */
-	public static function getQueueStatistics($taskName) {
+    public static function getQueueStatistics($taskName) {
         return self::getComponentType($taskName, self::TYPE_STATISTICS);
     }
 
@@ -193,9 +193,9 @@ class Factory {
 
         $className = self::_getClassName($taskName, $objectType);
         if (class_exists($className)) {
-	        $msg = 'Found ' . $objectType . ' class component: ' . $className;
-	        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
-        	return new $className();
+            $msg = 'Found ' . $objectType . ' class component: ' . $className;
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+            return new $className();
         }
         return false;
     }
@@ -213,18 +213,18 @@ class Factory {
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
         $configType = ucfirst(
-	        \PhpTaskDaemon\Daemon\Config::get()->getTaskOption(
-	            strtolower($objectType) . '.type', 
-	            $taskName
-	        )
+            \PhpTaskDaemon\Daemon\Config::get()->getTaskOption(
+                strtolower($objectType) . '.type', 
+                $taskName
+            )
         );
         $objectClassName = '\\PhpTaskDaemon\\Task\\Manager\\' . $configType;
         $msg = 'Testing class: ' . $objectClassName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
         if (class_exists($objectClassName, true)) {
-	        $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
-	        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
-        	$object = new $objectClassName();
+            $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+            $object = new $objectClassName();
             return $object;
         }
         return false;
