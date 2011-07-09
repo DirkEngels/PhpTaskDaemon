@@ -15,5 +15,5 @@ namespace PhpTaskDaemon\Task\Queue\Statistics;
  *
  */
 class BaseClass extends AbstractClass implements InterfaceClass {
-	
+
 }

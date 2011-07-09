@@ -11,29 +11,28 @@ namespace PhpTaskDaemon\Task\Manager\Process;
 
 class Child extends AbstractClass implements InterfaceClass {
 
-	/**
-	 * Forks the task to a seperate process
-	 * @param \PhpTaskDaemon\Task\Job $job
-	 */
+    /**
+     * Forks the task to a seperate process
+     * @param \PhpTaskDaemon\Task\Job $job
+     */
     protected function run() {
         // Fork the manager
         $pid = pcntl_fork();
-        
+
         if ($pid == -1) {
-            die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
+            $err = 'Could not fork.. dunno why not... shutting down... bleep bleep.. blap...';
+            \PhpTaskDaemon\Daemon\Logger::get()->log($err, \Zend_Log::CRIT);
+            die ($err);
         } elseif ($pid) {
             // The manager waits later
             $childs++;
 
         } else {
-        	foreach($this->getJobs() as $job) {        		
-	            // Set manager input and start the manager
-	            $this->_forkTask($this->getJob());
-	            
-        	}
-            $this->log('Finished current set of tasks!!!!');
-        	
-            // Exit after finishing the forked
+            foreach($this->getJobs() as $job) {                
+                // Set manager input and start the manager
+                $this->_forkTask($this->getJob());
+            }
+            \PhpTaskDaemon\Daemon\Logger::get()->log('Finished current set of tasks! Child exits!', \Zend_Log::INFO);
             exit;
         }
     } 
