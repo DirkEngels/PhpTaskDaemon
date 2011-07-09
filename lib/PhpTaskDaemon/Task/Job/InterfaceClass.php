@@ -17,4 +17,5 @@ interface InterfaceClass {
     public function setInput($input);
     public function getOutput();
     public function setOutput($output);
+
 }

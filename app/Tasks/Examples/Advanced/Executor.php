@@ -1,6 +1,6 @@
 <?php
 
-namespace Tasks\Examples\Minimal;
+namespace Tasks\Examples\Advanced;
 
 use \PhpTaskDaemon\Task\Executor as TaskExecutor;
 use \PhpTaskDaemon\Task\Queue\Statistics;
@@ -11,7 +11,7 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         // Sleep
         $sleepTimeProgress = round($job->getInput()->getVar('sleepTime')/10);
-        $sleepTimeProgress = 100000;
+        $sleepTimeProgress = 1000;
         for ($i=1; $i<10; $i++) {
             usleep($sleepTimeProgress);
             $this->updateStatus(($i*10), 'Task data: ' . $job->getJobId());

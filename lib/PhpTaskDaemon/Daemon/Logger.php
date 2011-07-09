@@ -15,12 +15,14 @@ namespace PhpTaskDaemon\Daemon;
  */
 class Logger {
     protected static $_instance = null;
-    
+
+
     /** 
      * Protected constructor for singleton pattern
      */
     protected function __construct() {
     }
+
 
     /**
      * Singleton getter
@@ -37,4 +39,5 @@ class Logger {
 
         return self::$_instance;
     }
+
 }

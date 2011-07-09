@@ -10,11 +10,13 @@
 namespace PhpTaskDaemon\Daemon\Ipc;
 
 interface InterfaceClass {
-	public function getKeys();
-	public function getVar($key);
-	public function setVar($key, $value);
-	public function incrementVar($key);
-	public function decrementVar($key);
-	public function removeVar($key);
-	public function remove();
+
+    public function getKeys();
+    public function getVar($key);
+    public function setVar($key, $value);
+    public function incrementVar($key);
+    public function decrementVar($key);
+    public function removeVar($key);
+    public function remove();
+
 }

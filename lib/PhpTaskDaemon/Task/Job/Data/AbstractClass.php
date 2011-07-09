@@ -16,7 +16,14 @@ namespace PhpTaskDaemon\Task\Job\Data;
  * used by the managers. 
  */
 abstract class AbstractClass {
+
     protected $_data = array();
+
+
+    public function __construct($data = array()) {
+        $this->set($data);
+    }
+
 
     /**
      * Returns the data keys
@@ -24,6 +31,7 @@ abstract class AbstractClass {
     public function getKeys() {
     	return array_keys($this->_data);
     }
+
 
     /**
      * 
@@ -33,19 +41,24 @@ abstract class AbstractClass {
     public function get() {
         return $this->_data;
     }
-    
+
+
     /**
      * 
      * (Re)Sets the input array 
-     * @param array $input
+     * @param array $data
      */
-    public function set($input, $reset = false) {
-    	if ($reset) {
-    		$this->_data = $input;
-    	} else {
-            $this->_data = array_merge($this->_data, $input);
-    	}
+    public function set($data, $reset = false) {
+
+//        if ($reset) {
+if (is_array($data)) {
+            $this->_data = $data;
+}
+//        } else {
+//            $this->_data = array_merge($this->_data, $data);
+//        }
     }
+
 
     /**
      * 
@@ -58,6 +71,7 @@ abstract class AbstractClass {
         }
         return null;
     }
+
 
     /**
      * 
@@ -74,6 +88,7 @@ abstract class AbstractClass {
         return false;
     }
 
+
     /**
      * 
      * Validate the input
@@ -81,4 +96,5 @@ abstract class AbstractClass {
     public function validate() {
     	return true;
     }
+
 }

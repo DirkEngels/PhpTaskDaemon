@@ -10,7 +10,7 @@
 namespace PhpTaskDaemon\Task\Queue;
 
 interface InterfaceClass {
-	
-	public function load();
+
+    public function load();
 
 }

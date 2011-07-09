@@ -16,225 +16,217 @@ namespace PhpTaskDaemon\Task\Manager;
  */
 abstract class AbstractClass {
 
-	/**
-	 * 
-	 * Pid manager object. This class is repsonsible for storing the current, 
-	 * parent and child process IDs.
-	 * @var \PhpTaskDaemon\Daemon\Pid\Manager
-	 */
-	protected $_pidManager = null;
-	
-	/**
-	 * Queue object
-	 * @var \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
-	 */
-	protected $_trigger = null;
-	
-	/**
-	 * Executor object
-	 * @var \PhpTaskDaemon\Task\Manager\Process\AbstractClass
-	 */
-	protected $_process = null;
+    /**
+     * 
+     * Pid manager object. This class is repsonsible for storing the current, 
+     * parent and child process IDs.
+     * @var \PhpTaskDaemon\Daemon\Pid\Manager
+     */
+    protected $_pidManager = null;
 
-	/**
-	 * Time to wait in milliseconds before running the next task.
-	 * 
-	 * @var integer
-	 */
-	protected $_sleepTimeExecutor = 10;
+    /**
+     * Queue object
+     * @var \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     */
+    protected $_trigger = null;
 
-	/**
-	 * Time to wait in milliseconds before loading the queue again.
-	 * 
-	 * @var integer
-	 */
-	protected $_sleepTimeQueue = 3000000;
-	
-	/**
-	 * 
-	 * A manager requires a executor and queue object. In case of a gearman
-	 * worker the queue object is optional. 
-	 * @param \PhpTaskDaemon\Task\Executor\AbstractClass $executor
-	 * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
-	 */
-	public function __construct($executor, $queue = null) {
-		$this->getTrigger()->setQueue($queue);
-		$this->getProcess()->setExecutor($executor);
-	}
+    /**
+     * Executor object
+     * @var \PhpTaskDaemon\Task\Manager\Process\AbstractClass
+     */
+    protected $_process = null;
 
-	/**
-	 * 
-	 * Destroy the shared memory object
-	 */	
-	public function __destruct() {
-	}
+    /**
+     * Time to wait in milliseconds before running the next task.
+     * 
+     * @var integer
+     */
+    protected $_sleepTimeExecutor = 10;
 
-	/**
-	 * 
-	 * Initializes the pid manager
-	 * @param int $parentPid
-	 */
-	public function init($parentPid = null) {
-		$this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
-			getmypid(), 
-			$parentPid
-		);
-	}
+    /**
+     * Time to wait in milliseconds before loading the queue again.
+     * 
+     * @var integer
+     */
+    protected $_sleepTimeQueue = 3000000;
 
-	/**
-	 * 
-	 * Returns the pid manager of the task manager
-	 * @return \PhpTaskDaemon\Pid\Manager
-	 */
-	public function getPidManager() {
-		return $this->_pidManager;
-	}
-	
-	/**
-	 * 
-	 * Sets the pid manager of the task manager
-	 * @param \PhpTaskDaemon\Pid\Manager $pidManager
-	 * @return $this
-	 */
-	public function setPidManager(\PhpTaskDaemon\Daemon\Pid\Manager $pidManager) {
-		$this->_pidManager = $pidManager;
-		return $this;
-	}
 
-	/**
-	 * 
-	 * Returns the current loaded queue array
-	 * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
-	 */
-	public function getTrigger() {
+    /**
+     * 
+     * Initializes the pid manager
+     * @param int $parentPid
+     */
+    public function init($parentPid = null) {
+        $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
+            getmypid(), 
+            $parentPid
+        );
+    }
+
+
+    /**
+     * 
+     * Returns the pid manager of the task manager
+     * @return \PhpTaskDaemon\Pid\Manager
+     */
+    public function getPidManager() {
+        return $this->_pidManager;
+    }
+
+
+    /**
+     * 
+     * Sets the pid manager of the task manager
+     * @param \PhpTaskDaemon\Pid\Manager $pidManager
+     * @return $this
+     */
+    public function setPidManager(\PhpTaskDaemon\Daemon\Pid\Manager $pidManager) {
+        $this->_pidManager = $pidManager;
+        return $this;
+    }
+
+
+    /**
+     * 
+     * Returns the current loaded queue array
+     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     */
+    public function getTrigger() {
         if (!is_a($this->_trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
             $this->_trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
         }
-		return $this->_trigger;
-	}
+        return $this->_trigger;
+    }
 
-	/**
-	 * 
-	 * Sets the current queue to process.
-	 * @param \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass $trigger
-	 * @return $this
-	 */
-	public function setTrigger($trigger) {
-		if (!is_a($trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
-			$trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
-		}
-		$this->_trigger = $trigger;
 
-		return $this;
-	}
+    /**
+     * 
+     * Sets the current queue to process.
+     * @param \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass $trigger
+     * @return $this
+     */
+    public function setTrigger($trigger) {
+        if (!is_a($trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
+            $trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+        }
+        $this->_trigger = $trigger;
 
-	/**
-	 * 
-	 * Returns the process object
-	 * @return \PhpTaskDaemon\Task\Manager\AbstractClass
-	 */
-	public function getProcess() {
+        return $this;
+    }
+
+
+    /**
+     * 
+     * Returns the process object
+     * @return \PhpTaskDaemon\Task\Manager\Process\AbstractClass
+     */
+    public function getProcess() {
         if (!is_a($this->_process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
             $this->_process = new \PhpTaskDaemon\Task\Manager\Process\Same();
         }
-		return $this->_process;
-	}
-
-	/**
-	 * 
-	 * Sets the current executor object.
-	 * @param \PhpTaskDaemon\Executor\AbstractClass $executor
-	 * @return $this
-	 */
-	public function setProcess($process) {
-		if (!is_a($process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
-			$process = new \PhpTaskDaemon\Task\Manager\Process\Same();
-		}
-		$this->_process = $process;
-
-		return $this;
-	}
+        return $this->_process;
+    }
 
 
-	/**
-	 * 
-	 * Starts the manager
-	 */
-	public function runManager() {
-		// Override signal handler
-		$this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
-			get_class($this),
-			array(&$this, 'sigHandler')
-		);
+    /**
+     * 
+     * Sets the current executor object.
+     * @param \PhpTaskDaemon\Task\Manager\Process\AbstractClass $process
+     * @return $this
+     */
+    public function setProcess($process) {
+        if (!is_a($process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
+            $process = new \PhpTaskDaemon\Task\Manager\Process\Same();
+        }
+        $this->_process = $process;
 
-		if ($this->getPidManager() === null) {
-			$this->setPidManager($this->_pidManager);
-		}
-		$this->execute();
-	}
+        return $this;
+    }
 
-	/**
-	 * 
-	 * POSIX Signal handler callback
-	 * @param $sig
-	 */
-	public function sigHandler($sig) {
-		switch ($sig) {
-			case SIGTERM:
-				// Shutdown
-				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
-				break;
-			case SIGCHLD:
-				// Halt
-				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);		
-				while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
-				break;
-			case SIGINT:
-				// Shutdown
-				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
-				break;
-			default:
-				\PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
-				break;
-		}
-		exit;
-	}
 
-	/**
-	 * 
-	 * Process a single task: set job input, reset status, run and update
-	 * statistics
-	 * @param \PhpTaskDaemon\Task\Job\AbstractClass $job
-	 */
-	protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
-		// Set manager input
- 		\PhpTaskDaemon\Daemon\Logger::get()->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
-		$this->getExecutor()->setJob($job);
-		
-		// Update Status before and after running the task
-		$this->getExecutor()->updateStatus(0);
-		$job = $this->getExecutor()->run();
-		$this->getExecutor()->updateStatus(100);
-		
-		// Log and sleep for a while
-		usleep($this->_sleepTimeExecutor);
-		\PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutputVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);			
-		$this->getQueue()->updateStatistics($job->getOutputVar('returnStatus'));
+    /**
+     * 
+     * Starts the manager
+     */
+    public function runManager() {
+        // Override signal handler
+        $this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
+            get_class($this),
+            array(&$this, 'sigHandler')
+        );
 
-		// Reset status and decrement queue
-		$this->getExecutor()->updateStatus(0);
-		$this->getQueue()->updateQueue();
+        if ($this->getPidManager() === null) {
+            $this->setPidManager($this->_pidManager);
+        }
+        $this->execute();
+    }
 
-		return $job->getOutputVar('returnStatus');
-	}
 
-	/**
-	 * 
-	 * The sleep function for an interval manager
-	 */
-	protected function _sleep() {
-		// Sleep
-		\PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
-		usleep($this->_sleepTimeQueue);
-	}
+    /**
+     * 
+     * POSIX Signal handler callback
+     * @param $sig
+     */
+    public function sigHandler($sig) {
+        switch ($sig) {
+            case SIGTERM:
+                // Shutdown
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
+                break;
+            case SIGCHLD:
+                // Halt
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);        
+                while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
+                break;
+            case SIGINT:
+                // Shutdown
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
+                break;
+            default:
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
+                break;
+        }
+        exit;
+    }
+
+
+    /**
+     * 
+     * Process a single task: set job input, reset status, run and update
+     * statistics
+     * @param \PhpTaskDaemon\Task\Job\AbstractClass $job
+     */
+    protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
+        // Set manager input
+         \PhpTaskDaemon\Daemon\Logger::get()->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
+        $this->getProcess()->getExecutor()->setJob($job);
+
+        // Update Status before and after running the task
+        $this->getProcess()->getExecutor()->updateStatus(0);
+        $job = $this->getProcess()->getExecutor()->run();
+        $this->getProcess()->getExecutor()->updateStatus(100);
+
+        // Log and sleep for a while
+        usleep($this->_sleepTimeExecutor);
+        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
+        $this->getTrigger()->getQueue()->updateStatistics($job->getOutput()->getVar('returnStatus'));
+
+        // Reset status and decrement queue
+        $this->getProcess()->getExecutor()->updateStatus(0);
+        $this->getTrigger()->getQueue()->updateQueue();
+
+        return $job->getOutput()->getVar('returnStatus');
+    }
+
+
+    /**
+     * 
+     * The sleep function for an interval manager
+     */
+    protected function _sleep() {
+        // Sleep
+        \PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
+        usleep($this->_sleepTimeQueue);
+    }
+
 }

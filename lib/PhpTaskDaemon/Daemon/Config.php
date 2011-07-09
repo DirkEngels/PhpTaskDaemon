@@ -37,14 +37,19 @@ class Config {
     }
 
 
+    /**
+     * Initializes the configuration by loading one or more (default)
+     * configuration files
+     * @param array $configFiles
+     */
     protected function _initConfig($configFiles) {
         // Add default configuration
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/app.ini'));
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/defaults.ini'));
         array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/daemon.ini'));
-        
+
         foreach($configFiles as $configFile) {
-        	Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
+            Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
             if (!file_exists($configFile)) {
                 Logger::get()->log("Config file does not exists: " . $configFile, \Zend_Log::ERR);
                 continue;
@@ -69,7 +74,7 @@ class Config {
             Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::INFO);
         }
         $this->_config->setReadonly();
-}
+    }
 
 
     /**
@@ -78,7 +83,7 @@ class Config {
      */
     public function get($configFiles = array()) {
         if (!self::$_instance) {
-        	Logger::get()->log("Creating new config object", \Zend_Log::DEBUG);
+            Logger::get()->log("Creating new config object", \Zend_Log::DEBUG);
             self::$_instance = new self($configFiles);
         }
 
@@ -112,7 +117,7 @@ class Config {
      * @param string $taskName
      * @param null|string
      */
-	public function getOption($option, $taskName = null) {
+    public function getOption($option, $taskName = null) {
         $value = null;
 
         if (!is_null($taskName)) {
@@ -133,9 +138,8 @@ class Config {
 
 
     /**
-     * Returns the Ret
-     * @param $option
-     * @param $taskName
+     * Returns the daemon configuration setting for $option
+     * @param string $option
      */
     public function getDaemonOption($option) {
         Logger::get()->log('Trying daemon config option: ' . $option, \Zend_Log::DEBUG);
@@ -143,14 +147,19 @@ class Config {
     }
 
 
+    /**
+     * Returns the task (specific or default) configuration for $option
+     * @param string $option
+     * @param string $taskName
+     */
     public function getTaskOption($option, $taskName = null) {
-    	if (!is_null($taskName)) {
-	    	try {
-	            $value = $this->getTaskSpecificOption($option, $taskName);
-	    	} catch (\Exception $e) {
-	            \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::DEBUG);
-	    	}
-    	}
+        if (!is_null($taskName)) {
+            try {
+                $value = $this->getTaskSpecificOption($option, $taskName);
+            } catch (\Exception $e) {
+                \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::DEBUG);
+            }
+        }
 
         if (!isset($value)) {
             $value = $this->getTaskDefaultOption($option);
@@ -162,7 +171,8 @@ class Config {
 
     /**
      * Returns the default task configuration option
-     * @param $option
+     * @param string $option
+     * @return null|mixed
      */
     public function getTaskDefaultOption($option) {
         $value = null;
@@ -178,8 +188,9 @@ class Config {
 
     /**
      * Returns the Ret
-     * @param $option
-     * @param $taskName
+     * @param string $option
+     * @param string $taskName
+     * @return null|mixed
      */
     public function getTaskSpecificOption($option, $taskName) {
         Logger::get()->log('Trying task config option: tasks.' . $this->_prepareString($taskName) . '.' . $option, \Zend_Log::DEBUG);
@@ -207,7 +218,15 @@ class Config {
         return $config;
     }
 
+
+    /**
+     * Prepares the string by replacing slashes with dots and makes the string
+     * lowercase. 
+     * @param string $string
+     * @return string
+     */
     protected function _prepareString($string) {
         return strtolower( str_replace('/', '.', $string) );
     }
+
 }

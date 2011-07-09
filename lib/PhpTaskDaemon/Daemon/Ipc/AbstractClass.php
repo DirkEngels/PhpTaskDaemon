@@ -15,42 +15,62 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * 
  */
 abstract class AbstractClass {
-	protected $_id = null;
 
-	public function __construct($id) {
-		$this->_id = $id;
-		return true;
-	}
-	
-	public function getId() {
-		return $this->_id;
-	}
+    /**
+     * Unique identifier
+     * @var string
+     */
+    protected $_id = null;
 
-	/**
-	 * This array contains the keys of all registered variables.
-	 * @var array
-	 */
-	protected $_keys = array();
 
-	/**
-	 * 
-	 * Returns the registered keys.
-	 * @return array
-	 */
-	public function getKeys() {
-		return $this->_keys;
-	}
+    /**
+     * This array contains the keys of all registered variables.
+     * @var array
+     */
+    protected $_keys = array();
 
-	/**
-	 * Returns all the registered keys with corresponding values.
-	 * @return array
-	 */
-	public function get() {
-		$keys = $this->getKeys();
-		$data = array();
-		foreach($keys as $nr => $key) {
-			$data[$nr] = $this->getVar($nr);
-		}
-		return $data;
-	}
-}	
+
+    /**
+     * 
+     * Constructs a new unique (id) Ipc object
+     * @param string $id
+     */
+    public function __construct($id) {
+        $this->_id = $id;
+        return true;
+    }
+
+
+    /**
+     * Returns the unique identifier
+     * @return string
+     */
+    public function getId() {
+        return $this->_id;
+    }
+
+
+    /**
+     * 
+     * Returns the registered keys.
+     * @return array
+     */
+    public function getKeys() {
+        return $this->_keys;
+    }
+
+
+    /**
+     * Returns all the registered keys with corresponding values.
+     * @return array
+     */
+    public function get() {
+        $keys = $this->getKeys();
+        $data = array();
+        foreach($keys as $nr => $key) {
+            $data[$nr] = $this->getVar($nr);
+        }
+        return $data;
+    }
+
+}
