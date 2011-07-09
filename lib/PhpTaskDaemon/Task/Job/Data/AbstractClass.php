@@ -20,6 +20,11 @@ abstract class AbstractClass {
     protected $_data = array();
 
 
+    public function __construct($data = array()) {
+        $this->set($data);
+    }
+
+
     /**
      * Returns the data keys
      */
@@ -41,14 +46,17 @@ abstract class AbstractClass {
     /**
      * 
      * (Re)Sets the input array 
-     * @param array $input
+     * @param array $data
      */
-    public function set($input, $reset = false) {
-        if ($reset) {
-            $this->_data = $input;
-        } else {
-            $this->_data = array_merge($this->_data, $input);
-        }
+    public function set($data, $reset = false) {
+
+//        if ($reset) {
+if (is_array($data)) {
+            $this->_data = $data;
+}
+//        } else {
+//            $this->_data = array_merge($this->_data, $data);
+//        }
     }
 
 
