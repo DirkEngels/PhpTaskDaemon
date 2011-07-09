@@ -37,6 +37,7 @@ Version 0.8 (planned)
 - Add example application (example)
     - Minimal
 - Deliver a runnable project (runnable)
++ Review coding style (coding-style)
 - Review/Fix current unit tests (tests)
 
 

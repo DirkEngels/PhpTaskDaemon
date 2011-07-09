@@ -18,7 +18,7 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the executor object
-     * @return \PhpTaskDaemon\Executor\AbstractClass
+     * @return \PhpTaskDaemon\Task\Executor\AbstractClass
      */
     public function getExecutor() {
         if (!is_a($this->_executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
@@ -31,7 +31,7 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current executor object.
-     * @param \PhpTaskDaemon\Executor\AbstractClass $executor
+     * @param \PhpTaskDaemon\Task\Executor\AbstractClass $executor
      * @return $this
      */
     public function setExecutor($executor) {
