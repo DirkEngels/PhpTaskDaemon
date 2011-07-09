@@ -35,8 +35,8 @@ Version 0.8 (planned)
 - Review/Fix current unit tests (tests)
 
 
-Version 0.7.1 (planned)
----------------------
+Version 0.7.1 (09-07-2011)
+==========================
 + Refactor code to use Logger component (logger)
 + Implement Task\Factory component (factory)
 + Implement task loading (loader)
@@ -46,7 +46,7 @@ Version 0.7.1 (planned)
 
 
 Version 0.7 (05-07-2011)
-========================
+------------------------
 + Add Daemon\Logger component
 + Add Daemon\Config component
 + Add Task\Job\Data component
