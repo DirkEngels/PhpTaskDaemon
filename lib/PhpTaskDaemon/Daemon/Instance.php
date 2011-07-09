@@ -182,15 +182,15 @@ class Instance {
             \PhpTaskDaemon\Daemon\Logger::get()->log("No daemon tasks found", \Zend_Log::INFO);
             exit;
         }
+        \PhpTaskDaemon\Daemon\Logger::get()->log("Found " . count($this->_managers) . " daemon tasks", \Zend_Log::INFO);
 
         $this->_ipc->setVar('childs', array());
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Starting daemon tasks", \Zend_Log::DEBUG);
         foreach ($this->_managers as $manager) {
             \PhpTaskDaemon\Daemon\Logger::get()->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
             try {
                 $this->_forkManager($manager);
             } catch (Exception $e) {
-                echo $e->getMessage();
+                \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::CRIT);
                 exit;
             }
         }
@@ -206,9 +206,9 @@ class Instance {
         $this->_ipc->setVar('childs', $this->_pidManager->getChilds());
 
         // Wait till all childs are done
+        \PhpTaskDaemon\Daemon\Logger::get()->log("Waiting for childs to complete", \Zend_Log::NOTICE);
         while (pcntl_waitpid(0, $status) != -1) {
             $status = pcntl_wexitstatus($status);
-            \PhpTaskDaemon\Daemon\Logger::get()->log("Child $status completed", \Zend_Log::NOTICE);
         }
         \PhpTaskDaemon\Daemon\Logger::get()->log("Running done.", \Zend_Log::NOTICE);
 
