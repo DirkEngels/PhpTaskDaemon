@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Task\Queue;
 
+use \PhpTaskDaemon\Task\Job;
+
 /**
  * 
  * The base class implements an example load method. The base class will also 
@@ -18,11 +20,23 @@ class BaseClass extends AbstractClass implements InterfaceClass {
 
     public function load() {
         $queue = array(
-            new \PhpTaskDaemon\Task\Job\BaseClass(
-                'base-1',array('sleepTime' => 100000)
+            new Job\BaseClass(
+                'base-1',
+                new Job\Data\BaseClass(
+                    array('sleepTime' => 100000)
+                )
             ),
-            new \PhpTaskDaemon\Task\Job\BaseClass(
-                'base-2',array('sleepTime' => 300000)
+            new Job\BaseClass(
+                'base-2',
+                new Job\Data\BaseClass(
+                    array('sleepTime' => 500000)
+                )
+            ),
+            new Job\BaseClass(
+                'base-3',
+                new Job\Data\BaseClass(
+                    array('sleepTime' => 1000000)
+                )
             )
         );
         return $queue;
