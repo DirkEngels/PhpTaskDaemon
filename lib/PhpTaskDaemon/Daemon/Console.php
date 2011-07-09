@@ -68,7 +68,7 @@ class Console {
                     'action|a=s'        => 'Action (default: start) (options: start, stop, restart, status, monitor)',
                     'list-tasks|lt'     => 'List tasks',
                     'settings|s'        => 'Display tasks settings',
-//                    'task|t=s'             => 'Run single task',
+                    'task|t=s'             => 'Run single task',
                     'verbose|v-i'            => 'Verbose (level: 5)',
                     'help|h'              => 'Show help message (this message)',
                 )
@@ -243,6 +243,14 @@ class Console {
                 APPLICATION_PATH . '/Tasks/'
             )
         );
+        if ($this->_consoleOpts->getOption('task')) {
+            // Reset tasks & set single one (if found) 
+            if (in_array($this->_consoleOpts->getOption('task'), $tasks)) {
+                $tasks = array($this->_consoleOpts->getOption('task'));
+            } else {
+                $tasks = array();
+            }
+        }
         \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
         return $tasks;
     }
@@ -309,7 +317,7 @@ class Console {
 
             // Initialize Configuration
             $this->_initConfig();
-            
+
             // List Tasks & exit (--list-tasks)
             $this->listTasks();
 
@@ -328,7 +336,7 @@ class Console {
                 exit;
             }
             $this->help();
-            
+
         } catch (\Exception $e) {
             Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
