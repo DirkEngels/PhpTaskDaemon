@@ -118,7 +118,7 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the process object
-     * @return \PhpTaskDaemon\Task\Manager\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Process\AbstractClass
      */
     public function getProcess() {
         if (!is_a($this->_process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
@@ -131,7 +131,7 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current executor object.
-     * @param \PhpTaskDaemon\Executor\AbstractClass $executor
+     * @param \PhpTaskDaemon\Task\Manager\Process\AbstractClass $process
      * @return $this
      */
     public function setProcess($process) {
@@ -199,23 +199,23 @@ abstract class AbstractClass {
     protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
         // Set manager input
          \PhpTaskDaemon\Daemon\Logger::get()->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
-        $this->getExecutor()->setJob($job);
+        $this->getProcess()->getExecutor()->setJob($job);
 
         // Update Status before and after running the task
-        $this->getExecutor()->updateStatus(0);
-        $job = $this->getExecutor()->run();
-        $this->getExecutor()->updateStatus(100);
+        $this->getProcess()->getExecutor()->updateStatus(0);
+        $job = $this->getProcess()->getExecutor()->run();
+        $this->getProcess()->getExecutor()->updateStatus(100);
 
         // Log and sleep for a while
         usleep($this->_sleepTimeExecutor);
-        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutputVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
-        $this->getQueue()->updateStatistics($job->getOutputVar('returnStatus'));
+        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
+        $this->getTrigger()->getQueue()->updateStatistics($job->getOutput()->getVar('returnStatus'));
 
         // Reset status and decrement queue
-        $this->getExecutor()->updateStatus(0);
-        $this->getQueue()->updateQueue();
+        $this->getProcess()->getExecutor()->updateStatus(0);
+        $this->getTrigger()->getQueue()->updateQueue();
 
-        return $job->getOutputVar('returnStatus');
+        return $job->getOutput()->getVar('returnStatus');
     }
 
 
