@@ -30,15 +30,19 @@ abstract class AbstractClass {
      * @param string $jobId
      * @param array $input 
      */
-    public function __construct($jobId = null, Data\AbstractClass $input = null) {
+    public function __construct($jobId = null, $inputData = null) {
         if ($jobId === null) {
             $jobId = $this::generateJobId();
         }
-        if ($input === null) {
-            $input = new Data\BaseClass();
+
+        $input = new \PhpTaskDaemon\Task\Job\Data\BaseClass();
+        if (is_array($inputData)) {
+            $input->set($inputData);
         }
+
         $this->setJobId($jobId);
         $this->setInput($input);
+        $this->_output = new \PhpTaskDaemon\Task\Job\Data\BaseClass();
     }
 
 
@@ -79,8 +83,8 @@ abstract class AbstractClass {
 
     /**
      * 
-     * Returns an array with input variables
-     * @return array
+     * Returns an data object with input variables
+     * @return \PhpTaskDaemon\Task\Job\Data
      */
     public function getInput() {
         return $this->_input;
@@ -90,17 +94,22 @@ abstract class AbstractClass {
     /**
      * 
      * (Re)Sets the input array 
-     * @param array $input
+     * @param \PhpTaskDaemon\Task\Job\Data $input
+     * @return bool
      */
     public function setInput($input) {
-        $this->_input->set($input);
+        if (is_a($input, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
+            $this->_input = $input;
+            return true; 
+        }
+        return false;
     }
 
 
     /**
      * 
-     * Returns an array with output variables
-     * @return array
+     * Returns an data object with output variables
+     * @return \PhpTaskDaemon\Task\Job\Data
      */
     public function getOutput() {
         return $this->_output;
@@ -110,10 +119,15 @@ abstract class AbstractClass {
     /**
      * 
      * (Re)Sets the output array 
-     * @param array $output
+     * @param \PhpTaskDaemon\Task\Job\Data $output
+     * @return bool
      */
-    public function setOutput(Data\AbstractClass $output) {
-        $this->_output->set($output);
+    public function setOutput($output) {
+        if (is_a($output, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
+            $this->_output = $output;
+            return true; 
+        }
+        return false;
     }
 
 }

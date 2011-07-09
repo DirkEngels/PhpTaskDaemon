@@ -2,15 +2,16 @@
 
 namespace Tasks\Examples\Minimal;
 
-use \PhpTaskDaemon\Task\Executor as PTDTE;
+use \PhpTaskDaemon\Task\Executor as TaskExecutor;
+use \PhpTaskDaemon\Task\Queue\Statistics;
 
-class Executor extends PTDTE\AbstractClass implements PTDTE\InterfaceClass {
+class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
     public function run() {
         $job = $this->getJob();
-        $input = $job->getInput();
 
         // Sleep
-        $sleepTimeProgress = round($job->getInputVar('sleepTime')/10);
+        $sleepTimeProgress = round($job->getInput()->getVar('sleepTime')/10);
+        $sleepTimeProgress = 100000;
         for ($i=1; $i<10; $i++) {
             usleep($sleepTimeProgress);
             $this->updateStatus(($i*10), 'Task data: ' . $job->getJobId());
@@ -18,15 +19,17 @@ class Executor extends PTDTE\AbstractClass implements PTDTE\InterfaceClass {
 
         // Return Status
         $returnStatus = (rand(0,1)==1) 
-            ? PTDTQS\BaseClass::STATUS_DONE 
-            : PTDTQS\BaseClass::STATUS_FAILED;
+            ? Statistics\BaseClass::STATUS_DONE 
+            : Statistics\BaseClass::STATUS_FAILED;
 
         // Output
-        $job->setOutput(array(
-            'returnStatus' => $returnStatus,
-            'waitTime' => rand(1,5)
-        ));
-        
+        $job->setOutput(
+            array(
+                'returnStatus' => $returnStatus,
+                'waitTime' => rand(1,5)
+            )
+        );
+
         return $job;
     }
 }
