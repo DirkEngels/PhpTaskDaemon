@@ -28,15 +28,15 @@ Version 0.9 (planned)
 
 Version 0.8 (planned)
 ---------------------
-- Refactor code to use Logger component (logger)
++ Refactor code to use Logger component (logger)
 + Implement Task\Factory component (factory)
-- Implement task loading (loader)
-    - Using classes
-    - Using config file
++ Implement task loading (loader)
+    + Using classes
+    + Using config file
 - Add exception handling (exception)
-- Add example application (example)
-    - Minimal
-- Deliver a runnable project (runnable)
++ Add example application (example)
+    + Minimal
++ Deliver a runnable project (runnable)
 + Review coding style (coding-style)
 - Review/Fix current unit tests (tests)
 
