@@ -9,7 +9,6 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
     public function run() {
         $job = $this->getJob();
 
-        echo var_dump($job->getInput());
         // Sleep
         $sleepTimeProgress = round($job->getInput()->getVar('sleepTime')/10);
         $sleepTimeProgress = 100000;
