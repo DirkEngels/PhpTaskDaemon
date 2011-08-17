@@ -52,22 +52,22 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertInternalType('array', $this->_statistics->get());
 	}
 	public function testGetStatus() {
-		$this->assertEquals(0, $this->_statistics->get('otherstatus'));
+		$this->assertEquals(null, $this->_statistics->get('otherstatus'));
 	}
 	public function testSetStatusCountNoArguments() {
 		$this->assertTrue($this->_statistics->setStatusCount());
-		$this->assertEquals(0, $this->_statistics->get('otherstatus'));
-		$this->assertEquals(0, $this->_statistics->get('loaded'));
+		$this->assertEquals(null, $this->_statistics->get('otherstatus'));
+		$this->assertEquals(null, $this->_statistics->get('loaded'));
 	}
 	public function testSetStatusCountStatusArgument() {
 		$this->assertTrue($this->_statistics->setStatusCount('total'));
-		$this->assertEquals(0, $this->_statistics->get('total'));
-		$this->assertEquals(0, $this->_statistics->get('loaded'));
+		$this->assertEquals(null, $this->_statistics->get('total'));
+		$this->assertEquals(null, $this->_statistics->get('loaded'));
 	}
 	public function testSetStatusCountStatusAndCountArgument() {
 		$this->assertTrue($this->_statistics->setStatusCount('total', 3));
 		$this->assertEquals(3, $this->_statistics->get('total'));
-		$this->assertEquals(0, $this->_statistics->get('loaded'));
+		$this->assertEquals(null, $this->_statistics->get('loaded'));
 	}
 	public function testIncrementStatusNoArguments() {
 		$this->_statistics->setIpc($this->_ipc);
