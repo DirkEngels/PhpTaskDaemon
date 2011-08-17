@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="./tests/bootstrap.php" colors="true">
+
+  <testsuite name="PlugWeb-Driver">
+    <directory>./tests/app/</directory>
+    <directory>./tests/lib/</directory>
+  </testsuite>
+
+  <logging>
+    <log type="coverage-html" target="build/coverage" title="Name of Project"
+      charset="UTF-8" yui="true" highlight="true"
+      lowUpperBound="35" highLowerBound="70"/>
+    <log type="coverage-clover" target="build/logs/clover.xml"/>
+    <log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false"/>
+  </logging>
+
+  <filter>
+    <blacklist>
+      <directory>/usr/share/php/libzend-framework-php/</directory>
+    </blacklist>
+  </filter>
+
+</phpunit>
