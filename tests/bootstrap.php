@@ -10,7 +10,8 @@ $includePaths = array(
     get_include_path(),
     \LIBRARY_PATH, 
     '/usr/share/php/',
-    '/usr/share/php/libzend-framework-php/'
+    '/usr/share/php/libzend-framework-php/',
+    '/usr/share/php/PHPUnit/',
 );
 set_include_path(
     implode(
