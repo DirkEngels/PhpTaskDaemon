@@ -35,6 +35,11 @@ Version 0.8 (planned)
 
 Version 0.7.2 (17-08-2011)
 ==========================
++ Add build.xml script for CI environment
+
+
+Version 0.7.2 (17-08-2011)
+--------------------------
 + Add example application (example)
     + Minimal
 + Deliver a runnable project (runnable)
