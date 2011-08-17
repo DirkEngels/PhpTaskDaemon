@@ -33,7 +33,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	}
 	
 	public function testConstructor() {
-		$this->assertEquals(2, sizeof($this->_queue->load()));
+		$this->assertEquals(3, sizeof($this->_queue->load()));
 	}
 	public function testSetStatistics() {
 		$this->assertNull($this->_queue->getStatistics());
