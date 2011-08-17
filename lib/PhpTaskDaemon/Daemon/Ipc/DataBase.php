@@ -17,6 +17,31 @@ namespace PhpTaskDaemon\Daemon\Ipc;
 class DataBase extends AbstractClass implements InterfaceClass {
 
     /**
+     * PDO Object
+     * @var PDO
+     */
+    protected $_pdo;
+
+
+    /**
+     * Getter for the PDO object
+     * @return \PDO
+     */
+    public function getPdo() {
+        return $this->_pdo;
+    }
+
+
+    /**
+     * Setter of the PDO object
+     * @param $pdo \PDO
+     */
+    public function setJob($pdo) {
+        $this->_pdo = $pdo;
+    }
+
+
+    /**
      * 
      * Returns an empty array
      * @return array
@@ -34,6 +59,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
      */
     public function getVar($key) {
         $sql = "SELECT value FROM ipc WHERE key='" . $key . "'";
+//        $row = $this->getPdo()->query($sql);
         $row = mysql_fetch_array($this->_queryDataBase($sql));
         return $row['value'];
     }

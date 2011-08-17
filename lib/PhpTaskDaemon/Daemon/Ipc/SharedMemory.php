@@ -47,7 +47,10 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
 
         if (!strstr($id, '/')) {
             $pathname = TMP_PATH . '/' . strtolower($id);
+        } else {
+            $pathname = $id;
         }
+
         $this->_pathNameWithPid = $pathname;
 
         // Dommel & Semaphores

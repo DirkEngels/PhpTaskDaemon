@@ -30,10 +30,10 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 }
 	
 	public function testConstructor() {
-		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
-		$this->assertEquals($this->_executor, $this->_manager->getExecutor());
-		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getQueue());
-		$this->assertEquals($this->_queue, $this->_manager->getQueue());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
+		$this->assertEquals($this->_executor, $this->_manager->getProcess()->getExecutor());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTrigger()->getQueue());
+		$this->assertEquals($this->_queue, $this->_manager->getTrigger()->getQueue());
 	}
 	public function testInitNoArguments() {
 		$this->_manager->init();
@@ -47,12 +47,6 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertEquals(getmypid(), $this->_manager->getPidManager()->getCurrent());
 		$this->assertEquals(1234, $this->_manager->getPidManager()->getParent());
 	}
-	public function testSetLog() {
-		$log = new \Zend_Log();
-		$this->assertNull($this->_manager->getLog());
-		$this->_manager->setLog($log);
-		$this->assertEquals($log, $this->_manager->getLog());
-	}
 	public function testSetPidManager() {
 		$pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager();
 		$this->assertNull($this->_manager->getPidManager());
@@ -60,25 +54,18 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertEquals($pidManager, $this->_manager->getPidManager());
 	}
 	public function testSetQueue() {
-		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getQueue());
-		$this->_manager->setQueue($this->_queue);
-		$this->assertEquals($this->_queue, $this->_manager->getQueue());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTrigger()->getQueue());
+		$this->_manager->getTrigger()->setQueue($this->_queue);
+		$this->assertEquals($this->_queue, $this->_manager->getTrigger()->getQueue());
 	}
 	public function testSetExecutor() {
-		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
-		$this->_manager->setExecutor($this->_executor);
-		$this->assertEquals($this->_executor, $this->_manager->getExecutor());
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
+		$this->_manager->getProcess()->setExecutor($this->_executor);
+		$this->assertEquals($this->_executor, $this->_manager->getProcess()->getExecutor());
 	}
 	public function testSetExecutorIncorrectExecutor() {
-		$this->_manager->setExecutor('no executor object');
-		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getExecutor());
-		$this->assertEquals($this->_executor, $this->_manager->getExecutor());
-	}
-	public function testLog() {
-		$this->assertFalse($this->_manager->log('test log message', \Zend_Log::INFO));
-		$writer = new \Zend_Log_Writer_Null();
-		$log = new \Zend_Log($writer);
-		$this->_manager->setLog($log);
-		$this->assertNull($this->_manager->log('test log message', \Zend_Log::INFO));
+		$this->_manager->getProcess()->setExecutor('no executor object');
+		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
+		$this->assertEquals($this->_executor, $this->_manager->getProcess()->getExecutor());
 	}
 }

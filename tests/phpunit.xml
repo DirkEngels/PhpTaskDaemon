@@ -11,4 +11,9 @@
       <directory>/usr/share/php/libzend-framework-php/</directory>
     </blacklist>
   </filter>
+
+  <logging>
+    <log type="coverage-html" target="./log/coverage" charset="UTF-8" 
+      yui="true" highlight="false" lowUpperBound="35" highLowerBound="70" />
+  </logging>
 </phpunit>
