@@ -49,14 +49,16 @@ abstract class AbstractClass {
      * @param array $data
      */
     public function set($data, $reset = false) {
-
-//        if ($reset) {
-if (is_array($data)) {
-            $this->_data = $data;
-}
-//        } else {
-//            $this->_data = array_merge($this->_data, $data);
-//        }
+        if ($reset) {
+            if (is_array($data)) {
+                $this->_data = $data;
+                return true;
+            }
+        } else {
+            $this->_data = array_merge($this->_data, $data);
+            return true;
+        }
+        return false;
     }
 
 
@@ -80,8 +82,8 @@ if (is_array($data)) {
      * @param mixed $value
      * @return bool
      */
-    public function setVar($var, $value) {
-        if (in_array($var, $this->getKeys())) {
+    public function setVar($var, $value, $force = false) {
+        if ( in_array($var, $this->getKeys()) || $force) {
             $this->_data[$var] = $value;
             return true;
         }
