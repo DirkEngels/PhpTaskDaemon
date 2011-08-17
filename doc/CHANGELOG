@@ -29,14 +29,19 @@ Version 0.9 (planned)
 Version 0.8 (planned)
 ---------------------
 - Add exception handling (exception)
+- Review/Fix current unit tests (tests)
+- Working version!!!
+
+
+Version 0.7.2 (17-08-2011)
+==========================
 + Add example application (example)
     + Minimal
 + Deliver a runnable project (runnable)
-- Review/Fix current unit tests (tests)
 
 
 Version 0.7.1 (09-07-2011)
-==========================
+--------------------------
 + Refactor code to use Logger component (logger)
 + Implement Task\Factory component (factory)
 + Implement task loading (loader)
