@@ -15,7 +15,7 @@
 
 namespace PhpTaskDaemon\Daemon\Ipc;
 
-class NoneTest extends \PHPUnit_Framework_Testcase {
+class NoneTest extends \PHPUnit_Framework_TestCase {
 
     protected $_ipc;
 

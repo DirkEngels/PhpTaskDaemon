@@ -15,7 +15,7 @@
 
 namespace PhpTaskDaemon\Daemon\Ipc;
 
-class SharedMemoryTest extends \PHPUnit_Framework_Testcase {
+class SharedMemoryTest extends \PHPUnit_Framework_TestCase {
 	protected $_sharedMemory;
 	
 	protected function setUp() {

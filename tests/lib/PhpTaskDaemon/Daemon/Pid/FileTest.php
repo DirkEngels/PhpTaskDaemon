@@ -15,7 +15,7 @@
 
 namespace PhpTaskDaemon\Daemon\Pid;
 
-class FileTest extends \PHPUnit_Framework_Testcase {
+class FileTest extends \PHPUnit_Framework_TestCase {
 
     protected $_file;
 

@@ -16,7 +16,7 @@
 
 namespace PhpTaskDaemon\Daemon\Pid;
 
-class ManagerTest extends \PHPUnit_Framework_Testcase {
+class ManagerTest extends \PHPUnit_Framework_TestCase {
 	protected $_manager;
 	
 	protected function setUp() {
