@@ -28,11 +28,9 @@ class SharedMemoryTest extends \PHPUnit_Framework_TestCase {
         $this->_sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory($semaphore);
     }
     protected function tearDown() {
-            if ($this->_sharedMemory instanceof 'PhpTaskDaemon\Daemon\Ipc\SharedMemory') {
-                $this->_sharedMemory->remove();
-            }
+        $this->_sharedMemory->remove();
     }
-    
+
     public function testConstructorAbsoluteId() {
         $this->assertEquals(0, sizeof($this->_sharedMemory->get()));
         $this->assertEquals('a:0:{}', serialize($this->_sharedMemory->get()));
