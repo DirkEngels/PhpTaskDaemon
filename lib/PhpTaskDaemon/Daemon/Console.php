@@ -287,10 +287,13 @@ class Console {
             $base = (is_null($subdir)) ? $item : $subdir . '/'. $item;
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
                         "Trying file: /Tasks/" . $base, 
-                        \Zend_Log::DEBUG
+                        \Zend_Log::INFO
                     );
             if (preg_match('/Executor.php$/', $base)) {
                 // Try manager file
+                var_dump($this->_config);
+                $class = preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4));
+                echo $base . ' / ' . $class . "\n\n";
                 if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
                         "Found executor file: /Tasks/" . $base, 
@@ -377,7 +380,8 @@ class Console {
      * Displays the configuration settings for each tasks.
      */ 
     public function displaySettings() {
-        if ($this->_consoleOpts->getOption('list-tasks')) {
+        if ($this->_consoleOpts->getOption('settings')) {
+            $tasks = array();
             try {
                 $tasks = $this->scanTasks();
             } catch (Exception $e) {
@@ -406,7 +410,7 @@ class Console {
                 echo "No tasks found!!!";
             }
 
-            echo "\n";
+            echo "\n\n";
             exit;
         }
     }
