@@ -44,9 +44,9 @@ class Config {
      */
     protected function _initConfig($configFiles) {
         // Add default configuration
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/app.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/defaults.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/daemon.ini'));
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/app.ini'));
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/defaults.ini'));
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/daemon.ini'));
 
         foreach($configFiles as $configFile) {
             Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
@@ -58,7 +58,7 @@ class Config {
             if (!is_a($this->_config, '\Zend_Config')) {
                 // First config
                 $this->_config = new \Zend_Config_Ini(
-                    $configFile,
+                    $configFile,    
                     \APPLICATION_ENV,
                     array('allowModifications' => true)
                 );

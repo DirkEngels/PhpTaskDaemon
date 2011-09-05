@@ -207,7 +207,7 @@ class Console {
         } else {
             $logFile = Config::get()->getOption('log.file');
             if (substr($logFile, 0, 1)!='/') {
-                $logFile = realpath(\APPLICATION_PATH . '/..') . '/' . $logFile;
+                $logFile = realpath(\APPLICATION_PATH) . '/' . $logFile;
             }
         }
 
