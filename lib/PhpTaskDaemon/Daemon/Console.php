@@ -185,7 +185,10 @@ class Console {
             // Determine Log Level
             $logLevel = \Zend_Log::NOTICE;
             if ($this->_consoleOpts->getOption('verbose')>0) {
-                $logLevel = (int) $this->_consoleOpts->getOption('verbose');
+                $logLevel = $this->_consoleOpts->getOption('verbose');
+                if (!is_int($logLevel)) {
+                    $logLevel = \Zend_Log::INFO;
+                }
             }
             $writerVerbose->addFilter($logLevel);
 
@@ -233,16 +236,23 @@ class Console {
      * @return array
      */
     public function scanTasks() {
-        $tasks = array_merge(
-            // Configuration
-            $this->scanTasksInConfig(
-                \PhpTaskDaemon\Daemon\Config::get()
-            ),
-            // Directories
-            $this->scanTasksInDirs(
-                APPLICATION_PATH . '/Tasks/'
-            )
+        // Configuration
+        $tasksFoundInConfig = $this->scanTasksInConfig(
+            \PhpTaskDaemon\Daemon\Config::get()
         );
+        // Directories
+        try {
+            $tasksFoundInDirs = $this->scanTasksInDirs(
+                APPLICATION_PATH . '/tasks/'
+            );
+        } catch (Exception $e) {
+            $tasksFoundInDirs = array();
+        }
+
+        // Merge Tasks
+        $tasks = array_merge($tasksFoundInConfig, $tasksFoundInDirs);
+echo var_dump($tasks);
+        // Filter single task
         if ($this->_consoleOpts->getOption('task')) {
             // Reset tasks & set single one (if found) 
             if (in_array($this->_consoleOpts->getOption('task'), $tasks)) {
@@ -275,6 +285,10 @@ class Console {
         foreach($items as $item) {
             if ($item== '.' || $item == '..') { continue; }
             $base = (is_null($subdir)) ? $item : $subdir . '/'. $item;
+                    \PhpTaskDaemon\Daemon\Logger::get()->log(
+                        "Trying file: /Tasks/" . $base, 
+                        \Zend_Log::DEBUG
+                    );
             if (preg_match('/Executor.php$/', $base)) {
                 // Try manager file
                 if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
@@ -363,39 +377,41 @@ class Console {
      * Displays the configuration settings for each tasks.
      */ 
     public function displaySettings() {
-        if ($this->_consoleOpts->getOption('settings')) {
+        try {
             $tasks = $this->scanTasks();
-    
-            echo "Tasks\n";
-            echo "=====\n\n";
-    
-            echo "Examples\\Minimal\n";
-            echo "-----------------\n";
-            echo "\tProcess:\t\tSame\t\t\t(default)\n";
-            echo "\tTrigger:\t\tInterval\t\t(default)\n";
-                echo "\t- sleepTime:\t\t3\t\t\t(default)\n";
-            echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-            echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-            echo "\tLogger:\t\t\tNone\t\t\t(default)\n";
-            echo "\n";
-    
-            echo "Examples\\Parallel\n";
-            echo "-----------------\n";
-            echo "\tProcess:\t\tParallel\t\t(config)\n";
-                echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
-            echo "\tTrigger:\t\tCron\t\t\t(default)\n";
-                echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
-            echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-            echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-            echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
-            echo "\n";
-
-            foreach($tasks as $nr => $taskName) {
-                echo "- " . $taskName . "\n";
-            }
-            echo "\n";
-            exit;
+        } catch (Exception $e) {
+            echo $e->getMessage();
         }
+
+        echo "Tasks\n";
+        echo "=====\n\n";
+
+        echo "Examples\\Minimal\n";
+        echo "-----------------\n";
+        echo "\tProcess:\t\tSame\t\t\t(default)\n";
+        echo "\tTrigger:\t\tInterval\t\t(default)\n";
+        echo "\t- sleepTime:\t\t3\t\t\t(default)\n";
+        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+        echo "\tLogger:\t\t\tNone\t\t\t(default)\n";
+        echo "\n";
+
+        echo "Examples\\Parallel\n";
+        echo "-----------------\n";
+        echo "\tProcess:\t\tParallel\t\t(config)\n";
+        echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
+        echo "\tTrigger:\t\tCron\t\t\t(default)\n";
+        echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
+        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+        echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
+        echo "\n";
+
+        foreach($tasks as $nr => $taskName) {
+            echo "- " . $taskName . "\n";
+        }
+        echo "\n";
+        exit;
     }
 
 
