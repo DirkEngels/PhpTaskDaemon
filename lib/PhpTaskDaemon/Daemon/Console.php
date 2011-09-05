@@ -377,41 +377,38 @@ echo var_dump($tasks);
      * Displays the configuration settings for each tasks.
      */ 
     public function displaySettings() {
-        try {
-            $tasks = $this->scanTasks();
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        if ($this->_consoleOpts->getOption('list-tasks')) {
+            try {
+                $tasks = $this->scanTasks();
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+
+            echo "Tasks\n";
+            echo "=====\n\n";
+
+            echo "Examples\\Parallel\n";
+            echo "-----------------\n";
+            echo "\tProcess:\t\tParallel\t\t(config)\n";
+            echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
+            echo "\tTrigger:\t\tCron\t\t\t(default)\n";
+            echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
+            echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+            echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+            echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
+            echo "\n";
+
+            if (count($tasks)>0) {
+                foreach($tasks as $nr => $taskName) {
+                    echo "- " . $taskName . "\n";
+                }
+            } else {
+                echo "No tasks found!!!";
+            }
+
+            echo "\n";
+            exit;
         }
-
-        echo "Tasks\n";
-        echo "=====\n\n";
-
-        echo "Examples\\Minimal\n";
-        echo "-----------------\n";
-        echo "\tProcess:\t\tSame\t\t\t(default)\n";
-        echo "\tTrigger:\t\tInterval\t\t(default)\n";
-        echo "\t- sleepTime:\t\t3\t\t\t(default)\n";
-        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-        echo "\tLogger:\t\t\tNone\t\t\t(default)\n";
-        echo "\n";
-
-        echo "Examples\\Parallel\n";
-        echo "-----------------\n";
-        echo "\tProcess:\t\tParallel\t\t(config)\n";
-        echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
-        echo "\tTrigger:\t\tCron\t\t\t(default)\n";
-        echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
-        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-        echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
-        echo "\n";
-
-        foreach($tasks as $nr => $taskName) {
-            echo "- " . $taskName . "\n";
-        }
-        echo "\n";
-        exit;
     }
 
 
