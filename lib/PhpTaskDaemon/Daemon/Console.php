@@ -251,7 +251,7 @@ class Console {
 
         // Merge Tasks
         $tasks = array_merge($tasksFoundInConfig, $tasksFoundInDirs);
-echo var_dump($tasks);
+
         // Filter single task
         if ($this->_consoleOpts->getOption('task')) {
             // Reset tasks & set single one (if found) 
