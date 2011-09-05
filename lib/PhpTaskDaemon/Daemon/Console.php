@@ -20,12 +20,6 @@ namespace PhpTaskDaemon\Daemon;
 class Console {
 
     /**
-     * Configuration Object
-     * @var Zend_Config
-     */
-    protected $_config;
-
-    /**
      * Console options object
      * @var Zend_Console_Getopt
      */
@@ -124,30 +118,6 @@ class Console {
     public function setDaemon($instance) {
         $this->_instance = $instance;
         return $this;
-    }
-
-
-    /**
-     * 
-     * Gets a config object
-     * @return \Zend_Config
-     */
-    public function getConfig() {
-        if ($this->_config === null) {
-            $this->_initConfig(array());
-        }
-        return $this->_config;
-    }
-
-
-    /**
-     * 
-     * Sets a config object
-     * @param \Zend_Config $config
-     * @return $this
-     */
-    public function setConfig($config) {
-        $this->_config = $config;
     }
 
 
