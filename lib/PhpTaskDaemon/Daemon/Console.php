@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Daemon;
 
+use PhpTaskDaemon\Daemon\Config;
+
 /**
 * The main Daemon class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon daemon options.
@@ -153,12 +155,9 @@ class Console {
             $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
 
             // Determine Log Level
-            $logLevel = \Zend_Log::NOTICE;
-            if ($this->_consoleOpts->getOption('verbose')>0) {
-                $logLevel = $this->_consoleOpts->getOption('verbose');
-                if (!is_int($logLevel)) {
-                    $logLevel = \Zend_Log::INFO;
-                }
+            $logLevel = \Zend_Log::ERR;
+            if ($this->_consoleOpts->getOption('verbose')>1) {
+                $logLevel = (int) $this->_consoleOpts->getOption('verbose');
             }
             $writerVerbose->addFilter($logLevel);
 
@@ -188,15 +187,14 @@ class Console {
         if (!file_exists($logFile)) {
             try {
                 touch($logFile);
+                // Adding logfile
+                $writerFile = new \Zend_Log_Writer_Stream($logFile);
+                \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
             } catch (\Exception $e) {
-                throw new \Exception('Cannot create log file: ' . $logFile);
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
             }
         }
-
-        // Adding logfile
-        $writerFile = new \Zend_Log_Writer_Stream($logFile);
-        \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-        \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
     }
 
 
@@ -249,6 +247,7 @@ class Console {
             throw new \Exception('Directory does not exists');
         }
 
+        $config = Config::get();
         $items = scandir($dir . '/' . $subdir);
         $tasks = array();
         $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
@@ -261,10 +260,10 @@ class Console {
                     );
             if (preg_match('/Executor.php$/', $base)) {
                 // Try manager file
-                var_dump($this->_config);
-                $class = preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4));
-                echo $base . ' / ' . $class . "\n\n";
-                if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
+                $class = preg_replace('#/#', '\\', Config::get()->getDaemonOption('global.namespace') .'/' . substr($base, 0, -4));
+                include_once(TASKDIR_PATH . '/' . $base);
+
+                if (class_exists($class)) {
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
                         "Found executor file: /Tasks/" . $base, 
                         \Zend_Log::DEBUG
@@ -374,7 +373,10 @@ class Console {
 
             if (count($tasks)>0) {
                 foreach($tasks as $nr => $taskName) {
-                    echo "- " . $taskName . "\n";
+                    echo $taskName . "\n";
+                    echo str_repeat('-', strlen($taskName)) . "\n";
+                    echo "\tProcess:\t\t" . Config::get()->getOption('manager.process.type') . "\t\t(config)\n";
+                    echo "\n";
                 }
             } else {
                 echo "No tasks found!!!";
