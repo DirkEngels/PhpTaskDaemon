@@ -120,20 +120,42 @@ class Config {
     public function getOption($option, $taskName = null) {
         $value = null;
 
+        // Task option
         if (!is_null($taskName)) {
-            $value = $this->getTaskOption($option, $taskName);
-            if (isset($value)) {
-                return $value;
+            try {
+                $value = $this->getTaskOption($option, $taskName);
+                if (isset($value)) {
+                    return $value;
+                }
+            } catch (Exception $e) {
+                Logger::get()->log('BLA' . $e->getMessage(), \Zend_Log::DEBUG);
             }
         }
 
-        $value = $this->getDaemonOption($option);
-        if (isset($value)) {
-            return $value;
+        // Daemon option
+        try {
+            $value = $this->getDaemonOption($option);
+            if (isset($value)) {
+                return $value;
+            }
+        } catch (Exception $e) {
+            Logger::get()->log('BLA' . $e->getMessage(), \Zend_Log::DEBUG);
         }
 
         Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::CRIT);
-        throw new \Exception('Config option not declared!');
+        throw new \Exception('Config option not declared: ' . $option);
+    }
+
+
+    public function getOptionSource($option, $taskName = null) {
+        list($source, $value) = $this->getOption($option, $taskName);
+        return $source;
+    }
+
+
+    public function getOptionValue($option, $taskName = null) {
+        list($source, $value) = $this->getOption($option, $taskName);
+        return $value;
     }
 
 
@@ -209,13 +231,13 @@ class Config {
         $keyPieces = explode('.', $keyString);
         $config = $this->_config;
         foreach ($keyPieces as $keyPiece) {
-            $config = $config->get($keyPiece);
+            $value = $config->get($keyPiece);
             if (!isset($config)) {
-                throw new \Exception('Config option not found');
+                throw new \Exception('Config option not found: ' . $keyString);
             }
         }
 
-        return $config;
+        return $value;
     }
 
 
