@@ -143,7 +143,6 @@ class Config {
         }
 
         Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::CRIT);
-        throw new \Exception('Config option not declared: ' . $option);
     }
 
 
