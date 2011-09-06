@@ -119,103 +119,74 @@ class Config {
      */
     public function getOption($option, $taskName = null) {
         $value = null;
+        $source = null;
 
         // Task option
         if (!is_null($taskName)) {
             try {
-                $value = $this->getTaskOption($option, $taskName);
-                if (isset($value)) {
-                    return $value;
-                }
-            } catch (Exception $e) {
-                Logger::get()->log('BLA' . $e->getMessage(), \Zend_Log::DEBUG);
+                $value = $this->getRecursiveKey('tasks.' . $taskName . '.' . $option);
+                $source = 'task';
+            } catch (\Exception $e) {
+                Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
+            }
+        }
+
+        if (is_null($source)) {
+            try {
+                $value = $this->getRecursiveKey('tasks.defaults.' . $option);
+                $source = 'default';
+            } catch (\Exception $e) {
+                Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
             }
         }
 
         // Daemon option
-        try {
-            $value = $this->getDaemonOption($option);
-            if (isset($value)) {
-                return $value;
+        if (is_null($source)) {
+            try {
+                $value = $this->getRecursiveKey('daemon.' . $option);
+                $source = 'daemon';
+            } catch (\Exception $e) {
+                Logger::get()->log('DAEMON' . $e->getMessage(), \Zend_Log::DEBUG);
             }
-        } catch (Exception $e) {
-            Logger::get()->log('BLA' . $e->getMessage(), \Zend_Log::DEBUG);
+        }
+
+        // Fallback
+        if (is_null($source)) {
+            try {
+                $value = $this->getRecursiveKey($option);
+                $source = 'fallback';
+            } catch (\Exception $e) {
+                Logger::get()->log('FALLBACK' . $e->getMessage(), \Zend_Log::DEBUG);
+            }
         }
 
         Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::CRIT);
+        $out = array($source, $value);
+        return $out;
     }
 
 
+    /**
+     * Returns the source of a configuration options
+     * @param $option
+     * @param $taskName
+     * @return string
+     */
     public function getOptionSource($option, $taskName = null) {
         list($source, $value) = $this->getOption($option, $taskName);
         return $source;
     }
 
 
+    /**
+     * Returns the value of a configuration options
+     * @param $option
+     * @param $taskName
+     * @return string
+     */
     public function getOptionValue($option, $taskName = null) {
         list($source, $value) = $this->getOption($option, $taskName);
         return $value;
-    }
-
-
-    /**
-     * Returns the daemon configuration setting for $option
-     * @param string $option
-     */
-    public function getDaemonOption($option) {
-        Logger::get()->log('Trying daemon config option: ' . $option, \Zend_Log::DEBUG);
-        return $this->getRecursiveKey($option);
-    }
-
-
-    /**
-     * Returns the task (specific or default) configuration for $option
-     * @param string $option
-     * @param string $taskName
-     */
-    public function getTaskOption($option, $taskName = null) {
-        if (!is_null($taskName)) {
-            try {
-                $value = $this->getTaskSpecificOption($option, $taskName);
-            } catch (\Exception $e) {
-                \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::DEBUG);
-            }
-        }
-
-        if (!isset($value)) {
-            $value = $this->getTaskDefaultOption($option);
-        }
-
-        return $value;
-    }
-
-
-    /**
-     * Returns the default task configuration option
-     * @param string $option
-     * @return null|mixed
-     */
-    public function getTaskDefaultOption($option) {
-        $value = null;
-        Logger::get()->log('Trying default config option: tasks.defaults.' . $option, \Zend_Log::DEBUG);
-        try {
-            $value = $this->getRecursiveKey('tasks.defaults.' . $option);
-        } catch (\Exception $e) {
-            Logger::get()->log('Failed loading default config option: ' . $option, \Zend_Log::DEBUG);
-        }
-        return $value;
-    }
-
-
-    /**
-     * Returns the Ret
-     * @param string $option
-     * @param string $taskName
-     * @return null|mixed
-     */
-    public function getTaskSpecificOption($option, $taskName) {
-        Logger::get()->log('Trying task config option: tasks.' . $this->_prepareString($taskName) . '.' . $option, \Zend_Log::DEBUG);
-        return $this->getRecursiveKey('tasks.' . $taskName . '.' . $option);
     }
 
 
@@ -226,16 +197,17 @@ class Config {
      */
     protected function getRecursiveKey($keyString) {
         $keyString = $this->_prepareString($keyString);
-        $value = null;
         $keyPieces = explode('.', $keyString);
-        $config = $this->_config;
-        foreach ($keyPieces as $keyPiece) {
-            $value = $config->get($keyPiece);
-            if (!isset($config)) {
-                throw new \Exception('Config option not found: ' . $keyString);
+
+        $configArray = Config::get()->getConfig()->toArray();
+        $value = $configArray;
+        foreach($keyPieces as $keyPiece) {
+            if (isset($value[$keyPiece])) {
+                $value = $value[$keyPiece];
+            } else {
+                throw new \Exception('Config option does not exists: ' . $keyString);
             }
         }
-
         return $value;
     }
 
