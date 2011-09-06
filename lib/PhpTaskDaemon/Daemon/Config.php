@@ -224,7 +224,7 @@ class Config {
      * level has been reached.
      * @param $keyString
      */
-    public function getRecursiveKey($keyString) {
+    protected function getRecursiveKey($keyString) {
         $keyString = $this->_prepareString($keyString);
         $value = null;
         $keyPieces = explode('.', $keyString);
