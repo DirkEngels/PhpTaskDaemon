@@ -177,7 +177,7 @@ class Console {
         if ($this->_consoleOpts->getOption('log-file')) {
             $logFile =  getcwd() . '/' . $this->_consoleOpts->getOption('log-file');
         } else {
-            $logFile = Config::get()->getOption('log.file');
+            $logFile = Config::get()->getOptionValue('log.file');
             if (substr($logFile, 0, 1)!='/') {
                 $logFile = realpath(\APPLICATION_PATH) . '/' . $logFile;
             }
@@ -260,7 +260,7 @@ class Console {
                     );
             if (preg_match('/Executor.php$/', $base)) {
                 // Try manager file
-                $class = preg_replace('#/#', '\\', Config::get()->getDaemonOption('global.namespace') .'/' . substr($base, 0, -4));
+                $class = preg_replace('#/#', '\\', Config::get()->getOptionValue('daemon.global.namespace') .'/' . substr($base, 0, -4));
                 include_once(TASKDIR_PATH . '/' . $base);
 
                 if (class_exists($class)) {
@@ -350,40 +350,71 @@ class Console {
      */ 
     public function displaySettings() {
         if ($this->_consoleOpts->getOption('settings')) {
-            $tasks = array();
-            try {
-                $tasks = $this->scanTasks();
-            } catch (Exception $e) {
-                echo $e->getMessage();
-            }
-
-            echo "Tasks\n";
-            echo "=====\n\n";
-
-            echo "Examples\\Parallel\n";
-            echo "-----------------\n";
-            echo "\tProcess:\t\tParallel\t\t(config)\n";
-            echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
-            echo "\tTrigger:\t\tCron\t\t\t(default)\n";
-            echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
-            echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-            echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-            echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
+            $this->displaySettingsDaemon();
+            $this->displaySettingsTasks();
             echo "\n";
-
-            if (count($tasks)>0) {
-                foreach($tasks as $nr => $taskName) {
-                    echo $taskName . "\n";
-                    echo str_repeat('-', strlen($taskName)) . "\n";
-                    echo "\tProcess:\t\t" . Config::get()->getOption('manager.process.type') . "\t\t(config)\n";
-                    echo "\n";
-                }
-            } else {
-                echo "No tasks found!!!";
-            }
-
-            echo "\n\n";
             exit;
+        }
+    }
+
+    public function displaySettingsDaemon() {
+        echo "Daemon Settings\n";
+        echo "===============\n\n";
+
+        echo "Global\n";
+        echo "------\n";
+        echo "\tNamespace:\t\t" . Config::get()->getOptionValue('daemon.global.namespace') . "\n";
+        echo "\tTmp Dir:\t\t" . Config::get()->getOptionValue('daemon.global.tmpdir') . "\n";
+        echo "\tInterrupt:\t\t" . Config::get()->getOptionValue('daemon.global.interrupt') . "\n";
+        echo "\tIPC:\t\t\t" . Config::get()->getOptionValue('daemon.global.ipc') . "\n";
+        echo "\n";
+
+        echo "Database\n";
+        echo "--------\n";
+        echo "\tAdapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
+        echo "\tDatabase:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
+        echo "\tHost:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
+        echo "\tUsername:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
+        echo "\n";
+
+        echo "Log\n";
+        echo "---\n";
+        echo "\tFile:\t\t\t" . Config::get()->getOptionValue('daemon.log.file') . "\n";
+        echo "\tLevel:\t\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
+        echo "\n";
+    }
+
+    public function displaySettingsTasks() {
+        echo "Tasks Settings\n";
+        echo "==============\n\n";
+
+        $tasks = array();
+        try {
+            $tasks = $this->scanTasks();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+
+        echo "Examples\\Parallel\n";
+        echo "-----------------\n";
+        echo "\tProcess:\t\tParallel\t\t(config)\n";
+        echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
+        echo "\tTrigger:\t\tCron\t\t\t(default)\n";
+        echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
+        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
+        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
+        echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
+        echo "\n";
+
+        if (count($tasks)>0) {
+            foreach($tasks as $nr => $taskName) {
+                echo $taskName . "\n";
+                echo str_repeat('-', strlen($taskName)) . "\n";
+                echo "\tProcess:\t\t" . Config::get()->getOptionValue('manager.process.type') . "\t\t(" . Config::get()->getOptionValue('manager.process.type') . ")\n";
+                echo "\n";
+            }
+        } else {
+            echo "No tasks found!!!";
         }
     }
 
