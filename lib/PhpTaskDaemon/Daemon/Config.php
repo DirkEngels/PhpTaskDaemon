@@ -38,46 +38,6 @@ class Config {
 
 
     /**
-     * Initializes the configuration by loading one or more (default)
-     * configuration files
-     * @param array $configFiles
-     */
-    protected function _initConfig($configFiles) {
-        // Add default configuration
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/app.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/defaults.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/daemon.ini'));
-
-        foreach($configFiles as $configFile) {
-            Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
-            if (!file_exists($configFile)) {
-                Logger::get()->log("Config file does not exists: " . $configFile, \Zend_Log::ERR);
-                continue;
-            }
-
-            if (!is_a($this->_config, '\Zend_Config')) {
-                // First config
-                $this->_config = new \Zend_Config_Ini(
-                    $configFile,    
-                    \APPLICATION_ENV,
-                    array('allowModifications' => true)
-                );
-            } else {
-                // Merge config file
-                $this->_config->merge(
-                    new \Zend_Config_Ini(
-                        $configFile, 
-                        \APPLICATION_ENV
-                    )
-                );
-            }
-            Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::INFO);
-        }
-        $this->_config->setReadonly();
-    }
-
-
-    /**
      * Singleton getter
      * @return \PhpTaskDaemon\Daemon\Config
      */
@@ -124,7 +84,7 @@ class Config {
         // Task option
         if (!is_null($taskName)) {
             try {
-                $value = $this->getRecursiveKey('tasks.' . $taskName . '.' . $option);
+                $value = $this->_getRecursiveKey('tasks.' . $taskName . '.' . $option);
                 $source = 'task';
             } catch (\Exception $e) {
                 Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
@@ -133,7 +93,7 @@ class Config {
 
         if (is_null($source)) {
             try {
-                $value = $this->getRecursiveKey('tasks.defaults.' . $option);
+                $value = $this->_getRecursiveKey('tasks.defaults.' . $option);
                 $source = 'default';
             } catch (\Exception $e) {
                 Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
@@ -143,7 +103,7 @@ class Config {
         // Daemon option
         if (is_null($source)) {
             try {
-                $value = $this->getRecursiveKey('daemon.' . $option);
+                $value = $this->_getRecursiveKey('daemon.' . $option);
                 $source = 'daemon';
             } catch (\Exception $e) {
                 Logger::get()->log('DAEMON' . $e->getMessage(), \Zend_Log::DEBUG);
@@ -153,7 +113,7 @@ class Config {
         // Fallback
         if (is_null($source)) {
             try {
-                $value = $this->getRecursiveKey($option);
+                $value = $this->_getRecursiveKey($option);
                 $source = 'fallback';
             } catch (\Exception $e) {
                 Logger::get()->log('FALLBACK' . $e->getMessage(), \Zend_Log::DEBUG);
@@ -191,11 +151,51 @@ class Config {
 
 
     /**
+     * Initializes the configuration by loading one or more (default)
+     * configuration files
+     * @param array $configFiles
+     */
+    protected function _initConfig($configFiles) {
+        // Add default configuration
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/app.ini'));
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/defaults.ini'));
+        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/daemon.ini'));
+
+        foreach($configFiles as $configFile) {
+            Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
+            if (!file_exists($configFile)) {
+                Logger::get()->log("Config file does not exists: " . $configFile, \Zend_Log::ERR);
+                continue;
+            }
+
+            if (!is_a($this->_config, '\Zend_Config')) {
+                // First config
+                $this->_config = new \Zend_Config_Ini(
+                    $configFile,    
+                    \APPLICATION_ENV,
+                    array('allowModifications' => true)
+                );
+            } else {
+                // Merge config file
+                $this->_config->merge(
+                    new \Zend_Config_Ini(
+                        $configFile, 
+                        \APPLICATION_ENV
+                    )
+                );
+            }
+            Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::INFO);
+        }
+        $this->_config->setReadonly();
+    }
+
+
+    /**
      * Recursively check if a config value exists untill the required nesting 
      * level has been reached.
      * @param $keyString
      */
-    protected function getRecursiveKey($keyString) {
+    protected function _getRecursiveKey($keyString) {
         $keyString = $this->_prepareString($keyString);
         $keyPieces = explode('.', $keyString);
 
