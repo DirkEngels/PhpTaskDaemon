@@ -202,8 +202,12 @@ class Console {
     public function listTasks() {
         if ($this->_consoleOpts->getOption('list-tasks')) {
             $tasks = $this->scanTasks();
-            foreach ($tasks as $task) {
-                echo $task . "\n";
+            if (count($tasks)==0) {
+                echo "No tasks found!\n";
+            } else {
+                foreach ($tasks as $task) {
+                    echo $task . "\n";
+                }
             }
             exit;
         }
