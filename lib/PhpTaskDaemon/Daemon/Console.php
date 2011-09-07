@@ -128,12 +128,12 @@ class Console {
      */
     public function scanTasks() {
         // Configuration
-        $tasksFoundInConfig = $this->scanTasksInConfig(
+        $tasksFoundInConfig = $this->_scanTasksInConfig(
             \PhpTaskDaemon\Daemon\Config::get()
         );
         // Directories
         try {
-            $tasksFoundInDirs = $this->scanTasksInDirs(
+            $tasksFoundInDirs = $this->_scanTasksInDirs(
                 APPLICATION_PATH . '/tasks/'
             );
         } catch (Exception $e) {
@@ -219,9 +219,9 @@ class Console {
      */ 
     public function settings() {
         if ($this->_consoleOpts->getOption('settings')) {
-            $this->settingsDaemon();
-            $this->settingsDefaults();
-            $this->settingsTasks();
+            $this->_settingsDaemon();
+            $this->_settingsDefaults();
+            $this->_settingsTasks();
             echo "\n";
             exit;
         }
@@ -416,7 +416,7 @@ class Console {
      * @param string $dir
      * @return integer
      */
-    protected function scanTasksInDirs($dir, $subdir = null) {
+    protected function _scanTasksInDirs($dir, $subdir = null) {
         if (!is_dir($dir . '/' . $subdir)) {
             throw new \Exception('Directory does not exists');
         }
@@ -448,7 +448,7 @@ class Console {
                 // Load recursively
                 $tasks = array_merge(
                     $tasks, 
-                    $this->scanTasksInDirs($dir, $base)
+                    $this->_scanTasksInDirs($dir, $base)
                 );
             }
         }
@@ -461,12 +461,12 @@ class Console {
      * @param $config
      * @return array
      */
-    protected function scanTasksInConfig($config) {
+    protected function _scanTasksInConfig($config) {
         return array();
     }
 
 
-    protected function settingsDaemon() {
+    protected function _settingsDaemon() {
         echo "Daemon Settings\n";
         echo "===============\n\n";
 
@@ -502,7 +502,7 @@ class Console {
     }
 
 
-    protected function settingsDefaults() {
+    protected function _settingsDefaults() {
         echo "Tasks Default Settings\n";
         echo "======================\n\n";
 
@@ -533,7 +533,7 @@ class Console {
     }
 
 
-    protected function settingsTasks() {
+    protected function _settingsTasks() {
         echo "Tasks Specific Settings\n";
         echo "=======================\n\n";
 
