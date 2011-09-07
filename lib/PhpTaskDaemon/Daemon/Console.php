@@ -351,6 +351,7 @@ class Console {
     public function displaySettings() {
         if ($this->_consoleOpts->getOption('settings')) {
             $this->displaySettingsDaemon();
+            $this->displaySettingsDefaults();
             $this->displaySettingsTasks();
             echo "\n";
             exit;
@@ -363,30 +364,70 @@ class Console {
 
         echo "Global\n";
         echo "------\n";
-        echo "\tNamespace:\t\t" . Config::get()->getOptionValue('daemon.global.namespace') . "\n";
-        echo "\tTmp Dir:\t\t" . Config::get()->getOptionValue('daemon.global.tmpdir') . "\n";
-        echo "\tInterrupt:\t\t" . Config::get()->getOptionValue('daemon.global.interrupt') . "\n";
-        echo "\tIPC:\t\t\t" . Config::get()->getOptionValue('daemon.global.ipc') . "\n";
+        echo "- Namespace:\t\t" . Config::get()->getOptionValue('daemon.global.namespace') . "\n";
+        echo "- Interrupt:\t\t" . Config::get()->getOptionValue('daemon.global.interrupt') . "\n";
+        echo "- IPC:\t\t\t" . Config::get()->getOptionValue('daemon.global.ipc') . "\n";
+        echo "\n";
+
+        echo "Paths\n";
+        echo "-----\n";
+        echo "- App Dir:\t\t" . \APPLICATION_PATH . '/'. "\n";
+        echo "- Task Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.taskdir') . "\n";
+        echo "- Tmp Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.tmpdir') . "\n";
         echo "\n";
 
         echo "Database\n";
         echo "--------\n";
-        echo "\tAdapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
-        echo "\tDatabase:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
-        echo "\tHost:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
-        echo "\tUsername:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
+        echo "- Adapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
+        echo "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
+        echo "- Host:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
+        echo "- Username:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
         echo "\n";
 
         echo "Log\n";
         echo "---\n";
-        echo "\tFile:\t\t\t" . Config::get()->getOptionValue('daemon.log.file') . "\n";
-        echo "\tLevel:\t\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
+        echo "- File:\t\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.log.file') . "\n";
+        echo "- Level:\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
+        echo "\n";
+
         echo "\n";
     }
 
+
+    public function displaySettingsDefaults() {
+        echo "Tasks Default Settings\n";
+        echo "======================\n\n";
+
+        echo "Global\n";
+        echo "------\n";
+        echo "- Namespace:\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
+        echo "- IPC:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
+        echo "\n";
+
+        echo "Trigger\n";
+        echo "-------\n";
+        echo "- Type:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
+        echo "- Interval\n";
+        echo "\t- Time:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
+        echo "- Cron\n";
+        echo "\t- Interval:\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
+        echo "\n";
+
+        echo "Process\n";
+        echo "-------\n";
+        echo "- Type:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.type') . "\n";
+        echo "- Parallel\n";
+        echo "\t- Childs:\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.parallel.childs') . "\n";
+        echo "\n";
+
+
+        echo "\n";
+    }
+
+
     public function displaySettingsTasks() {
-        echo "Tasks Settings\n";
-        echo "==============\n\n";
+        echo "Tasks Specific Settings\n";
+        echo "=======================\n\n";
 
         $tasks = array();
         try {
@@ -395,27 +436,17 @@ class Console {
             echo $e->getMessage();
         }
 
-        echo "Examples\\Parallel\n";
-        echo "-----------------\n";
-        echo "\tProcess:\t\tParallel\t\t(config)\n";
-        echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
-        echo "\tTrigger:\t\tCron\t\t\t(default)\n";
-        echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
-        echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-        echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-        echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
-        echo "\n";
-
         if (count($tasks)>0) {
             foreach($tasks as $nr => $taskName) {
                 echo $taskName . "\n";
                 echo str_repeat('-', strlen($taskName)) . "\n";
                 echo "\tProcess:\t\t" . Config::get()->getOptionValue('manager.process.type') . "\t\t(" . Config::get()->getOptionValue('manager.process.type') . ")\n";
-                echo "\n";
             }
         } else {
             echo "No tasks found!!!";
         }
+
+        echo "\n\n";
     }
 
 
