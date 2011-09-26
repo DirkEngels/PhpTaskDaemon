@@ -53,9 +53,9 @@ class DataBase extends AbstractClass implements InterfaceClass {
 
     /**
      * 
-     * Returns nothing (null) 
+     * Returns nothing (NULL) 
      * @param string $key
-     * @return null
+     * @return NULL
      */
     public function getVar($key) {
         $sql = "SELECT value FROM ipc WHERE key='" . $key . "'";
