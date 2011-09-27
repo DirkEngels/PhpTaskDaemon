@@ -40,7 +40,7 @@ class Console {
      * Daemon constructor method
      * @param \Zend_Console_Getopt $consoleOpts
      */
-    public function __construct(Daemon $instance = null) {
+    public function __construct(Daemon $instance = NULL) {
         // Initialize command line arguments
         $this->setDaemon($instance);
         $this->setConsoleOpts();
@@ -54,7 +54,7 @@ class Console {
      */
     public function getConsoleOpts() {
         // Initialize default console options
-        if (is_null($this->_consoleOpts)) {
+        if (is_NULL($this->_consoleOpts)) {
             $this->_consoleOpts = new \Zend_Console_Getopt(
                 array(
                     'config-file|c-s'    => 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
@@ -78,8 +78,8 @@ class Console {
      * @param Zend_Console_Getopt $consoleOpts
      * @return $this
      */
-    public function setConsoleOpts(Zend_Console_Getopt $consoleOpts = null) {
-        if ($consoleOpts === null) {
+    public function setConsoleOpts(Zend_Console_Getopt $consoleOpts = NULL) {
+        if ($consoleOpts === NULL) {
             $consoleOpts = $this->getConsoleOpts();
         }
 
@@ -102,7 +102,7 @@ class Console {
      * @return Daemon
      */
     public function getDaemon() {
-        if ($this->_instance === null) {
+        if ($this->_instance === NULL) {
             $this->_instance = new Instance();
         }
         return $this->_instance;
@@ -131,6 +131,7 @@ class Console {
         $tasksFoundInConfig = $this->_scanTasksInConfig(
             \PhpTaskDaemon\Daemon\Config::get()
         );
+
         // Directories
         try {
             $tasksFoundInDirs = $this->_scanTasksInDirs(
@@ -152,6 +153,7 @@ class Console {
                 $tasks = array();
             }
         }
+
         \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
         return $tasks;
     }
@@ -220,7 +222,7 @@ class Console {
     public function settings() {
         if ($this->_consoleOpts->getOption('settings')) {
             $this->_settingsDaemon();
-            $this->_settingsDefaults();
+//            $this->_settingsDefaults();
             $this->_settingsTasks();
             echo "\n";
             exit;
@@ -286,7 +288,7 @@ class Console {
     public function status() {
         
         $status = State::getState();
-        if ($status['pid'] === null) {
+        if ($status['pid'] === NULL) {
             echo "Daemon not running\n";
             exit;
         }
@@ -307,7 +309,7 @@ class Console {
             }
 
         }
-        return true;
+        return TRUE;
     }
 
 
@@ -416,7 +418,7 @@ class Console {
      * @param string $dir
      * @return integer
      */
-    protected function _scanTasksInDirs($dir, $subdir = null) {
+    protected function _scanTasksInDirs($dir, $subdir = NULL) {
         if (!is_dir($dir . '/' . $subdir)) {
             throw new \Exception('Directory does not exists');
         }
@@ -427,7 +429,7 @@ class Console {
         $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
         foreach($items as $item) {
             if ($item== '.' || $item == '..') { continue; }
-            $base = (is_null($subdir)) ? $item : $subdir . '/'. $item;
+            $base = (is_NULL($subdir)) ? $item : $subdir . '/'. $item;
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
                         "Trying file: /Tasks/" . $base, 
                         \Zend_Log::INFO
@@ -436,10 +438,11 @@ class Console {
                 // Try manager file
                 $class = preg_replace('#/#', '\\', Config::get()->getOptionValue('daemon.global.namespace') .'/' . substr($base, 0, -4));
                 include_once(TASKDIR_PATH . '/' . $base);
+                echo $class . " => => " . TASKDIR_PATH . '/' . $base  . "\n";
 
-                if (class_exists($class)) {
+                if (class_exists('\\' . $class)) {
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
-                        "Found executor file: /Tasks/" . $base, 
+                        "Found executor file: /Task/" . $base, 
                         \Zend_Log::DEBUG
                     );
                     array_push($tasks, substr($base, 0, -13));
@@ -514,11 +517,12 @@ class Console {
 
         echo "Trigger\n";
         echo "-------\n";
-        echo "- Type:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
+        echo "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
+        echo "- Types:\t\tInterval, Cron, Gearman\n";
         echo "- Interval\n";
-        echo "\t- Time:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
+//        echo "\t- Time:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
         echo "- Cron\n";
-        echo "\t- Interval:\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
+//        echo "\t- Interval:\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.cron.default') . "\n";
         echo "\n";
 
         echo "Process\n";

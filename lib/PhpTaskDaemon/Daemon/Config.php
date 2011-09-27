@@ -20,13 +20,13 @@ use \PhpTaskDaemon\Daemon\Logger;
  *
  */
 class Config {
-    protected static $_instance = null;
+    protected static $_instance = NULL;
 
     /**
      * Zend_Config object instance
      * @var \Zend_Config
      */
-    protected $_config = null;
+    protected $_config = NULL;
 
 
     /** 
@@ -75,14 +75,14 @@ class Config {
      * default will be returned.
      * @param string $option
      * @param string $taskName
-     * @param null|string
+     * @param NULL|string
      */
-    public function getOption($option, $taskName = null) {
-        $value = null;
-        $source = null;
+    public function getOption($option, $taskName = NULL) {
+        $value = NULL;
+        $source = NULL;
 
         // Task option
-        if (!is_null($taskName)) {
+        if (!is_NULL($taskName)) {
             try {
                 $value = $this->_getRecursiveKey('tasks.' . $taskName . '.' . $option);
                 $source = 'task';
@@ -91,7 +91,7 @@ class Config {
             }
         }
 
-        if (is_null($source)) {
+        if (is_NULL($source)) {
             try {
                 $value = $this->_getRecursiveKey('tasks.defaults.' . $option);
                 $source = 'default';
@@ -101,7 +101,7 @@ class Config {
         }
 
         // Daemon option
-        if (is_null($source)) {
+        if (is_NULL($source)) {
             try {
                 $value = $this->_getRecursiveKey('daemon.' . $option);
                 $source = 'daemon';
@@ -111,7 +111,7 @@ class Config {
         }
 
         // Fallback
-        if (is_null($source)) {
+        if (is_NULL($source)) {
             try {
                 $value = $this->_getRecursiveKey($option);
                 $source = 'fallback';
@@ -132,7 +132,7 @@ class Config {
      * @param $taskName
      * @return string
      */
-    public function getOptionSource($option, $taskName = null) {
+    public function getOptionSource($option, $taskName = NULL) {
         list($source, $value) = $this->getOption($option, $taskName);
         return $source;
     }
@@ -144,7 +144,7 @@ class Config {
      * @param $taskName
      * @return string
      */
-    public function getOptionValue($option, $taskName = null) {
+    public function getOptionValue($option, $taskName = NULL) {
         list($source, $value) = $this->getOption($option, $taskName);
         return $value;
     }
@@ -173,7 +173,7 @@ class Config {
                 $this->_config = new \Zend_Config_Ini(
                     $configFile,    
                     \APPLICATION_ENV,
-                    array('allowModifications' => true)
+                    array('allowModifications' => TRUE)
                 );
             } else {
                 // Merge config file

@@ -20,19 +20,19 @@ class Instance {
      * This variable contains pid manager object
      * @var Pid\Manager $_pidManager
      */
-    protected $_pidManager = null;
+    protected $_pidManager = NULL;
 
     /**
      * Pid reader object
      * @var Pid\File $_pidFile
      */
-    protected $_pidFile = null;
+    protected $_pidFile = NULL;
 
     /**
      * Shared memory object
      * @var Ipc\AbstractClass $_ipc
      */
-    protected $_ipc = null;
+    protected $_ipc = NULL;
 
     /**
      * Array with managers
@@ -131,14 +131,16 @@ class Instance {
         \PhpTaskDaemon\Daemon\Logger::get()->log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
         posix_kill($pid, SIGTERM);
 
-//        echo "THIS PID: " . $this->_pidManager->getCurrent() . "\n";
-//        echo "Child PIDs\n";
-//        $childs = $this->_pidManager->getChilds();
-//        echo var_dump($childs);
-//        foreach($childs as $child) {
-//            echo " - " . $child . "\n";
-//        }
-//        echo "\n";
+        /*
+        echo "THIS PID: " . $this->_pidManager->getCurrent() . "\n";
+        echo "Child PIDs\n";
+        $childs = $this->_pidManager->getChilds();
+        echo var_dump($childs);
+        foreach($childs as $child) {
+            echo " - " . $child . "\n";
+        }
+        echo "\n";
+        */
     }
 
 
@@ -156,7 +158,7 @@ class Instance {
                 break;
             case SIGCHLD:
                 // Halt
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);        
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);
                 while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
                 break;
             case SIGINT:
@@ -235,7 +237,7 @@ class Instance {
             // Throw exception: Fork Failed
             throw new \PhpTaskDaemon\Daemon\Exception\ForkFailed();
 
-            return false;
+            return FALSE;
 
         } elseif ($pid) {
             // Parent

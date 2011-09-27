@@ -14,7 +14,7 @@ namespace PhpTaskDaemon\Daemon;
  *
  */
 class Logger {
-    protected static $_instance = null;
+    protected static $_instance = NULL;
 
 
     /** 
