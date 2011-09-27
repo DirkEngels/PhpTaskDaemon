@@ -20,9 +20,9 @@ class Signal {
 
     /**
      * Task identifier
-     * @var string|null 
+     * @var string|NULL 
      */
-    protected $_identifier = null;
+    protected $_identifier = NULL;
 
     /**
      * 
@@ -32,13 +32,13 @@ class Signal {
      * @param $callback
      * @param $signals
      */
-    public function __construct($identifier, $callback = null, $signals = null) {
+    public function __construct($identifier, $callback = NULL, $signals = NULL) {
         $this->_identifier = $identifier;
-        if ($callback === null) {
+        if ($callback === NULL) {
             $callback = array(&$this, 'defaultHandler');
         }
 
-        if ($signals === null) {
+        if ($signals === NULL) {
             $signals = array(SIGCHLD, SIGTERM, SIGHUP, SIGINT, SIGQUIT, SIGILL, SIGTRAP, SIGABRT, SIGBUS);
         }
 

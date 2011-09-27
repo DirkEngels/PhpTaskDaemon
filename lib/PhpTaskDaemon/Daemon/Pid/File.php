@@ -22,7 +22,7 @@ class File {
      * managers daemon to storing the process ID to a file.
      * @var string
      */
-    protected $_filename = null;
+    protected $_filename = NULL;
 
 
     /**
@@ -31,7 +31,7 @@ class File {
      * filename.
      * @param string $filename
      */
-    public function __construct($filename = null) {
+    public function __construct($filename = NULL) {
         $this->setFilename($filename);
     }
 
@@ -43,7 +43,7 @@ class File {
      * @return string
      */
     public function getFilename() {
-        if ($this->_filename == null) {
+        if ($this->_filename == NULL) {
             $this->_filename = \TMP_PATH . '/daemon.pid';
         }
         return $this->_filename;
@@ -59,9 +59,9 @@ class File {
     public function setFilename($filename) {
         if (isset($filename)) {
             $this->_filename = $filename;
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -73,9 +73,9 @@ class File {
     public function isRunning() {
         $pid = $this->read();
         if ($pid>0) {
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -92,13 +92,13 @@ class File {
             $pid = (int) file_get_contents($this->getFilename());
             return $pid;
         }
-        return null;
+        return NULL;
     }
 
 
     /**
      * 
-     * Removes the pidfile. Returns false if the file does not exists or cannot
+     * Removes the pidfile. Returns FALSE if the file does not exists or cannot
      * be removed.
      * @return bool
      */
@@ -108,7 +108,7 @@ class File {
         } else {
             return unlink($this->getFilename());
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -118,16 +118,16 @@ class File {
      * @param int $pid
      * @return bool
      */
-    public function write($pid = null) {
+    public function write($pid = NULL) {
         if ($pid>0) {
             if (!file_exists($this->getFilename())) {
                 touch($this->getFilename());
             }
 
             file_put_contents($this->getFilename(), $pid);
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 }

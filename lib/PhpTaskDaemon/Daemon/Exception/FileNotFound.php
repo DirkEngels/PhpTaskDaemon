@@ -9,5 +9,4 @@
 namespace PhpTaskDaemon\Daemon\Exception;
 
 class FileNotFound extends \Exception {
-    
 }
