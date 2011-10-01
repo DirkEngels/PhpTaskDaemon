@@ -69,18 +69,6 @@ class Instance {
 
     /**
      * 
-     * Returns the log file to use. It tries a few possible options for
-     * retrieving or composing a valid logfile.
-     * @return string
-     */
-    protected function _getLogFile() {
-        $logFile = TMP_PATH . '/phptaskdaemond.log';
-        return $logFile;
-    }
-
-
-    /**
-     * 
      * Return the loaded manager objects.
      * @return array
      */
