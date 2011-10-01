@@ -40,7 +40,7 @@ class Factory {
     public static function get($taskName) {
         // Base Manager
         $manager = self::getManager($taskName);
-        
+
         // Trigger, Queue & Statistics
         $manager->setTrigger(
             self::getComponentType($taskName, self::TYPE_TRIGGER)
@@ -213,7 +213,7 @@ class Factory {
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
         $configType = ucfirst(
-            \PhpTaskDaemon\Daemon\Config::get()->getOption(
+            \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
                 strtolower($objectType) . '.type', 
                 $taskName
             )
