@@ -128,14 +128,15 @@ class Console {
      */
     public function scanTasks() {
         // Configuration
-        $tasksFoundInConfig = $this->_scanTasksInConfig(
-            \PhpTaskDaemon\Daemon\Config::get()
-        );
+//        $tasksFoundInConfig = $this->_scanTasksInConfig(
+//            \PhpTaskDaemon\Daemon\Config::get()
+//        );
+$tasksFoundInConfig = array();
 
         // Directories
         try {
             $tasksFoundInDirs = $this->_scanTasksInDirs(
-                APPLICATION_PATH . '/tasks/'
+                APPLICATION_PATH . '/task/'
             );
         } catch (Exception $e) {
             $tasksFoundInDirs = array();
@@ -419,9 +420,9 @@ class Console {
      * @return integer
      */
     protected function _scanTasksInDirs($dir, $subdir = NULL) {
-        if (!is_dir($dir . '/' . $subdir)) {
-            throw new \Exception('Directory does not exists');
-        }
+//        if (!is_dir($dir . '/' . $subdir)) {
+//            throw new \Exception('Directory does not exists');
+//        }
 
         $config = Config::get();
         $items = scandir($dir . '/' . $subdir);
@@ -431,14 +432,14 @@ class Console {
             if ($item== '.' || $item == '..') { continue; }
             $base = (is_NULL($subdir)) ? $item : $subdir . '/'. $item;
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
-                        "Trying file: /Tasks/" . $base, 
+                        "Trying file: /Task/" . $base, 
                         \Zend_Log::INFO
                     );
             if (preg_match('/Executor.php$/', $base)) {
                 // Try manager file
                 $class = preg_replace('#/#', '\\', Config::get()->getOptionValue('daemon.global.namespace') .'/' . substr($base, 0, -4));
-                include_once(TASKDIR_PATH . '/' . $base);
-                echo $class . " => => " . TASKDIR_PATH . '/' . $base  . "\n";
+                include_once($dir . '/' . $base);
+//                echo $class . " => => " . TASKDIR_PATH . '/' . $base  . "\n";
 
                 if (class_exists('\\' . $class)) {
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
