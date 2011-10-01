@@ -213,7 +213,7 @@ class Factory {
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
         $configType = ucfirst(
-            \PhpTaskDaemon\Daemon\Config::get()->getTaskOption(
+            \PhpTaskDaemon\Daemon\Config::get()->getOption(
                 strtolower($objectType) . '.type', 
                 $taskName
             )
