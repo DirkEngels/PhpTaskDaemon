@@ -26,6 +26,7 @@ class NoneTest extends \PHPUnit_Framework_TestCase {
     public function testConstructor() {
         $this->assertEquals(0, sizeof($this->_ipc->get()));
         $this->assertEquals('a:0:{}', serialize($this->_ipc->get()));
+        $this->assertEquals('test', $this->_ipc->getId());
     }
 
     public function testGetKeys() {

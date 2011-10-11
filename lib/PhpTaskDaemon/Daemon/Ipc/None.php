@@ -15,15 +15,6 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  */
 class None extends AbstractClass implements InterfaceClass {
 
-    /**
-     * 
-     * Returns an empty array
-     * @return array
-     */
-    public function getKeys() {
-        return array();
-    }
-
 
     /**
      * 
