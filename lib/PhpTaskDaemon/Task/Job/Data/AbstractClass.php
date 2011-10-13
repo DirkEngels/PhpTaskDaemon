@@ -49,16 +49,16 @@ abstract class AbstractClass {
      * @param array $data
      */
     public function set($data, $reset = false) {
+        if (!is_array($data)) {
+            throw new \Exception('Job data must be an array!');
+        }
+
         if ($reset) {
-            if (is_array($data)) {
-                $this->_data = $data;
-                return true;
-            }
+            $this->_data = $data;
         } else {
             $this->_data = array_merge($this->_data, $data);
-            return true;
         }
-        return false;
+        return true;
     }
 
 
