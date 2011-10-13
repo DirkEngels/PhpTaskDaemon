@@ -35,14 +35,14 @@ abstract class AbstractClass {
             $jobId = $this::generateJobId();
         }
 
-        $input = new \PhpTaskDaemon\Task\Job\Data\BaseClass();
+        $input = new \PhpTaskDaemon\Task\Job\Data\DefaultClass();
         if (is_array($inputData)) {
             $input->set($inputData);
         }
 
         $this->setJobId($jobId);
         $this->setInput($input);
-        $this->_output = new \PhpTaskDaemon\Task\Job\Data\BaseClass();
+        $this->_output = new \PhpTaskDaemon\Task\Job\Data\DefaultClass();
     }
 
 

@@ -30,7 +30,7 @@ Version 0.8.1 (planned)
   - DataBase
 - Refactoring
   - Extract task loading methods to seperate class
-  - Rename BaseClasses to DefaultClasses 
+  + Rename BaseClasses to DefaultClasses 
 
 Version 0.8 (14-10-2011)
 ========================
