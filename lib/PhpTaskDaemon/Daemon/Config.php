@@ -28,11 +28,24 @@ class Config {
      */
     protected $_config = NULL;
 
+    /**
+     * Loaded configurations files
+     * @var array
+     */
+    protected $_files = array();
+
 
     /** 
      * Protected constructor for singleton pattern
      */
     protected function __construct($configFiles = array()) {
+        if (count($configFiles) == 0) {
+            // Add default configuration
+            array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/app.ini'));
+            array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/defaults.ini'));
+            array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/daemon.ini'));
+        }
+
         $this->_initConfig($configFiles);
     }
 
@@ -42,6 +55,10 @@ class Config {
      * @return \PhpTaskDaemon\Daemon\Config
      */
     public function get($configFiles = array()) {
+        if (count($configFiles) > 0) {
+            self::$_instance = NULL;
+        }
+
         if (!self::$_instance) {
             Logger::get()->log("Creating new config object", \Zend_Log::DEBUG);
             self::$_instance = new self($configFiles);
@@ -66,8 +83,17 @@ class Config {
      */
     public function setConfig($config) {
         $this->_config = $config;
+        return $this;
     }
 
+
+    /**
+     * Returns the loaded configurations files.
+     * @return array
+     */
+    public function getLoadedConfigFiles() {
+        return $this->_files;
+    }
 
     /**
      * Returns a configuration option. If the taskName is specified, then it
@@ -156,11 +182,6 @@ class Config {
      * @param array $configFiles
      */
     protected function _initConfig($configFiles) {
-        // Add default configuration
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/app.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/defaults.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/daemon.ini'));
-
         foreach($configFiles as $configFile) {
             Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
             if (!file_exists($configFile)) {
@@ -184,8 +205,16 @@ class Config {
                     )
                 );
             }
+            // Register configurations file
+            array_push($this->_files, $configFile);
             Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::INFO);
         }
+
+        // At least one configuration file must be loaded.
+        if (count($this->_files) == 0) {
+            throw new \Exception('No configuration files found!');
+        }
+
         $this->_config->setReadonly();
     }
 
