@@ -19,18 +19,23 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_sharedMemory;
 	
 	protected function setUp() {
+        // Stop here and mark this test as incomplete.
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
+        );
+
 		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-status');
 		$this->_status = new \PhpTaskDaemon\Task\Executor\Status\BaseClass();
 		
 	}
 	protected function tearDown() {
-		$this->_ipc->remove();
-		unset($this->_ipc);
-		$ipc = $this->_status->getIpc();
-		if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-			$ipc->remove();
-		}
-		unset($this->_status);
+//		$this->_ipc->remove();
+//		unset($this->_ipc);
+//		$ipc = $this->_status->getIpc();
+//		if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//			$ipc->remove();
+//		}
+//		unset($this->_status);
 	}
 
 	public function testConstructorNoArguments() {

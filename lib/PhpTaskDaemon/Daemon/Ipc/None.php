@@ -15,24 +15,15 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  */
 class None extends AbstractClass implements InterfaceClass {
 
-    /**
-     * 
-     * Returns an empty array
-     * @return array
-     */
-    public function getKeys() {
-        return array();
-    }
-
 
     /**
      * 
-     * Returns nothing (null) 
+     * Returns nothing (NULL) 
      * @param string $key
-     * @return null
+     * @return NULL
      */
     public function getVar($key) {
-        return null;
+        return NULL;
     }
 
 
@@ -44,7 +35,7 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function setVar($key, $value) {
-        return true;
+        return TRUE;
     }
 
 
@@ -55,7 +46,7 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function incrementVar($key) {
-        return true;
+        return TRUE;
     }
 
 
@@ -66,7 +57,7 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function decrementVar($key) {
-        return true;
+        return TRUE;
     }
 
 
@@ -77,7 +68,7 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function removeVar($key) {
-        return true;
+        return TRUE;
     }
 
 
@@ -87,7 +78,7 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function remove() {
-        return true;
+        return TRUE;
     }
 
 }

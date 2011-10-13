@@ -18,22 +18,22 @@ namespace PhpTaskDaemon\Daemon\Ipc;
 class SharedMemory extends AbstractClass implements InterfaceClass {
     /**
      * This variable contains the identifier string.
-     * @var string|null
+     * @var string|NULL
      */
-    protected $_pathNameWithPid = null;
+    protected $_pathNameWithPid = NULL;
 
     /**
      * The actual resource of the shared memory segment
      * @var resource
      */
-    protected $_sharedMemory = null;
+    protected $_sharedMemory = NULL;
 
     /**
      * The semaphore needed to lock/unlock access to the shared memory
      * segment.
      * @var resource
      */
-    protected $_semaphoreLock = null;
+    protected $_semaphoreLock = NULL;
 
 
     /**
@@ -143,7 +143,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         if (shm_has_var($this->_sharedMemory, 1)) {
             $keys = shm_get_var($this->_sharedMemory, 1);
         }
-        $retInit = true;
+        $retInit = TRUE;
 
         // Update keys
         if (!in_array($key, array_keys($keys))) {
@@ -172,7 +172,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         if (shm_has_var($this->_sharedMemory, 1)) {
             $keys = shm_get_var($this->_sharedMemory, 1);
         }
-        $retInit = true;
+        $retInit = TRUE;
 
         // Update keys
         if (in_array($key, array_keys($keys))) {
@@ -206,7 +206,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         if (shm_has_var($this->_sharedMemory, 1)) {
             $keys = shm_get_var($this->_sharedMemory, 1);
         }
-        $retInit = true;
+        $retInit = TRUE;
 
         // Update keys
         $value = 0;

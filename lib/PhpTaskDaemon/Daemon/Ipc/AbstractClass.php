@@ -20,7 +20,7 @@ abstract class AbstractClass {
      * Unique identifier
      * @var string
      */
-    protected $_id = null;
+    protected $_id = NULL;
 
 
     /**
@@ -37,7 +37,7 @@ abstract class AbstractClass {
      */
     public function __construct($id) {
         $this->_id = $id;
-        return true;
+        return TRUE;
     }
 
 

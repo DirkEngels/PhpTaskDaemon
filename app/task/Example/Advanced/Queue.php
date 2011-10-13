@@ -7,7 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace Tasks\Examples\Advanced;
+namespace PhpTaskDaemon\Task\Example\Advanced;
 
 use PhpTaskDaemon\Task\Queue as TaskQueue;
 use \PhpTaskDaemon\Task\Job;

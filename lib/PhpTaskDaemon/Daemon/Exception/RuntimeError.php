@@ -9,5 +9,4 @@
 namespace PhpTaskDaemon\Daemon\Exception;
 
 class RuntimeError extends \Exception {
-    
 }

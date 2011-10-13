@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Daemon;
 
+use PhpTaskDaemon\Daemon\Config;
+
 /**
 * The main Daemon class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon daemon options.
@@ -18,12 +20,6 @@ namespace PhpTaskDaemon\Daemon;
 * managers.
 */
 class Console {
-
-    /**
-     * Configuration Object
-     * @var Zend_Config
-     */
-    protected $_config;
 
     /**
      * Console options object
@@ -44,7 +40,7 @@ class Console {
      * Daemon constructor method
      * @param \Zend_Console_Getopt $consoleOpts
      */
-    public function __construct(Daemon $instance = null) {
+    public function __construct(Daemon $instance = NULL) {
         // Initialize command line arguments
         $this->setDaemon($instance);
         $this->setConsoleOpts();
@@ -58,18 +54,16 @@ class Console {
      */
     public function getConsoleOpts() {
         // Initialize default console options
-        if (is_null($this->_consoleOpts)) {
+        if (is_NULL($this->_consoleOpts)) {
             $this->_consoleOpts = new \Zend_Console_Getopt(
                 array(
                     'config-file|c-s'    => 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
                     'log-file|l-s'        => 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
-//                    'tmp-dir|td-s'      => 'Tmp directory (defaults /tmp/,',
-//                    'daemonize|d'        => 'Run in Daemon mode (default) (fork to background)',
                     'action|a=s'        => 'Action (default: start) (options: start, stop, restart, status, monitor)',
                     'list-tasks|lt'     => 'List tasks',
                     'settings|s'        => 'Display tasks settings',
                     'task|t=s'             => 'Run single task',
-                    'verbose|v-i'            => 'Verbose (level: 5)',
+                    'verbose|v-i'            => 'Verbose',
                     'help|h'              => 'Show help message (this message)',
                 )
             );
@@ -84,8 +78,8 @@ class Console {
      * @param Zend_Console_Getopt $consoleOpts
      * @return $this
      */
-    public function setConsoleOpts(Zend_Console_Getopt $consoleOpts = null) {
-        if ($consoleOpts === null) {
+    public function setConsoleOpts(Zend_Console_Getopt $consoleOpts = NULL) {
+        if ($consoleOpts === NULL) {
             $consoleOpts = $this->getConsoleOpts();
         }
 
@@ -108,7 +102,7 @@ class Console {
      * @return Daemon
      */
     public function getDaemon() {
-        if ($this->_instance === null) {
+        if ($this->_instance === NULL) {
             $this->_instance = new Instance();
         }
         return $this->_instance;
@@ -128,121 +122,30 @@ class Console {
 
 
     /**
-     * 
-     * Gets a config object
-     * @return \Zend_Config
-     */
-    public function getConfig() {
-        if ($this->_config === null) {
-            $this->_initConfig(array());
-        }
-        return $this->_config;
-    }
-
-
-    /**
-     * 
-     * Sets a config object
-     * @param \Zend_Config $config
-     * @return $this
-     */
-    public function setConfig($config) {
-        $this->_config = $config;
-    }
-
-
-    /**
-     * Initializes the Config component by loading configuration files passed 
-     * using command line arguments and the default configuration files.
-     */
-    protected function _initConfig() {
-        // Prepare configuration files
-        $configFiles = array();
-        if ($this->_consoleOpts->getOption('config-file')!='') {
-            $configArguments = explode(',', $this->_consoleOpts->getOption('config-file'));
-            foreach ($configArguments as $configArgument) {
-                if (!strstr($configArgument, '/')) {
-                    $configArgument = \APPLICATION_PATH . '/' . $configArgument;
-                }
-                array_push($configFiles, $configArgument);
-            } 
-        }
-
-        // Initiate config
-        $config = \PhpTaskDaemon\Daemon\Config::get($configFiles);
-        return $config;
-    }
-
-
-    /**
-     * Initializes the logging verbose mode
-     */
-    protected function _initLogVerbose() {
-       // Log Verbose Output
-        if ($this->_consoleOpts->getOption('verbose')) {
-            $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
-
-            // Determine Log Level
-            $logLevel = \Zend_Log::NOTICE;
-            if ($this->_consoleOpts->getOption('verbose')>0) {
-                $logLevel = (int) $this->_consoleOpts->getOption('verbose');
-            }
-            $writerVerbose->addFilter($logLevel);
-
-            \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
-            $msg = 'Adding log writer: verbose (level: ' . $logLevel . ')';
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
-        }
-    }
-
-
-    /**
-     * Initalizes the Logger component to save log messages to a file based on
-     * the command line arguments and/or configuration files. 
-     * @throws \Exception
-     */
-    protected function _initLogFile() {
-        if ($this->_consoleOpts->getOption('log-file')) {
-            $logFile =  getcwd() . '/' . $this->_consoleOpts->getOption('log-file');
-        } else {
-            $logFile = Config::get()->getOption('log.file');
-            if (substr($logFile, 0, 1)!='/') {
-                $logFile = realpath(\APPLICATION_PATH . '/..') . '/' . $logFile;
-            }
-        }
-
-        // Create logfile if not exists
-        if (!file_exists($logFile)) {
-            try {
-                touch($logFile);
-            } catch (\Exception $e) {
-                throw new \Exception('Cannot create log file: ' . $logFile);
-            }
-        }
-
-        // Adding logfile
-        $writerFile = new \Zend_Log_Writer_Stream($logFile);
-        \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-        \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
-    }
-
-
-    /**
      * Main function to scan all tasks by scanning directories and 
      * configuration files for executors.
      * @return array
      */
     public function scanTasks() {
-        $tasks = array_merge(
-            // Configuration
-            $this->scanTasksInConfig(
-                \PhpTaskDaemon\Daemon\Config::get()
-            ),
-            // Directories
-            $this->scanTasksInDirs(
-                APPLICATION_PATH . '/Tasks/'
-            )
-        );
+        // Configuration
+//        $tasksFoundInConfig = $this->_scanTasksInConfig(
+//            \PhpTaskDaemon\Daemon\Config::get()
+//        );
+$tasksFoundInConfig = array();
+
+        // Directories
+        try {
+            $tasksFoundInDirs = $this->_scanTasksInDirs(
+                APPLICATION_PATH . '/task/'
+            );
+        } catch (Exception $e) {
+            $tasksFoundInDirs = array();
+        }
+
+        // Merge Tasks
+        $tasks = array_merge($tasksFoundInConfig, $tasksFoundInDirs);
+
+        // Filter single task
         if ($this->_consoleOpts->getOption('task')) {
             // Reset tasks & set single one (if found) 
             if (in_array($this->_consoleOpts->getOption('task'), $tasks)) {
@@ -251,58 +154,9 @@ class Console {
                 $tasks = array();
             }
         }
+
         \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
         return $tasks;
-    }
-
-
-    /**
-     * 
-     * Scans a directory for task managers and returns the number of loaded
-     * tasks.
-     * 
-     * @param string $dir
-     * @return integer
-     */
-    public function scanTasksInDirs($dir, $subdir = null) {
-        if (!is_dir($dir . '/' . $subdir)) {
-            throw new \Exception('Directory does not exists');
-        }
-
-        $items = scandir($dir . '/' . $subdir);
-        $tasks = array();
-        $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
-        foreach($items as $item) {
-            if ($item== '.' || $item == '..') { continue; }
-            $base = (is_null($subdir)) ? $item : $subdir . '/'. $item;
-            if (preg_match('/Executor.php$/', $base)) {
-                // Try manager file
-                if (class_exists(preg_replace('#/#', '\\', 'Tasks/' . substr($base, 0, -4)))) {
-                    \PhpTaskDaemon\Daemon\Logger::get()->log(
-                        "Found executor file: /Tasks/" . $base, 
-                        \Zend_Log::DEBUG
-                    );
-                    array_push($tasks, substr($base, 0, -13));
-                }
-            } elseif (is_dir($dir . '/' . $base)) {
-                // Load recursively
-                $tasks = array_merge(
-                    $tasks, 
-                    $this->scanTasksInDirs($dir, $base)
-                );
-            }
-        }
-        return $tasks;
-    }
-
-
-    /**
-     * Scan for tasks witin the configuration files 
-     * @param $config
-     * @return array
-     */
-    public function scanTasksInConfig($config) {
-        return array();
     }
 
 
@@ -322,7 +176,7 @@ class Console {
             $this->listTasks();
 
             // Display Settings & exit (--settings)
-            $this->displaySettings();
+            $this->settings();
 
             // Add Log Files
             $this->_initLogFile();
@@ -351,8 +205,12 @@ class Console {
     public function listTasks() {
         if ($this->_consoleOpts->getOption('list-tasks')) {
             $tasks = $this->scanTasks();
-            foreach ($tasks as $task) {
-                echo $task . "\n";
+            if (count($tasks)==0) {
+                echo "No tasks found!\n";
+            } else {
+                foreach ($tasks as $task) {
+                    echo $task . "\n";
+                }
             }
             exit;
         }
@@ -362,37 +220,11 @@ class Console {
     /**
      * Displays the configuration settings for each tasks.
      */ 
-    public function displaySettings() {
+    public function settings() {
         if ($this->_consoleOpts->getOption('settings')) {
-            $tasks = $this->scanTasks();
-    
-            echo "Tasks\n";
-            echo "=====\n\n";
-    
-            echo "Examples\\Minimal\n";
-            echo "-----------------\n";
-            echo "\tProcess:\t\tSame\t\t\t(default)\n";
-            echo "\tTrigger:\t\tInterval\t\t(default)\n";
-                echo "\t- sleepTime:\t\t3\t\t\t(default)\n";
-            echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-            echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-            echo "\tLogger:\t\t\tNone\t\t\t(default)\n";
-            echo "\n";
-    
-            echo "Examples\\Parallel\n";
-            echo "-----------------\n";
-            echo "\tProcess:\t\tParallel\t\t(config)\n";
-                echo "\t- maxProcesses:\t\t3\t\t\t(default)\n";
-            echo "\tTrigger:\t\tCron\t\t\t(default)\n";
-                echo "\t- cronTime:\t\t*/15 * * * *\t\t(default)\n";
-            echo "\tStatus:\t\t\tNone\t\t\t(default)\n";
-            echo "\tStatistics:\t\tNone\t\t\t(default)\n";
-            echo "\tLogger:\t\t\tDataBase\t\t(default)\n";
-            echo "\n";
-
-            foreach($tasks as $nr => $taskName) {
-                echo "- " . $taskName . "\n";
-            }
+            $this->_settingsDaemon();
+//            $this->_settingsDefaults();
+            $this->_settingsTasks();
             echo "\n";
             exit;
         }
@@ -457,7 +289,7 @@ class Console {
     public function status() {
         
         $status = State::getState();
-        if ($status['pid'] === null) {
+        if ($status['pid'] === NULL) {
             echo "Daemon not running\n";
             exit;
         }
@@ -478,7 +310,7 @@ class Console {
             }
 
         }
-        return true;
+        return TRUE;
     }
 
 
@@ -501,6 +333,233 @@ class Console {
     public function help() {
         echo $this->_consoleOpts->getUsageMessage();
         exit;
+    }
+
+
+    /**
+     * Initializes the Config component by loading configuration files passed 
+     * using command line arguments and the default configuration files.
+     */
+    protected function _initConfig() {
+        // Prepare configuration files
+        $configFiles = array();
+        if ($this->_consoleOpts->getOption('config-file')!='') {
+            $configArguments = explode(',', $this->_consoleOpts->getOption('config-file'));
+            foreach ($configArguments as $configArgument) {
+                if (!strstr($configArgument, '/')) {
+                    $configArgument = \APPLICATION_PATH . '/' . $configArgument;
+                }
+                array_push($configFiles, $configArgument);
+            } 
+        }
+
+        // Initiate config
+        $config = \PhpTaskDaemon\Daemon\Config::get($configFiles);
+        return $config;
+    }
+
+
+    /**
+     * Initializes the logging verbose mode
+     */
+    protected function _initLogVerbose() {
+       // Log Verbose Output
+        if ($this->_consoleOpts->getOption('verbose')) {
+            $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
+
+            // Determine Log Level
+            $logLevel = \Zend_Log::ERR;
+            if ($this->_consoleOpts->getOption('verbose')>1) {
+                $logLevel = (int) $this->_consoleOpts->getOption('verbose');
+            }
+            $writerVerbose->addFilter($logLevel);
+
+            \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
+            $msg = 'Adding log writer: verbose (level: ' . $logLevel . ')';
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+        }
+    }
+
+
+    /**
+     * Initalizes the Logger component to save log messages to a file based on
+     * the command line arguments and/or configuration files. 
+     * @throws \Exception
+     */
+    protected function _initLogFile() {
+        if ($this->_consoleOpts->getOption('log-file')) {
+            $logFile =  getcwd() . '/' . $this->_consoleOpts->getOption('log-file');
+        } else {
+            $logFile = Config::get()->getOptionValue('log.file');
+            if (substr($logFile, 0, 1)!='/') {
+                $logFile = realpath(\APPLICATION_PATH) . '/' . $logFile;
+            }
+        }
+
+        // Create logfile if not exists
+        if (!file_exists($logFile)) {
+            try {
+                touch($logFile);
+                // Adding logfile
+                $writerFile = new \Zend_Log_Writer_Stream($logFile);
+                \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
+            } catch (\Exception $e) {
+                \PhpTaskDaemon\Daemon\Logger::get()->log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
+            }
+        }
+    }
+
+
+    /**
+     * 
+     * Scans a directory for task managers and returns the number of loaded
+     * tasks.
+     * 
+     * @param string $dir
+     * @return integer
+     */
+    protected function _scanTasksInDirs($dir, $subdir = NULL) {
+//        if (!is_dir($dir . '/' . $subdir)) {
+//            throw new \Exception('Directory does not exists');
+//        }
+
+        $config = Config::get();
+        $items = scandir($dir . '/' . $subdir);
+        $tasks = array();
+        $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
+        foreach($items as $item) {
+            if ($item== '.' || $item == '..') { continue; }
+            $base = (is_NULL($subdir)) ? $item : $subdir . '/'. $item;
+                    \PhpTaskDaemon\Daemon\Logger::get()->log(
+                        "Trying file: /Task/" . $base, 
+                        \Zend_Log::INFO
+                    );
+            if (preg_match('/Executor.php$/', $base)) {
+                // Try manager file
+                $class = preg_replace('#/#', '\\', Config::get()->getOptionValue('daemon.global.namespace') .'/' . substr($base, 0, -4));
+                include_once($dir . '/' . $base);
+//                echo $class . " => => " . TASKDIR_PATH . '/' . $base  . "\n";
+
+                if (class_exists('\\' . $class)) {
+                    \PhpTaskDaemon\Daemon\Logger::get()->log(
+                        "Found executor file: /Task/" . $base, 
+                        \Zend_Log::DEBUG
+                    );
+                    array_push($tasks, substr($base, 0, -13));
+                }
+            } elseif (is_dir($dir . '/' . $base)) {
+                // Load recursively
+                $tasks = array_merge(
+                    $tasks, 
+                    $this->_scanTasksInDirs($dir, $base)
+                );
+            }
+        }
+        return $tasks;
+    }
+
+
+    /**
+     * Scan for tasks witin the configuration files 
+     * @param $config
+     * @return array
+     */
+    protected function _scanTasksInConfig($config) {
+        return array();
+    }
+
+
+    protected function _settingsDaemon() {
+        echo "Daemon Settings\n";
+        echo "===============\n\n";
+
+        echo "Global\n";
+        echo "------\n";
+        echo "- Namespace:\t\t" . Config::get()->getOptionValue('daemon.global.namespace') . "\n";
+        echo "- Interrupt:\t\t" . Config::get()->getOptionValue('daemon.global.interrupt') . "\n";
+        echo "- IPC:\t\t\t" . Config::get()->getOptionValue('daemon.global.ipc') . "\n";
+        echo "\n";
+
+        echo "Paths\n";
+        echo "-----\n";
+        echo "- App Dir:\t\t" . \APPLICATION_PATH . '/'. "\n";
+        echo "- Task Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.taskdir') . "\n";
+        echo "- Tmp Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.tmpdir') . "\n";
+        echo "\n";
+
+        echo "Database\n";
+        echo "--------\n";
+        echo "- Adapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
+        echo "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
+        echo "- Host:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
+        echo "- Username:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
+        echo "\n";
+
+        echo "Log\n";
+        echo "---\n";
+        echo "- File:\t\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.log.file') . "\n";
+        echo "- Level:\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
+        echo "\n";
+
+        echo "\n";
+    }
+
+
+    protected function _settingsDefaults() {
+        echo "Tasks Default Settings\n";
+        echo "======================\n\n";
+
+        echo "Global\n";
+        echo "------\n";
+        echo "- Namespace:\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
+        echo "- IPC:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
+        echo "\n";
+
+        echo "Trigger\n";
+        echo "-------\n";
+        echo "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
+        echo "- Types:\t\tInterval, Cron, Gearman\n";
+        echo "- Interval\n";
+//        echo "\t- Time:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
+        echo "- Cron\n";
+//        echo "\t- Interval:\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.cron.default') . "\n";
+        echo "\n";
+
+        echo "Process\n";
+        echo "-------\n";
+        echo "- Type:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.type') . "\n";
+        echo "- Parallel\n";
+        echo "\t- Childs:\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.parallel.childs') . "\n";
+        echo "\n";
+
+
+        echo "\n";
+    }
+
+
+    protected function _settingsTasks() {
+        echo "Tasks Specific Settings\n";
+        echo "=======================\n\n";
+
+        $tasks = array();
+        try {
+            $tasks = $this->scanTasks();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+
+        if (count($tasks)>0) {
+            foreach($tasks as $nr => $taskName) {
+                echo $taskName . "\n";
+                echo str_repeat('-', strlen($taskName)) . "\n";
+                echo "\tProcess:\t\t" . Config::get()->getOptionValue('manager.process.type') . "\t\t(" . Config::get()->getOptionValue('manager.process.type') . ")\n";
+            }
+        } else {
+            echo "No tasks found!!!";
+        }
+
+        echo "\n\n";
     }
 
 }

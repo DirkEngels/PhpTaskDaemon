@@ -1,7 +1,9 @@
 <?php
 
+define('APPLICATION_ENV', 'production');
+
 define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
-define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/application'));
+define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/app'));
 define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/lib'));
 define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
 
@@ -10,7 +12,8 @@ $includePaths = array(
     get_include_path(),
     \LIBRARY_PATH, 
     '/usr/share/php/',
-    '/usr/share/php/libzend-framework-php/'
+    '/usr/share/php/libzend-framework-php/',
+    '/usr/share/php/PHPUnit/',
 );
 set_include_path(
     implode(

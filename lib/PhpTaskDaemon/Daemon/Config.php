@@ -20,60 +20,33 @@ use \PhpTaskDaemon\Daemon\Logger;
  *
  */
 class Config {
-    protected static $_instance = null;
+    protected static $_instance = NULL;
 
     /**
      * Zend_Config object instance
      * @var \Zend_Config
      */
-    protected $_config = null;
+    protected $_config = NULL;
+
+    /**
+     * Loaded configurations files
+     * @var array
+     */
+    protected $_files = array();
 
 
     /** 
      * Protected constructor for singleton pattern
      */
     protected function __construct($configFiles = array()) {
-        $this->_initConfig($configFiles);
-    }
-
-
-    /**
-     * Initializes the configuration by loading one or more (default)
-     * configuration files
-     * @param array $configFiles
-     */
-    protected function _initConfig($configFiles) {
-        // Add default configuration
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/app.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/defaults.ini'));
-        array_unshift($configFiles, realpath(\APPLICATION_PATH . '/../etc/daemon.ini'));
-
-        foreach($configFiles as $configFile) {
-            Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
-            if (!file_exists($configFile)) {
-                Logger::get()->log("Config file does not exists: " . $configFile, \Zend_Log::ERR);
-                continue;
-            }
-
-            if (!is_a($this->_config, '\Zend_Config')) {
-                // First config
-                $this->_config = new \Zend_Config_Ini(
-                    $configFile,
-                    \APPLICATION_ENV,
-                    array('allowModifications' => true)
-                );
-            } else {
-                // Merge config file
-                $this->_config->merge(
-                    new \Zend_Config_Ini(
-                        $configFile, 
-                        \APPLICATION_ENV
-                    )
-                );
-            }
-            Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::INFO);
+        if (count($configFiles) == 0) {
+            // Add default configuration
+            array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/app.ini'));
+            array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/defaults.ini'));
+            array_unshift($configFiles, realpath(\APPLICATION_PATH . '/etc/daemon.ini'));
         }
-        $this->_config->setReadonly();
+
+        $this->_initConfig($configFiles);
     }
 
 
@@ -82,6 +55,10 @@ class Config {
      * @return \PhpTaskDaemon\Daemon\Config
      */
     public function get($configFiles = array()) {
+        if (count($configFiles) > 0) {
+            self::$_instance = NULL;
+        }
+
         if (!self::$_instance) {
             Logger::get()->log("Creating new config object", \Zend_Log::DEBUG);
             self::$_instance = new self($configFiles);
@@ -106,8 +83,17 @@ class Config {
      */
     public function setConfig($config) {
         $this->_config = $config;
+        return $this;
     }
 
+
+    /**
+     * Returns the loaded configurations files.
+     * @return array
+     */
+    public function getLoadedConfigFiles() {
+        return $this->_files;
+    }
 
     /**
      * Returns a configuration option. If the taskName is specified, then it
@@ -115,86 +101,121 @@ class Config {
      * default will be returned.
      * @param string $option
      * @param string $taskName
-     * @param null|string
+     * @param NULL|string
      */
-    public function getOption($option, $taskName = null) {
-        $value = null;
+    public function getOption($option, $taskName = NULL) {
+        $value = NULL;
+        $source = NULL;
 
-        if (!is_null($taskName)) {
-            $value = $this->getTaskOption($option, $taskName);
-            if (isset($value)) {
-                return $value;
+        // Task option
+        if (!is_NULL($taskName)) {
+            try {
+                $value = $this->_getRecursiveKey('tasks.' . $taskName . '.' . $option);
+                $source = 'task';
+            } catch (\Exception $e) {
+                Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
             }
         }
 
-        $value = $this->getDaemonOption($option);
-        if (isset($value)) {
-            return $value;
+        if (is_NULL($source)) {
+            try {
+                $value = $this->_getRecursiveKey('tasks.defaults.' . $option);
+                $source = 'default';
+            } catch (\Exception $e) {
+                Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
+            }
+        }
+
+        // Daemon option
+        if (is_NULL($source)) {
+            try {
+                $value = $this->_getRecursiveKey('daemon.' . $option);
+                $source = 'daemon';
+            } catch (\Exception $e) {
+                Logger::get()->log('DAEMON' . $e->getMessage(), \Zend_Log::DEBUG);
+            }
+        }
+
+        // Fallback
+        if (is_NULL($source)) {
+            try {
+                $value = $this->_getRecursiveKey($option);
+                $source = 'fallback';
+            } catch (\Exception $e) {
+                Logger::get()->log('FALLBACK' . $e->getMessage(), \Zend_Log::DEBUG);
+            }
         }
 
         Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::CRIT);
-        throw new \Exception('Config option not declared!');
+        $out = array($source, $value);
+        return $out;
     }
 
 
     /**
-     * Returns the daemon configuration setting for $option
-     * @param string $option
+     * Returns the source of a configuration options
+     * @param $option
+     * @param $taskName
+     * @return string
      */
-    public function getDaemonOption($option) {
-        Logger::get()->log('Trying daemon config option: ' . $option, \Zend_Log::DEBUG);
-        return $this->getRecursiveKey($option);
+    public function getOptionSource($option, $taskName = NULL) {
+        list($source, $value) = $this->getOption($option, $taskName);
+        return $source;
     }
 
 
     /**
-     * Returns the task (specific or default) configuration for $option
-     * @param string $option
-     * @param string $taskName
+     * Returns the value of a configuration options
+     * @param $option
+     * @param $taskName
+     * @return string
      */
-    public function getTaskOption($option, $taskName = null) {
-        if (!is_null($taskName)) {
-            try {
-                $value = $this->getTaskSpecificOption($option, $taskName);
-            } catch (\Exception $e) {
-                \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::DEBUG);
+    public function getOptionValue($option, $taskName = NULL) {
+        list($source, $value) = $this->getOption($option, $taskName);
+        return $value;
+    }
+
+
+    /**
+     * Initializes the configuration by loading one or more (default)
+     * configuration files
+     * @param array $configFiles
+     */
+    protected function _initConfig($configFiles) {
+        foreach($configFiles as $configFile) {
+            Logger::get()->log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
+            if (!file_exists($configFile)) {
+                Logger::get()->log("Config file does not exists: " . $configFile, \Zend_Log::ERR);
+                continue;
             }
+
+            if (!is_a($this->_config, '\Zend_Config')) {
+                // First config
+                $this->_config = new \Zend_Config_Ini(
+                    $configFile,    
+                    \APPLICATION_ENV,
+                    array('allowModifications' => TRUE)
+                );
+            } else {
+                // Merge config file
+                $this->_config->merge(
+                    new \Zend_Config_Ini(
+                        $configFile, 
+                        \APPLICATION_ENV
+                    )
+                );
+            }
+            // Register configurations file
+            array_push($this->_files, $configFile);
+            Logger::get()->log("Loaded config file: " . $configFile, \Zend_Log::INFO);
         }
 
-        if (!isset($value)) {
-            $value = $this->getTaskDefaultOption($option);
+        // At least one configuration file must be loaded.
+        if (count($this->_files) == 0) {
+            throw new \Exception('No configuration files found!');
         }
 
-        return $value;
-    }
-
-
-    /**
-     * Returns the default task configuration option
-     * @param string $option
-     * @return null|mixed
-     */
-    public function getTaskDefaultOption($option) {
-        $value = null;
-        Logger::get()->log('Trying default config option: tasks.defaults.' . $option, \Zend_Log::DEBUG);
-        try {
-            $value = $this->getRecursiveKey('tasks.defaults.' . $option);
-        } catch (\Exception $e) {
-            Logger::get()->log('Failed loading default config option: ' . $option, \Zend_Log::DEBUG);
-        }
-        return $value;
-    }
-
-
-    /**
-     * Returns the Ret
-     * @param string $option
-     * @param string $taskName
-     * @return null|mixed
-     */
-    public function getTaskSpecificOption($option, $taskName) {
-        Logger::get()->log('Trying task config option: tasks.' . $this->_prepareString($taskName) . '.' . $option, \Zend_Log::DEBUG);
-        return $this->getRecursiveKey('tasks.' . $taskName . '.' . $option);
+        $this->_config->setReadonly();
     }
 
 
@@ -203,19 +224,20 @@ class Config {
      * level has been reached.
      * @param $keyString
      */
-    public function getRecursiveKey($keyString) {
+    protected function _getRecursiveKey($keyString) {
         $keyString = $this->_prepareString($keyString);
-        $value = null;
         $keyPieces = explode('.', $keyString);
-        $config = $this->_config;
-        foreach ($keyPieces as $keyPiece) {
-            $config = $config->get($keyPiece);
-            if (!isset($config)) {
-                throw new \Exception('Config option not found');
+
+        $configArray = Config::get()->getConfig()->toArray();
+        $value = $configArray;
+        foreach($keyPieces as $keyPiece) {
+            if (isset($value[$keyPiece])) {
+                $value = $value[$keyPiece];
+            } else {
+                throw new \Exception('Config option does not exists: ' . $keyString);
             }
         }
-
-        return $config;
+        return $value;
     }
 
 

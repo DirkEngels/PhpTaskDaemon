@@ -8,33 +8,39 @@ Features (requested)
 - Add new Manager Process
     - System (isolates a process)
 
-Version 1.0 (planned)
+Version 1.0 (roadmap)
 ---------------------
+- multiple IPC adapters (none, filesystem, shared memory, database)
+- multiple Manager Process Adapters (same, child, parallel)
+- multiple Manager Trigger (interval, cron, gearman)
 - fully unit tested: Functional tests start a daemon and send interrupt signals
 - Add tools
     - cron restart script (for restarting after critical errors)
     - boot script (/etc/init.d/phptaskdaemon)
 - Create user documentation (website/wiki)
 
-Version 0.9 (planned) 
----------------------
-- Implement Task\Manager\Trigger type: Cron
-- Implement Task\Manager\Trigger type: Gearman
-- Implement Task\Manager\Process type: Child
-- Implement Task\Manager\Process type: Parallel
-- Add database support (database)
-    - Implement Daemon\Ipc type: Database (ipc-db)
 
 
-Version 0.8 (planned)
----------------------
-- Add exception handling (exception)
-- Review/Fix current unit tests (tests)
-- Working version!!!
+Version 0.8.1 (planned)
+-----------------------
+- Implement & unit tests IPC adapters
+  - None
+  - FileSystem
+  - SharedMemory
+  - DataBase
+- Refactoring
+  - Extract task loading methods to seperate class
+  - Rename BaseClasses to DefaultClasses 
+
+Version 0.8 (14-10-2011)
+========================
++ Add initial exception handling
++ Review/Fix current unit tests
++ Runnable version!!!
 
 
 Version 0.7.2 (17-08-2011)
-==========================
+--------------------------
 + Add build.xml script for CI environment
 
 

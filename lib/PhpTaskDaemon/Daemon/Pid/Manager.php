@@ -19,16 +19,16 @@ class Manager {
 
     /**
      * This variables stores the current process ID.
-     * @var int|null
+     * @var int|NULL
      */
-    protected $_current = null;
+    protected $_current = NULL;
 
     /**
      * 
      * The parent process ID
-     * @var int|null
+     * @var int|NULL
      */
-    protected $_parent = null;
+    protected $_parent = NULL;
 
     /**
      * An array with the child pids, if any.
@@ -43,12 +43,12 @@ class Manager {
      * @param int $pid
      * @param int $parent
      */
-    public function __construct($pid = null, $parent = null) {
-        if ($pid === null) {
+    public function __construct($pid = NULL, $parent = NULL) {
+        if ($pid === NULL) {
             $pid = getmypid();
         }
         $this->_current = $pid;
-        if ($parent !== null) {
+        if ($parent !== NULL) {
             $this->_parent = $parent;
         }
     }
@@ -67,7 +67,7 @@ class Manager {
     /**
      * 
      * Returns the PID of the parent process
-     * @return int|null
+     * @return int|NULL
      */
     public function getParent() {
         return $this->_parent;
@@ -91,9 +91,9 @@ class Manager {
      */
     public function hasChilds() {
         if (count($this->_childs)>0) {
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -116,11 +116,11 @@ class Manager {
      */
     public function removeChild($pid) {
         $key = array_search($pid, $this->_childs);
-        if ($key !== false) {
+        if ($key !== FALSE) {
             unset($this->_childs[$key]);
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 

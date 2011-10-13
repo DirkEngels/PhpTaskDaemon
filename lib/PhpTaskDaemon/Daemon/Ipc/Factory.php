@@ -16,6 +16,7 @@ namespace PhpTaskDaemon\Daemon\Ipc;
 class Factory {
     const TYPE_NONE = 'None';
     const TYPE_SHAREDMEMORY = 'SharedMemory';
+    const TYPE_FILESYSTEM = 'FileSystem';
     const TYPE_DATABASE = 'DataBase';
 
 
@@ -25,7 +26,7 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
     public static function get($ipcType, $id) {
-        $ipcObject = null;
+        $ipcObject = NULL;
         switch($ipcType) {
             case self::TYPE_SHAREDMEMORY:
                 $ipcObject = new SharedMemory($id);

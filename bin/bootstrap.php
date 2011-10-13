@@ -3,7 +3,7 @@
 // Set include paths
 define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
 define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/app'));
-define('TASKDIR_PATH', realpath(\PROJECT_ROOT .'/app/Tasks'));
+define('TASKDIR_PATH', realpath(\PROJECT_ROOT .'/app/tasks'));
 define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/lib'));
 define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
 

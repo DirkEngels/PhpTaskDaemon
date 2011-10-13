@@ -1,6 +1,6 @@
 <?php
 
-namespace Tasks\Examples\Minimal;
+namespace PhpTaskDaemon\Task\Example\Minimal;
 
 use \PhpTaskDaemon\Task\Executor as TaskExecutor;
 use \PhpTaskDaemon\Task\Queue\Statistics;
