@@ -15,7 +15,7 @@
 
 namespace PhpTaskDaemon\Task\Data\Job;
 
-class BaseClassTest extends \PHPUnit_Framework_Testcase {
+class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
     /**
      * @var \PhpTaskDaemon\Task\Job\Data\AbstractClass
@@ -28,7 +28,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
     protected $_mockData;
 
     protected function setUp() {
-        $this->_data = new \PhpTaskDaemon\Task\Job\Data\BaseClass();
+        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DefaultClass();
         $this->_mockData = array(
             'key1' => 'value1',
             'key2' => 'value2',
@@ -54,7 +54,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertEquals(0, sizeof($this->_data->getKeys()));
     }
     public function testInitWithDataArguments() {
-        $this->_data = new \PhpTaskDaemon\Task\Job\Data\BaseClass($this->_mockData);
+        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DefaultClass($this->_mockData);
         $this->assertInstanceOf('\PhpTaskDaemon\Task\Job\Data\AbstractClass', $this->_data);
         $this->assertInternalType('array', $this->_data->get());
         $this->assertEquals(4, sizeof($this->_data->get()));
@@ -73,7 +73,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
     }
 
     public function testSetVarInitialized() {
-        $this->_data = new \PhpTaskDaemon\Task\Job\Data\BaseClass($this->_mockData);
+        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DefaultClass($this->_mockData);
 
         $this->assertEquals(4, sizeof($this->_data->get()));
         $this->assertEquals(4, sizeof($this->_data->getKeys()));

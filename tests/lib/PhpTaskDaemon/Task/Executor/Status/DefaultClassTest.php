@@ -14,7 +14,7 @@
 
 namespace PhpTaskDaemon\Task\Executor\Status;
 
-class BaseClassTest extends \PHPUnit_Framework_Testcase {
+class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_status;
 	protected $_sharedMemory;
 	
@@ -25,7 +25,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
         );
 
 		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-status');
-		$this->_status = new \PhpTaskDaemon\Task\Executor\Status\BaseClass();
+		$this->_status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
 		
 	}
 	protected function tearDown() {
@@ -43,7 +43,7 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
 	}
 	public function testConstructorSingleArguments() {
-		$this->_status = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($this->_ipc);
+		$this->_status = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($this->_ipc);
 		$ipcCreated = $this->_status->getIpc();
 		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
 	}
