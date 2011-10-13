@@ -14,15 +14,15 @@
 
 namespace PhpTaskDaemon\Task\Manager;
 
-class BaseClassTest extends \PHPUnit_Framework_Testcase {
+class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_manager;
 	protected $_executor;
 	protected $_queue;
 	
 	protected function setUp() {
-		$this->_executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
-		$this->_queue = new \PhpTaskDaemon\Task\Queue\BaseClass();
-		$this->_manager = new \PhpTaskDaemon\Task\Manager\BaseClass($this->_executor);
+		$this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass();
+		$this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
+		$this->_manager = new \PhpTaskDaemon\Task\Manager\DefaultClass($this->_executor);
 	}
 	protected function tearDown() {
 		unset($this->_manager);

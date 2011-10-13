@@ -14,7 +14,7 @@
 
 namespace PhpTaskDaemon\Task\Queue;
 
-class BaseClassTest extends \PHPUnit_Framework_Testcase {
+class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_queue;
 	protected $_statistics;
 	
@@ -25,9 +25,9 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
         );
 
 		$semaphore = __DIR__ . '/_data/constructor.shm';
-		$this->_queue = new \PhpTaskDaemon\Task\Queue\BaseClass($semaphore);
+		$this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass($semaphore);
 		$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-queue');
-		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass($sharedMemory);
+		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($sharedMemory);
 	}
 	protected function tearDown() {
 //		$sharedMemory = $this->_statistics->getIpc();
