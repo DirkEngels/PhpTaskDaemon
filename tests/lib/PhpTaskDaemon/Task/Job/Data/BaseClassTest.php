@@ -112,6 +112,34 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertNull($this->_data->getVar('array_does_not_exists'));
     }
 
+    public function testSetReset () {
+        $this->assertEquals(0, sizeof($this->_data->get()));
+        $this->assertEquals(0, sizeof($this->_data->getKeys()));
+
+        $newData = array('keyA' => 'valueA', 'keyB' => 'valueB');
+        $this->assertTrue($this->_data->set($newData, true));
+
+        $this->assertEquals(2, sizeof($this->_data->get()));
+        $this->assertEquals(2, sizeof($this->_data->getKeys()));
+        $this->assertEquals('valueA', $this->_data->getVar('keyA'));
+        $this->assertEquals('valueB', $this->_data->getVar('keyB'));
+
+        $this->assertNull($this->_data->getVar('array_does_not_exists'));
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testSetInvalidData () {
+        $this->assertEquals(0, sizeof($this->_data->get()));
+        $this->assertEquals(0, sizeof($this->_data->getKeys()));
+
+        $this->assertFalse($this->_data->set('invalid data'));
+
+        $this->assertEquals(0, sizeof($this->_data->get()));
+        $this->assertEquals(0, sizeof($this->_data->getKeys()));
+    }
+
     public function testValidate() {
         $this->assertTrue($this->_data->validate());
     }
