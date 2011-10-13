@@ -242,21 +242,21 @@ class Factory {
 
         switch($objectType) {
             case 'manager':
-                return new \PhpTaskDaemon\Task\Manager\BaseClass(
+                return new \PhpTaskDaemon\Task\Manager\DefaultClass(
                     self::getComponentType($taskName, self::TYPE_EXECUTOR)
                 );
             case 'trigger':
                 return new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
             case 'queue':
-                return new \PhpTaskDaemon\Task\Queue\BaseClass();
+                return new \PhpTaskDaemon\Task\Queue\DefaultClass();
             case 'statistics':
-                return new \PhpTaskDaemon\Task\Queue\Statistics\BaseClass();
+                return new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
             case 'process':
                 return new \PhpTaskDaemon\Task\Manager\Process\Same();
             case 'executor':
-                return new \PhpTaskDaemon\Task\Executor\BaseClass();
+                return new \PhpTaskDaemon\Task\Executor\DefaultClass();
             case 'status':
-                return new \PhpTaskDaemon\Task\Executor\Status\BaseClass();
+                return new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
         }
         throw new Exception\UndefinedObjectType('Unknown object type: ' . $objectType);
 

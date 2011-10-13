@@ -13,7 +13,7 @@ namespace PhpTaskDaemon\Task\Manager;
  * The manager base class does notting, but is defined for unit testing
  * purposes.
  */
-class BaseClass extends AbstractClass implements InterfaceClass {
+class DefaultClass extends AbstractClass implements InterfaceClass {
 
     public function execute() {
         echo "Running\n";
