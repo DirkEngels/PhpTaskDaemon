@@ -66,5 +66,48 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertEquals('test', $this->_job->getJobId());
 	}
 
-	
+    public function testSetInput() {
+        $this->_job = new \PhpTaskDaemon\Task\Job\BaseClass();
+
+        $input = new \PhpTaskDaemon\Task\Job\Data\BaseClass(
+            array('key' => 'value')
+        );
+        $this->assertNotEquals($input, $this->_job->getInput());
+
+        $this->_job->setInput($input);
+        $this->assertEquals($input, $this->_job->getInput());
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testSetInputInvalidFormat() {
+        $this->_job = new \PhpTaskDaemon\Task\Job\BaseClass();
+
+        $input = array('key' => 'value');
+        $this->_job->setInput($input);
+    }
+
+	public function testSetOutput() {
+		$this->_job = new \PhpTaskDaemon\Task\Job\BaseClass();
+
+		$output = new \PhpTaskDaemon\Task\Job\Data\BaseClass(
+		    array('key' => 'value')
+		);
+		$this->assertNotEquals($output, $this->_job->getOutput());
+
+		$this->_job->setOutput($output);
+		$this->assertEquals($output, $this->_job->getOutput());
+	}
+
+	/**
+	 * @expectedException Exception
+	 */
+    public function testSetOutputInvalidFormat() {
+        $this->_job = new \PhpTaskDaemon\Task\Job\BaseClass();
+
+        $output = array('key' => 'value');
+        $this->_job->setOutput($output);
+    }
+
 }
