@@ -27,7 +27,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	protected function tearDown() {
 		unset($this->_manager);
 		unset($this->_executor);
-}
+    }
 	
 	public function testConstructor() {
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
