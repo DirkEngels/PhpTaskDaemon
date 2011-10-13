@@ -98,11 +98,11 @@ abstract class AbstractClass {
      * @return bool
      */
     public function setInput($input) {
-        if (is_a($input, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
-            $this->_input = $input;
-            return true; 
+        if (!is_a($input, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
+            throw new \Exception('Wrong data format for job input!');
         }
-        return false;
+        $this->_input = $input;
+        return true; 
     }
 
 
@@ -123,11 +123,11 @@ abstract class AbstractClass {
      * @return bool
      */
     public function setOutput($output) {
-        if (is_a($output, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
-            $this->_output = $output;
-            return true; 
+        if (!is_a($output, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
+            throw new \Exception('Wrong data format for job output!');
         }
-        return false;
+        $this->_output = $output;
+        return true; 
     }
 
 }
