@@ -16,6 +16,7 @@ class Interval extends AbstractClass implements InterfaceClass {
 
     /**
      * Returns the time to wait.
+     * @output integer
      */
     public function getTimeToWait() {
         return $this->_timeToWait;
@@ -25,9 +26,11 @@ class Interval extends AbstractClass implements InterfaceClass {
     /**
      * Sets the time to wait
      * @param $timeToWait
+     * @output $this
      */
     public function setTimeToWait($timeToWait) {
-    	$this->_timeToWait = $timeToWait;
+        $this->_timeToWait = $timeToWait;
+        return $this;
     }
 
 }
