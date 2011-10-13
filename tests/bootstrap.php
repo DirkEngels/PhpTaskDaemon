@@ -1,7 +1,9 @@
 <?php
 
+define('APPLICATION_ENV', 'production');
+
 define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
-define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/application'));
+define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/app'));
 define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/lib'));
 define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
 
