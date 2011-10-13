@@ -39,8 +39,8 @@ class State {
             // Child info
             if (isset($state['childs'])) {
                 foreach($state['childs'] as $child) {
-                    $state['task-' . $child]['status'] = self::_getStatusChild($child);
-                    $state['task-' . $child]['statistics'] = self::_getStaticsChild($child);
+                    $state['task-' . $child]['status'] = self::_getChildStatus($child);
+                    $state['task-' . $child]['statistics'] = self::_getChildStatistics($child);
                 }
             }
         }
@@ -56,7 +56,7 @@ class State {
      * @param int $childPid
      * @return array
      */
-    protected static function _getStatusChild($childPid) {
+    protected static function _getChildStatus($childPid) {
         $state = array('childPid' => $childPid);
         if (file_exists(TMP_PATH . '/status-' . $childPid . '.shm')) {
             $shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . $childPid);
@@ -78,7 +78,7 @@ class State {
      * @param int $childPid
      * @return array
      */
-    protected static function _getStaticsChild($childPid) {
+    protected static function _getChildStatistics($childPid) {
         $state = array('childPid' => $childPid);
         if (file_exists(TMP_PATH . '/statistics-' . $childPid . '.shm')) {
             $shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . $childPid);
