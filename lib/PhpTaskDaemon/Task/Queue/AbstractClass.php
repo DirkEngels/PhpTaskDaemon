@@ -89,8 +89,9 @@ abstract class AbstractClass {
             } else {
                 $this->_statistics->decrementQueue();
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
 }
