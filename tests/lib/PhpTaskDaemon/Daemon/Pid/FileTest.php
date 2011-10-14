@@ -63,6 +63,11 @@ class FileTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->_file->isRunning());
     }
 
+    public function testIsRunningWhenTheDaemonIsShutDown() {
+        $this->_file = new \PhpTaskDaemon\Daemon\Pid\File(__DIR__ . '/_data/empty.pid');
+        $this->assertFalse($this->_file->isRunning());
+    }
+
     /**
      * @expectedException \PhpTaskDaemon\Daemon\Exception\FileNotFound
      */    
