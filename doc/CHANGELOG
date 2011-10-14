@@ -4,7 +4,7 @@ Change Log
 Features (requested)
 --------------------
 - Add new Manager Trigger 
-    - Event (uses eventloop)
+    - Beanstalk
 - Add new Manager Process
     - System (isolates a process)
 
@@ -24,18 +24,18 @@ Version 1.0 (roadmap)
 Version 0.8.1 (planned)
 -----------------------
 - Implement IPC adapters
-  + None
-  - FileSystem
-  + SharedMemory
-  - DataBase
+    + None
+    - FileSystem
+    + SharedMemory
+    - DataBase
 - Unit tests IPC adapters
-  + None
-  - FileSystem
-  - SharedMemory
-  - DataBase
+    + None
+    - FileSystem
+    - SharedMemory
+    - DataBase
 - Refactoring
-  - Extract task loading methods to seperate class
-  + Rename BaseClasses to DefaultClasses 
+    - Extract task loading methods to seperate class
+    + Rename BaseClasses to DefaultClasses 
 
 Version 0.8 (14-10-2011)
 ========================
