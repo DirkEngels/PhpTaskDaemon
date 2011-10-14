@@ -48,7 +48,7 @@ abstract class AbstractClass {
      * (Re)Sets the input array 
      * @param array $data
      */
-    public function set($data, $reset = false) {
+    public function set($data, $reset = FALSE) {
         if (!is_array($data)) {
             throw new \Exception('Job data must be an array!');
         }
@@ -58,7 +58,7 @@ abstract class AbstractClass {
         } else {
             $this->_data = array_merge($this->_data, $data);
         }
-        return true;
+        return TRUE;
     }
 
 
@@ -71,7 +71,7 @@ abstract class AbstractClass {
         if (in_array($var, array_keys($this->_data))) {
             return $this->_data[$var];
         }
-        return null;
+        return NULL;
     }
 
 
@@ -82,12 +82,12 @@ abstract class AbstractClass {
      * @param mixed $value
      * @return bool
      */
-    public function setVar($var, $value, $force = false) {
+    public function setVar($var, $value, $force = FALSE) {
         if ( in_array($var, $this->getKeys()) || $force) {
             $this->_data[$var] = $value;
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -96,7 +96,7 @@ abstract class AbstractClass {
      * Validate the input
      */
     public function validate() {
-    	return true;
+    	return TRUE;
     }
 
 }
