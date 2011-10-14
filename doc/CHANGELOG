@@ -23,8 +23,13 @@ Version 1.0 (roadmap)
 
 Version 0.8.1 (planned)
 -----------------------
-- Implement & unit tests IPC adapters
-  - None
+- Implement IPC adapters
+  + None
+  - FileSystem
+  + SharedMemory
+  - DataBase
+- Unit tests IPC adapters
+  + None
   - FileSystem
   - SharedMemory
   - DataBase
