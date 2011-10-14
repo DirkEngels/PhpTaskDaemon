@@ -82,5 +82,4 @@ class DefaultClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('still executing', $this->_executor->getStatus()->get('message'));
 	}
 
-	
 }
