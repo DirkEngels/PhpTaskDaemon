@@ -15,16 +15,16 @@ namespace PhpTaskDaemon\Task\Executor;
  */
 abstract class AbstractClass {
 
-	protected $_job = null;
+	protected $_job = NULL;
 
-    protected $_status = null;
+    protected $_status = NULL;
 
     /**
      * 
      * Optional a executor status object can be provided. 
      * @param \PhpTaskDaemon\Task\Executor\Status $status
      */
-    public function __construct($status = null) {
+    public function __construct($status = NULL) {
         $this->setStatus($status);
     }
 
@@ -73,14 +73,14 @@ abstract class AbstractClass {
      * 
      * Updates the status of the current job in shared memory.
      * @param integer $percentage
-     * @param string|null $message
+     * @param string|NULL $message
      * @return bool
      */
-    public function updateStatus($percentage, $message = null) {
-        if ($this->_status != null) {
+    public function updateStatus($percentage, $message = NULL) {
+        if ($this->_status != NULL) {
             return $this->_status->set($percentage, $message);
         }
-        return false;
+        return FALSE;
     }
 
 }

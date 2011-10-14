@@ -19,8 +19,8 @@ use \PhpTaskDaemon\Task\Job\Data as Data;
  */
 abstract class AbstractClass {
     protected $_jobId;
-    protected $_input = null;
-    protected $_output = null;
+    protected $_input = NULL;
+    protected $_output = NULL;
 
 
     /**
@@ -30,8 +30,8 @@ abstract class AbstractClass {
      * @param string $jobId
      * @param array $input 
      */
-    public function __construct($jobId = null, $inputData = null) {
-        if ($jobId === null) {
+    public function __construct($jobId = NULL, $inputData = NULL) {
+        if ($jobId === NULL) {
             $jobId = $this::generateJobId();
         }
 
@@ -72,8 +72,8 @@ abstract class AbstractClass {
      * @param string $jobId
      * @return $this;
      */
-    public function setJobId($jobId = null) {
-        if ($jobId===null) {
+    public function setJobId($jobId = NULL) {
+        if ($jobId===NULL) {
             $jobId = $this->generateJobId();
         }
         $this->_jobId = $jobId;
@@ -102,7 +102,7 @@ abstract class AbstractClass {
             throw new \Exception('Wrong data format for job input!');
         }
         $this->_input = $input;
-        return true; 
+        return TRUE; 
     }
 
 
@@ -127,7 +127,7 @@ abstract class AbstractClass {
             throw new \Exception('Wrong data format for job output!');
         }
         $this->_output = $output;
-        return true; 
+        return TRUE; 
     }
 
 }

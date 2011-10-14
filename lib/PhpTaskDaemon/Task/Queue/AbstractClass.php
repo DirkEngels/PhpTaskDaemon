@@ -24,7 +24,7 @@ abstract class AbstractClass {
      * Optionally a statistics instance can be provided. 
      * @param \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass $statistics
      */
-    public function __construct($statistics = null) {
+    public function __construct($statistics = NULL) {
         $this->setStatistics($statistics);
     }
 
@@ -59,19 +59,19 @@ abstract class AbstractClass {
      * segment. If no count is given, the current count will be increased by
      * one.
      * @param integer $status
-     * @param integer|null $count
+     * @param integer|NULL $count
      * @return bool
      */
-    public function updateStatistics($status, $count = null) {
-        if ($this->_statistics != null) {
-            if ($count != null) {
+    public function updateStatistics($status, $count = NULL) {
+        if ($this->_statistics != NULL) {
+            if ($count != NULL) {
                 $this->_statistics->setStatusCount($status, $count);
             } else {
                 $this->_statistics->incrementStatus($status);
             }
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -79,19 +79,19 @@ abstract class AbstractClass {
      * 
      * Updates the current queue information with the current count. If no
      * count is given, the current count will be decreased by one.
-     * @param integer|null $count
+     * @param integer|NULL $count
      * @return boolean
      */
-    public function updateQueue($count = null) {
-        if ($this->_statistics != null) {
-            if ($count != null) {
+    public function updateQueue($count = NULL) {
+        if ($this->_statistics != NULL) {
+            if ($count != NULL) {
                 $this->_statistics->setQueueCount($count);
             } else {
                 $this->_statistics->decrementQueue();
             }
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 }
