@@ -2,7 +2,7 @@
 
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Executor
+ * @subpackage Task\Manager\Trigger
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
@@ -10,6 +10,7 @@
  * @group PhpTaskDaemon
  * @group PhpTaskDaemon-Task
  * @group PhpTaskDaemon-Task-Manager
+ * @group PhpTaskDaemon-Task-Manager-Trigger
  */
 
 namespace PhpTaskDaemon\Task\Manager\Trigger;
