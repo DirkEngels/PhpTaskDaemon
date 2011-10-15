@@ -19,8 +19,8 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         // Return Status
         $returnStatus = (rand(0,1)==1) 
-            ? Statistics\BaseClass::STATUS_DONE 
-            : Statistics\BaseClass::STATUS_FAILED;
+            ? Statistics\DefaultClass::STATUS_DONE 
+            : Statistics\DefaultClass::STATUS_FAILED;
 
         // Output
         $job->setOutput(

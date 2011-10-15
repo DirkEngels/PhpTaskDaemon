@@ -23,9 +23,9 @@ class Queue extends TaskQueue\AbstractClass implements TaskQueue\InterfaceClass 
         $queue = array();
         for ($i=0; $i<rand(50,500); $i++) {
             array_push($queue,
-                new Job\BaseClass(
+                new Job\DefaultClass(
                     'advanced-' . $i,
-                    new Job\Data\BaseClass(
+                    new Job\Data\DefaultClass(
                         array('sleepTime' => 10000)
                     )
                 )
