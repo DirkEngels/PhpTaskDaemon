@@ -12,12 +12,9 @@ namespace PhpTaskDaemon\Daemon;
 use PhpTaskDaemon\Daemon\Config;
 
 /**
-* The main Daemon class is responsible for starting, stopping and monitoring
+* The main Console class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon daemon options.
-* The start method creates an instance of Dew_Daemon_Daemon and contains the 
-* methods for setup a logger, read the config, daemonize the process and set 
-* the uid/gui of the process. After that the daemon instance starts all the 
-* managers.
+* The start method creates an Instance object 
 */
 class Console {
 
@@ -29,8 +26,8 @@ class Console {
 
     /**
      * 
-     * Daemon run object
-     * @var Daemon
+     * Instance run object
+     * @var Instance
      */
     protected $_instance;
 
@@ -40,9 +37,9 @@ class Console {
      * Daemon constructor method
      * @param \Zend_Console_Getopt $consoleOpts
      */
-    public function __construct(Daemon $instance = NULL) {
+    public function __construct(Instance $instance = NULL) {
         // Initialize command line arguments
-        $this->setDaemon($instance);
+        $this->setInstance($instance);
         $this->setConsoleOpts();
     }
 
@@ -98,10 +95,10 @@ class Console {
 
     /**
      * 
-     * Returns the daemon daemon object
-     * @return Daemon
+     * Returns the daemon instance object
+     * @return Instance
      */
-    public function getDaemon() {
+    public function getInstance() {
         if ($this->_instance === NULL) {
             $this->_instance = new Instance();
         }
@@ -111,52 +108,13 @@ class Console {
 
     /**
      * 
-     * Sets a daemon daemon object
-     * @param Daemon $instance
+     * Sets a daemon instance object
+     * @param Instance $instance
      * @return $this
      */
-    public function setDaemon($instance) {
+    public function setInstance($instance) {
         $this->_instance = $instance;
         return $this;
-    }
-
-
-    /**
-     * Main function to scan all tasks by scanning directories and 
-     * configuration files for executors.
-     * @return array
-     */
-    public function scanTasks() {
-        // Configuration
-//        $tasksFoundInConfig = $this->_scanTasksInConfig(
-//            \PhpTaskDaemon\Daemon\Config::get()
-//        );
-$tasksFoundInConfig = array();
-
-        // Directories
-        try {
-            $tasksFoundInDirs = $this->_scanTasksInDirs(
-                APPLICATION_PATH . '/task/'
-            );
-        } catch (Exception $e) {
-            $tasksFoundInDirs = array();
-        }
-
-        // Merge Tasks
-        $tasks = array_merge($tasksFoundInConfig, $tasksFoundInDirs);
-
-        // Filter single task
-        if ($this->_consoleOpts->getOption('task')) {
-            // Reset tasks & set single one (if found) 
-            if (in_array($this->_consoleOpts->getOption('task'), $tasks)) {
-                $tasks = array($this->_consoleOpts->getOption('task'));
-            } else {
-                $tasks = array();
-            }
-        }
-
-        \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
-        return $tasks;
     }
 
 
@@ -204,7 +162,8 @@ $tasksFoundInConfig = array();
      */
     public function listTasks() {
         if ($this->_consoleOpts->getOption('list-tasks')) {
-            $tasks = $this->scanTasks();
+            $taskLoader = new Tasks();
+            $tasks = $taskLoader->scan();
             if (count($tasks)==0) {
                 echo "No tasks found!\n";
             } else {
@@ -224,7 +183,7 @@ $tasksFoundInConfig = array();
         if ($this->_consoleOpts->getOption('settings')) {
             $this->_settingsDaemon();
 //            $this->_settingsDefaults();
-            $this->_settingsTasks();
+//            $this->_settingsTasks();
             echo "\n";
             exit;
         }
@@ -236,23 +195,17 @@ $tasksFoundInConfig = array();
      * Action: Start Daemon
      */
     public function start() {
-        $tasks = $this->scanTasks();
+        $tasks = new Tasks();
+        $taskNames = $tasks->scan();
 
-        // Initialize daemon
-        foreach($tasks as $task) {
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Loading task: ' . $task, \Zend_Log::INFO);
-            try {
-                $taskManager = \PhpTaskDaemon\Task\Factory::get($task);
-                $this->getDaemon()->addManager($taskManager);
-            } catch (\Exception $e) {
-                throw new \Exception('Failed loading task: ' . $task);
-            }
+        // Initialize daemon tasks
+        foreach($taskNames as $taskName) {
+            $tasks->loadManagerByTaskName($taskName);
         }
-        \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
+        $this->getInstance()->setTasks($tasks);
 
         // Start the Daemon
-        $this->getDaemon()->start();
-        \PhpTaskDaemon\Daemon\Logger::get()->log('---------------------------------', \Zend_Log::DEBUG);
+        $this->getInstance()->start();
     }
 
 
@@ -261,11 +214,11 @@ $tasksFoundInConfig = array();
      * Action: Stop daemon 
      */
     public function stop() {
-        if (!$this->getDaemon()->isRunning()) {
+        if (!$this->getInstance()->isRunning()) {
             echo 'Daemon is NOT running!!!' . "\n";
         } else {    
             echo 'Terminating application  !!!' . "\n";
-            $this->getDaemon()->stop();
+            $this->getInstance()->stop();
         }
 
         exit();
@@ -408,65 +361,6 @@ $tasksFoundInConfig = array();
                 \PhpTaskDaemon\Daemon\Logger::get()->log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
             }
         }
-    }
-
-
-    /**
-     * 
-     * Scans a directory for task managers and returns the number of loaded
-     * tasks.
-     * 
-     * @param string $dir
-     * @return integer
-     */
-    protected function _scanTasksInDirs($dir, $subdir = NULL) {
-//        if (!is_dir($dir . '/' . $subdir)) {
-//            throw new \Exception('Directory does not exists');
-//        }
-
-        $config = Config::get();
-        $items = scandir($dir . '/' . $subdir);
-        $tasks = array();
-        $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
-        foreach($items as $item) {
-            if ($item== '.' || $item == '..') { continue; }
-            $base = (is_NULL($subdir)) ? $item : $subdir . '/'. $item;
-                    \PhpTaskDaemon\Daemon\Logger::get()->log(
-                        "Trying file: /Task/" . $base, 
-                        \Zend_Log::INFO
-                    );
-            if (preg_match('/Executor.php$/', $base)) {
-                // Try manager file
-                $class = preg_replace('#/#', '\\', Config::get()->getOptionValue('daemon.global.namespace') .'/' . substr($base, 0, -4));
-                include_once($dir . '/' . $base);
-//                echo $class . " => => " . TASKDIR_PATH . '/' . $base  . "\n";
-
-                if (class_exists('\\' . $class)) {
-                    \PhpTaskDaemon\Daemon\Logger::get()->log(
-                        "Found executor file: /Task/" . $base, 
-                        \Zend_Log::DEBUG
-                    );
-                    array_push($tasks, substr($base, 0, -13));
-                }
-            } elseif (is_dir($dir . '/' . $base)) {
-                // Load recursively
-                $tasks = array_merge(
-                    $tasks, 
-                    $this->_scanTasksInDirs($dir, $base)
-                );
-            }
-        }
-        return $tasks;
-    }
-
-
-    /**
-     * Scan for tasks witin the configuration files 
-     * @param $config
-     * @return array
-     */
-    protected function _scanTasksInConfig($config) {
-        return array();
     }
 
 

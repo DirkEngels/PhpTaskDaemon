@@ -35,10 +35,10 @@ class Instance {
     protected $_ipc = NULL;
 
     /**
-     * Array with managers
-     * @var array $_managers
+     * Array with tasks
+     * @var array $_tasks
      */
-    protected $_managers = array();
+    protected $_tasks = NULL;
 
 
     /**
@@ -51,8 +51,8 @@ class Instance {
         $pidFile = \TMP_PATH . '/phptaskdaemond.pid';
         $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid());
         $this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
-        
         $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
+        $this->_tasks = new \PhpTaskDaemon\Daemon\Tasks();
     }
 
 
@@ -64,27 +64,29 @@ class Instance {
         unset($this->_pidManager);
         unset($this->_pidFile);
         unset($this->_ipc);
+        unset($this->_tasks);
     }
 
 
     /**
      * 
-     * Return the loaded manager objects.
-     * @return array
+     * Return the tasks collection object.
+     * @return \PhpTaskDaemon\Daemon\Tasks
      */
-    public function getManagers() {
-        return $this->_managers;
+    public function getTasks() {
+        return $this->_tasks;
     }
 
 
     /**
      * 
-     * Adds a manager object to the managers stack
-     * @param \PhpTaskDaemon\Task\Manager\AbstractClass $manager
-     * @return bool
+     * Sets the tasks collection object
+     * @param \PhpTaskDaemon\Daemon\Tasks $tasks
+     * @return $this
      */
-    public function addManager($manager) {
-        return array_push($this->_managers, $manager);
+    public function setTasks($tasks) {
+        $this->_tasks = $tasks;
+        return $this;
     }
 
 
@@ -168,14 +170,15 @@ class Instance {
         // All OK.. Let's go
         declare(ticks = 1);
 
-        if (count($this->_managers)==0) {
+        if (count($this->_tasks->getManagers())==0) {
             \PhpTaskDaemon\Daemon\Logger::get()->log("No daemon tasks found", \Zend_Log::INFO);
             exit;
         }
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Found " . count($this->_managers) . " daemon tasks", \Zend_Log::INFO);
+        \PhpTaskDaemon\Daemon\Logger::get()->log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::INFO);
 
         $this->_ipc->setVar('childs', array());
-        foreach ($this->_managers as $manager) {
+        $managers = $this->_tasks->getManagers();
+        foreach ($managers as $manager) {
             \PhpTaskDaemon\Daemon\Logger::get()->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
             try {
                 $this->_forkManager($manager);
