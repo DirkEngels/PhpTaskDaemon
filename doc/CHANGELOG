@@ -23,6 +23,7 @@ Version 1.0 (roadmap)
 
 Version 0.8.1 (planned)
 -----------------------
+- Implement Task loader class
 - Implement IPC adapters
     + None
     - FileSystem
