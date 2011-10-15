@@ -53,6 +53,15 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 		$this->_manager->setPidManager($pidManager);
 		$this->assertEquals($pidManager, $this->_manager->getPidManager());
 	}
+
+    public function testSetTrigger() {
+        $interval = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+        $cron = new \PhpTaskDaemon\Task\Manager\Trigger\Cron();
+        $this->assertEquals($interval, $this->_manager->getTrigger());
+        $this->_manager->setTrigger($cron);
+        $this->assertEquals($cron, $this->_manager->getTrigger());
+    }
+
 	public function testSetQueue() {
 //		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTrigger()->getQueue());
 		$this->_manager->getTrigger()->setQueue($this->_queue);
