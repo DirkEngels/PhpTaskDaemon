@@ -108,45 +108,45 @@ class Config {
         $source = NULL;
 
         // Task option
-        if (!is_NULL($taskName)) {
+        if (!is_null($taskName)) {
             try {
                 $value = $this->_getRecursiveKey('tasks.' . $taskName . '.' . $option);
                 $source = 'task';
             } catch (\Exception $e) {
-                Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
+                Logger::get()->log('TASK SPECIFIC ' . $e->getMessage(), \Zend_Log::DEBUG);
             }
         }
 
-        if (is_NULL($source)) {
+        if (is_null($source)) {
             try {
                 $value = $this->_getRecursiveKey('tasks.defaults.' . $option);
                 $source = 'default';
             } catch (\Exception $e) {
-                Logger::get()->log('TASK SPECIFIC' . $e->getMessage(), \Zend_Log::DEBUG);
+                Logger::get()->log('TASK DEFAULT ' . $e->getMessage(), \Zend_Log::DEBUG);
             }
         }
 
         // Daemon option
-        if (is_NULL($source)) {
+        if (is_null($source)) {
             try {
                 $value = $this->_getRecursiveKey('daemon.' . $option);
                 $source = 'daemon';
             } catch (\Exception $e) {
-                Logger::get()->log('DAEMON' . $e->getMessage(), \Zend_Log::DEBUG);
+                Logger::get()->log('DAEMON ' . $e->getMessage(), \Zend_Log::DEBUG);
             }
         }
 
         // Fallback
-        if (is_NULL($source)) {
+        if (is_null($source)) {
             try {
                 $value = $this->_getRecursiveKey($option);
                 $source = 'fallback';
             } catch (\Exception $e) {
-                Logger::get()->log('FALLBACK' . $e->getMessage(), \Zend_Log::DEBUG);
+                Logger::get()->log('FALLBACK ' . $e->getMessage(), \Zend_Log::DEBUG);
             }
         }
 
-        Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::ERR);
+        Logger::get()->log('Config option result: ' . $option . ' => ' . $value . ' (' . $source . ')', \Zend_Log::ERR);
         $out = array($source, $value);
         return $out;
     }
