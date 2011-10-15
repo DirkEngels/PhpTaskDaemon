@@ -58,9 +58,9 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return NULL
      */
     public function getVar($key) {
-        $sql = "SELECT value FROM ipc WHERE key='" . $key . "'";
-//        $row = $this->getPdo()->query($sql);
-        $row = mysql_fetch_array($this->_queryDataBase($sql));
+        $sql = "SELECT value FROM ipc WHERE ipcId='" . $this->_id . "' AND key='" . $key . "'";
+        $row = $this->getPdo()->query($sql);
+//        $row = mysql_fetch_array($this->_queryDataBase($sql));
         return $row['value'];
     }
 
@@ -128,9 +128,11 @@ class DataBase extends AbstractClass implements InterfaceClass {
     /**
      * Executes a single query
      * @param string $query
+     * @return integer
      */
-    protected function _queryDataBase($query) {
-        return mysql_query($query);
+    protected function _queryDataBase($statement) {
+        return mysql_query();
+        return $this->_pdo->exec($statement);
     }
 
 }
