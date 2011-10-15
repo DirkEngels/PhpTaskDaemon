@@ -18,25 +18,32 @@ Version 1.0 (roadmap)
     - cron restart script (for restarting after critical errors)
     - boot script (/etc/init.d/phptaskdaemon)
 - Create user documentation (website/wiki)
-
+- Implement extra IPC adapters
+    + SharedMemory
+    - FileSystem
+    - DataBase
+- Implement extra Trigger adapters
+    - Cron
+    - Gearman
+- Implement extra Process adapters
+    - Child
+    - Parallel
 
 
 Version 0.8.1 (planned)
 -----------------------
 + Implement Task loader class
-- Implement IPC adapters
++ Implement basic IPC adapters
     + None
-    - FileSystem
-    + SharedMemory
-    - DataBase
-- Unit tests IPC adapters
-    + None
-    - FileSystem
-    - SharedMemory
-    - DataBase
++ Implement basic Trigger adapter
+    - Same
++ Implement basic Process adapter
+    - Interval
+- Implement loading task components by configuration
 + Refactoring
     + Extract task loading methods to seperate class
     + Rename BaseClasses to DefaultClasses 
+
 
 Version 0.8 (14-10-2011)
 ========================
