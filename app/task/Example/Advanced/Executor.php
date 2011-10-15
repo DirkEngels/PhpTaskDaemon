@@ -23,7 +23,7 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
             : Statistics\DefaultClass::STATUS_FAILED;
 
         // Output
-        $job->setOutput(
+        $job->getOutput()->set(
             array(
                 'returnStatus' => $returnStatus,
                 'waitTime' => rand(1,5)
