@@ -57,6 +57,7 @@ class Tasks {
             $taskManager = \PhpTaskDaemon\Task\Factory::get($taskName);
             $this->addManager($taskManager);
             \PhpTaskDaemon\Daemon\Logger::get()->log('Succesfully loaded task: ' . $taskName, \Zend_Log::INFO);
+
         } catch (\Exception $e) {
             \PhpTaskDaemon\Daemon\Logger::get()->log('Failed loading task: ' . $taskName . ' => ' . $e->getMessage(), \Zend_Log::INFO);
             return false;
@@ -122,7 +123,6 @@ class Tasks {
                 // Try manager file
                 $class = preg_replace('#/#', '\\', Config::get()->getOptionValue('daemon.global.namespace') .'/' . substr($base, 0, -4));
                 include_once($dir . '/' . $base);
-//                echo $class . " => => " . TASKDIR_PATH . '/' . $base  . "\n";
 
                 if (class_exists('\\' . $class)) {
                     \PhpTaskDaemon\Daemon\Logger::get()->log(
@@ -151,6 +151,5 @@ class Tasks {
     protected function _scanTasksInConfig($config) {
         return array();
     }
-
 
 }
