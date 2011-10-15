@@ -9,6 +9,7 @@
 
 namespace PhpTaskDaemon\Task;
 use \PhpTaskDaemon\Task\Exception as Exception;
+use \PhpTaskDaemon\Daemon;
 
 /**
  * The Task Factory object uses the Factory Design Pattern for instantiating
@@ -168,7 +169,7 @@ class Factory {
      * @return string
      */
     protected function _getClassName($taskName, $objectType) {
-        return '\\Tasks\\' . str_replace('/', '\\', $taskName) . '\\' . ucfirst($objectType);
+        return Daemon\Config::get()->getOptionValue('global.namespace') . '\\'. str_replace('/', '\\', $taskName) . '\\' . ucfirst($objectType);
     }
 
 
@@ -188,10 +189,11 @@ class Factory {
      * @return null|stdClass
      */
     protected function _getObjectClass($taskName, $objectType) {
+        $className = self::_getClassName($taskName, $objectType);
+
         $msg = 'Trying ' . $objectType . ' class component: ' . self::_getClassName($taskName, $objectType);
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
-        $className = self::_getClassName($taskName, $objectType);
         if (class_exists($className)) {
             $msg = 'Found ' . $objectType . ' class component: ' . $className;
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
@@ -237,7 +239,7 @@ class Factory {
      * @return null|StdClass
      */
     protected function _getObjectDefault($taskName, $objectType) {
-        $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Base';
+        $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Default';
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
 
         switch($objectType) {
