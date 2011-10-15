@@ -23,7 +23,7 @@ Version 1.0 (roadmap)
 
 Version 0.8.1 (planned)
 -----------------------
-- Implement Task loader class
++ Implement Task loader class
 - Implement IPC adapters
     + None
     - FileSystem
@@ -34,8 +34,8 @@ Version 0.8.1 (planned)
     - FileSystem
     - SharedMemory
     - DataBase
-- Refactoring
-    - Extract task loading methods to seperate class
++ Refactoring
+    + Extract task loading methods to seperate class
     + Rename BaseClasses to DefaultClasses 
 
 Version 0.8 (14-10-2011)
