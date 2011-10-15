@@ -16,7 +16,6 @@ namespace PhpTaskDaemon\Task\Manager;
 class DefaultClass extends AbstractClass implements InterfaceClass {
 
     public function execute() {
-        echo "Running\n";
         while (true) {
             // Load Tasks in Queue
             $jobs = $this->getTrigger()->getQueue()->load();
@@ -39,8 +38,6 @@ class DefaultClass extends AbstractClass implements InterfaceClass {
             // manageres from using all resources.
             $this->_sleep();
         }
-
-        echo "Done\n";
     }
 
 }
