@@ -15,7 +15,7 @@ class Child extends AbstractClass implements InterfaceClass {
      * Forks the task to a seperate process
      * @param \PhpTaskDaemon\Task\Job $job
      */
-    protected function run() {
+    public function run() {
         // Fork the manager
         $pid = pcntl_fork();
 
