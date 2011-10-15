@@ -146,7 +146,7 @@ class Config {
             }
         }
 
-        Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::CRIT);
+        Logger::get()->log('Config option not declared: ' . $option, \Zend_Log::ERR);
         $out = array($source, $value);
         return $out;
     }
