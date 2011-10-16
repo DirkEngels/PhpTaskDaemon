@@ -72,10 +72,10 @@ class Console {
     /**
      * 
      * Sets new console arguments
-     * @param Zend_Console_Getopt $consoleOpts
+     * @param \Zend_Console_Getopt $consoleOpts
      * @return $this
      */
-    public function setConsoleOpts(Zend_Console_Getopt $consoleOpts = NULL) {
+    public function setConsoleOpts(\Zend_Console_Getopt $consoleOpts = NULL) {
         if ($consoleOpts === NULL) {
             $consoleOpts = $this->getConsoleOpts();
         }
