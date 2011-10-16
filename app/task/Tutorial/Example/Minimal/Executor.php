@@ -1,13 +1,12 @@
 <?php
 
-namespace PhpTaskDaemon\Task\Example\Advanced;
+namespace PhpTaskDaemon\Task\Tutorial\Minimal;
 
 use \PhpTaskDaemon\Task\Executor as TaskExecutor;
 use \PhpTaskDaemon\Task\Queue\Statistics;
 
-require_once(__DIR__ . '/Queue.php');
-
 class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+
     public function run() {
         $job = $this->getJob();
 
@@ -33,4 +32,5 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         return $job;
     }
+
 }
