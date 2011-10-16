@@ -5,13 +5,14 @@ namespace PhpTaskDaemon\Task\Example\Advanced;
 use \PhpTaskDaemon\Task\Executor as TaskExecutor;
 use \PhpTaskDaemon\Task\Queue\Statistics;
 
+require_once(__DIR__ . '/Queue.php');
+
 class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
     public function run() {
         $job = $this->getJob();
 
         // Sleep
         $sleepTimeProgress = round($job->getInput()->getVar('sleepTime')/10);
-        $sleepTimeProgress = rand(200, 1500) * 1000;
         for ($i=1; $i<10; $i++) {
             usleep($sleepTimeProgress);
             $this->updateStatus(($i*10), 'Task data: ' . $job->getJobId());
@@ -19,11 +20,11 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         // Return Status
         $returnStatus = (rand(0,1)==1) 
-            ? Statistics\BaseClass::STATUS_DONE 
-            : Statistics\BaseClass::STATUS_FAILED;
+            ? Statistics\DefaultClass::STATUS_DONE 
+            : Statistics\DefaultClass::STATUS_FAILED;
 
         // Output
-        $job->setOutput(
+        $job->getOutput()->set(
             array(
                 'returnStatus' => $returnStatus,
                 'waitTime' => rand(1,5)

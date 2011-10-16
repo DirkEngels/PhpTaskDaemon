@@ -19,8 +19,8 @@ use \PhpTaskDaemon\Task\Job\Data as Data;
  */
 abstract class AbstractClass {
     protected $_jobId;
-    protected $_input = null;
-    protected $_output = null;
+    protected $_input = NULL;
+    protected $_output = NULL;
 
 
     /**
@@ -28,21 +28,19 @@ abstract class AbstractClass {
      * no jobId is provided, an random ID will be generated. The second 
      * argument is an array containing the input variables.
      * @param string $jobId
-     * @param array $input 
+     * @param \PhpTaskDaemon\Task\Job\AbstractClass $input 
      */
-    public function __construct($jobId = null, $inputData = null) {
-        if ($jobId === null) {
+    public function __construct($jobId = NULL, $input = NULL) {
+        if ($jobId === NULL) {
             $jobId = $this::generateJobId();
         }
 
-        $input = new \PhpTaskDaemon\Task\Job\Data\BaseClass();
-        if (is_array($inputData)) {
-            $input->set($inputData);
+        $this->setJobId($jobId);
+        if (!is_null($input)) {
+            $this->setInput($input);
         }
 
-        $this->setJobId($jobId);
-        $this->setInput($input);
-        $this->_output = new \PhpTaskDaemon\Task\Job\Data\BaseClass();
+        $this->_output = new \PhpTaskDaemon\Task\Job\Data\DefaultClass();
     }
 
 
@@ -72,8 +70,8 @@ abstract class AbstractClass {
      * @param string $jobId
      * @return $this;
      */
-    public function setJobId($jobId = null) {
-        if ($jobId===null) {
+    public function setJobId($jobId = NULL) {
+        if ($jobId===NULL) {
             $jobId = $this->generateJobId();
         }
         $this->_jobId = $jobId;
@@ -102,7 +100,7 @@ abstract class AbstractClass {
             throw new \Exception('Wrong data format for job input!');
         }
         $this->_input = $input;
-        return true; 
+        return TRUE; 
     }
 
 
@@ -127,7 +125,7 @@ abstract class AbstractClass {
             throw new \Exception('Wrong data format for job output!');
         }
         $this->_output = $output;
-        return true; 
+        return TRUE; 
     }
 
 }

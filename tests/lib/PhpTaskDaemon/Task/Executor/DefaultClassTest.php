@@ -13,7 +13,7 @@
 
 namespace PhpTaskDaemon\Task\Executor;
 
-class BaseClassTest extends \PHPUnit_Framework_TestCase {
+class DefaultClassTest extends \PHPUnit_Framework_TestCase {
 	protected $_executor;
 	protected $_status;
 	protected $_job;
@@ -24,10 +24,10 @@ class BaseClassTest extends \PHPUnit_Framework_TestCase {
           'This test has not been implemented yet.'
         );
 
-		$this->_executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
+		$this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass();
 		$sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-executor');
-		$this->_status = new \PhpTaskDaemon\Task\Executor\Status\BaseClass($sharedMemory);
-		$this->_job = new \PhpTaskDaemon\Task\Job\BaseClass();
+		$this->_status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass($sharedMemory);
+		$this->_job = new \PhpTaskDaemon\Task\Job\DefaultClass();
 		
 		// Mark empty run function of the base class as executed in the coverage
 		$this->_executor->run();
@@ -44,7 +44,7 @@ class BaseClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertNull($this->_executor->getStatus());
 	}
 	public function testConstructorSingleArgument() {
-		$this->_executor = new \PhpTaskDaemon\Task\Executor\BaseClass($this->_status);
+		$this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass($this->_status);
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\Status\AbstractClass', $this->_executor->getStatus());
 		$this->assertNull($this->_executor->getJob());
 	}
@@ -82,5 +82,4 @@ class BaseClassTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('still executing', $this->_executor->getStatus()->get('message'));
 	}
 
-	
 }

@@ -22,7 +22,7 @@ abstract class AbstractClass {
      */
     public function getExecutor() {
         if (!is_a($this->_executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
-            $this->_executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
+            $this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass();
         }
         return $this->_executor;
     }

@@ -13,10 +13,9 @@ namespace PhpTaskDaemon\Task\Manager;
  * The manager base class does notting, but is defined for unit testing
  * purposes.
  */
-class BaseClass extends AbstractClass implements InterfaceClass {
+class DefaultClass extends AbstractClass implements InterfaceClass {
 
     public function execute() {
-        echo "Running\n";
         while (true) {
             // Load Tasks in Queue
             $jobs = $this->getTrigger()->getQueue()->load();
@@ -39,8 +38,6 @@ class BaseClass extends AbstractClass implements InterfaceClass {
             // manageres from using all resources.
             $this->_sleep();
         }
-
-        echo "Done\n";
     }
 
 }

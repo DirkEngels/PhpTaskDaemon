@@ -32,7 +32,7 @@ abstract class AbstractClass {
      * object instance will be created when none provided.
      * @param \PhpTaskDaemon\Ipc $ipc
      */
-    public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = null) {
+    public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
         $this->setIpc($ipc);
     }
 
@@ -76,7 +76,7 @@ abstract class AbstractClass {
         $this->_initializeStatus(self::STATUS_RUNNING);
         $this->_initializeStatus(self::STATUS_DONE);
         $this->_initializeStatus(self::STATUS_FAILED);
-        return true;
+        return TRUE;
     }
 
 
@@ -86,8 +86,8 @@ abstract class AbstractClass {
      * @param string $status
      * @return array
      */
-    public function get($status = null) {
-        if (is_null($status)) {
+    public function get($status = NULL) {
+        if (is_NULL($status)) {
             return $this->_ipc->get();
         }
         if (!in_array($status, $this->_ipc->getKeys())) {
@@ -154,9 +154,9 @@ abstract class AbstractClass {
         $keys = $this->_ipc->getKeys();
         if (!in_array($status, array_keys($keys))) {
             $this->_ipc->setVar($status, 0);
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
 }

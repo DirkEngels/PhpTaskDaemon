@@ -4,7 +4,7 @@ Change Log
 Features (requested)
 --------------------
 - Add new Manager Trigger 
-    - Event (uses eventloop)
+    - Beanstalk
 - Add new Manager Process
     - System (isolates a process)
 
@@ -18,22 +18,46 @@ Version 1.0 (roadmap)
     - cron restart script (for restarting after critical errors)
     - boot script (/etc/init.d/phptaskdaemon)
 - Create user documentation (website/wiki)
+- Implement extra IPC adapters
+    + SharedMemory
+    - FileSystem
+    - DataBase
+- Implement extra Trigger adapters
+    - Cron
+    - Gearman
+- Implement extra Process adapters
+    - Child
+    - Parallel
+- Example Tasks & Tools
 
 
-
-Version 0.8.1 (planned)
+Version 0.8.2 (planned)
 -----------------------
-- Implement & unit tests IPC adapters
-  - None
-  - FileSystem
-  - SharedMemory
-  - DataBase
-- Refactoring
-  - Extract task loading methods to seperate class
-  - Rename BaseClasses to DefaultClasses 
+- Add example tasks
+- Add documentation
+    - INSTALL: Installation manual
+    - QUICKSTART: Getting Started
+    - USAGE: Daemon Usage 
+- Implement loading task components by config file
+
+
+Version 0.8.1 (16-10-2011)
+==========================
++ Implement Task loader class
++ Implement basic IPC adapters
+    + None
++ Implement basic Trigger adapter
+    - Same
++ Implement basic Process adapter
+    - Interval
++ Implement loading task components by class definition
++ Refactoring
+    + Extract task loading methods to seperate class
+    + Rename BaseClasses to DefaultClasses 
+
 
 Version 0.8 (14-10-2011)
-========================
+------------------------
 + Add initial exception handling
 + Review/Fix current unit tests
 + Runnable version!!!

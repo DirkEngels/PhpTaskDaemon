@@ -27,7 +27,7 @@ abstract class AbstractClass {
      * object instance will be created when none provided.
      * @param \PhpTaskDaemon\Ipc $ipc
      */
-    public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = null) {
+    public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
         $this->setIpc($ipc);
     }
 
@@ -63,7 +63,7 @@ abstract class AbstractClass {
             $ipc = new \PhpTaskDaemon\Daemon\Ipc\None('status-' . getmypid());
         }
         $this->_ipc = $ipc;
-        return true;
+        return TRUE;
     }
 
 
@@ -72,10 +72,10 @@ abstract class AbstractClass {
      * Get one or more status variables. When a key is provided and exists, the
      * corresponding value will be returning. If no key is given, all
      * registered keys and values will be returned. 
-     * @param string|null $key
+     * @param string|NULL $key
      */
-    public function get($key = null) {
-        if ($key != null) {
+    public function get($key = NULL) {
+        if ($key != NULL) {
             return $this->_ipc->getVar($key);
         }
         return $this->_ipc->getKeys();
@@ -89,12 +89,12 @@ abstract class AbstractClass {
      * @param string $message
      * @return bool
      */
-    public function set($percentage, $message = null) {
+    public function set($percentage, $message = NULL) {
         $this->_ipc->setVar('percentage', $percentage);
-        if ($message != null) {
+        if ($message != NULL) {
             $this->_ipc->setVar('message', $message);
         }
-        return true;
+        return TRUE;
     }
 
 }

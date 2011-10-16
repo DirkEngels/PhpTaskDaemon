@@ -32,7 +32,7 @@ abstract class AbstractClass {
      */
     public function setQueue($queue) {
         if (!is_a($queue, '\PhpTaskDaemon\Task\Queue\AbstractClass')) {
-            $queue = new \PhpTaskDaemon\Task\Queue\BaseClass();
+            $queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
         }
         $this->_queue = $queue;
 

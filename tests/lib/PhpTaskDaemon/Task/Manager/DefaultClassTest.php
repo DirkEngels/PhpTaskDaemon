@@ -14,20 +14,20 @@
 
 namespace PhpTaskDaemon\Task\Manager;
 
-class BaseClassTest extends \PHPUnit_Framework_Testcase {
+class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_manager;
 	protected $_executor;
 	protected $_queue;
 	
 	protected function setUp() {
-		$this->_executor = new \PhpTaskDaemon\Task\Executor\BaseClass();
-		$this->_queue = new \PhpTaskDaemon\Task\Queue\BaseClass();
-		$this->_manager = new \PhpTaskDaemon\Task\Manager\BaseClass($this->_executor);
+		$this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass();
+		$this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
+		$this->_manager = new \PhpTaskDaemon\Task\Manager\DefaultClass($this->_executor);
 	}
 	protected function tearDown() {
 		unset($this->_manager);
 		unset($this->_executor);
-}
+    }
 	
 	public function testConstructor() {
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
@@ -53,6 +53,23 @@ class BaseClassTest extends \PHPUnit_Framework_Testcase {
 		$this->_manager->setPidManager($pidManager);
 		$this->assertEquals($pidManager, $this->_manager->getPidManager());
 	}
+
+    public function testSetTrigger() {
+        $interval = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+        $cron = new \PhpTaskDaemon\Task\Manager\Trigger\Cron();
+        $this->assertEquals($interval, $this->_manager->getTrigger());
+        $this->_manager->setTrigger($cron);
+        $this->assertEquals($cron, $this->_manager->getTrigger());
+    }
+
+    public function testSetProcess() {
+        $same = new \PhpTaskDaemon\Task\Manager\Process\Same();
+        $child = new \PhpTaskDaemon\Task\Manager\Process\Child();
+        $this->assertEquals($same, $this->_manager->getProcess());
+        $this->_manager->setProcess($child);
+        $this->assertEquals($child, $this->_manager->getProcess());
+    }
+
 	public function testSetQueue() {
 //		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTrigger()->getQueue());
 		$this->_manager->getTrigger()->setQueue($this->_queue);
