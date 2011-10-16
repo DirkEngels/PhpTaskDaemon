@@ -31,8 +31,18 @@ Version 1.0 (roadmap)
 - Example Tasks & Tools
 
 
-Version 0.8.1 (planned)
+Version 0.8.2 (planned)
 -----------------------
+- Add example tasks
+- Add documentation
+    - INSTALL: Installation manual
+    - QUICKSTART: Getting Started
+    - USAGE: Daemon Usage 
+- Implement loading task components by config file
+
+
+Version 0.8.1 (16-10-2011)
+==========================
 + Implement Task loader class
 + Implement basic IPC adapters
     + None
@@ -40,14 +50,14 @@ Version 0.8.1 (planned)
     - Same
 + Implement basic Process adapter
     - Interval
-- Implement loading task components by configuration
++ Implement loading task components by class definition
 + Refactoring
     + Extract task loading methods to seperate class
     + Rename BaseClasses to DefaultClasses 
 
 
 Version 0.8 (14-10-2011)
-========================
+------------------------
 + Add initial exception handling
 + Review/Fix current unit tests
 + Runnable version!!!
