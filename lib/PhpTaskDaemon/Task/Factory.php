@@ -199,7 +199,7 @@ class Factory {
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
             return new $className();
         }
-        return false;
+        return NULL;
     }
 
 
@@ -220,16 +220,22 @@ class Factory {
                 $taskName
             )
         );
-        $objectClassName = '\\PhpTaskDaemon\\Task\\Manager\\' . $configType;
-        $msg = 'Testing class: ' . $objectClassName;
+
+        $nameSpace = \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
+            'global.namespace'
+        );
+        $objectClassName = $nameSpace . '\\' . $configType;
+        $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+
         if (class_exists($objectClassName, true)) {
             $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
             $object = new $objectClassName();
             return $object;
         }
-        return false;
+
+        return NULL;
     }
 
 
@@ -262,7 +268,7 @@ class Factory {
         }
         throw new Exception\UndefinedObjectType('Unknown object type: ' . $objectType);
 
-        return null;
+        return NULL;
     }
 
 }
