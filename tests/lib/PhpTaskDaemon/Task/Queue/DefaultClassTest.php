@@ -77,4 +77,13 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertEquals(9, $this->_queue->getStatistics()->get('queued'));
     }
 
+    public function testLoad() {
+        $result = $this->_queue->load();
+
+        $this->assertInternalType('array', $result);
+        $this->assertEquals(3, count($result));
+        foreach($result as $item) {
+            $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Job\\AbstractClass', $item);
+        }
+    }
 }
