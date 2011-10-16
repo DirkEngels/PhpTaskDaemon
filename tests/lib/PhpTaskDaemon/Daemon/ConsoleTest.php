@@ -44,4 +44,13 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $consoleOpts = new \Zend_Console_Getopt(array());
         $this->_console->setConsoleOpts($consoleOpts);
     }
+
+    public function testListTasks() {
+        $this->assertInternalType('string', $this->_console->listTasks());
+    }
+
+    public function testSettings() {
+        $this->assertInternalType('string', $this->_console->settings());
+    }
+
 }
