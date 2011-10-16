@@ -33,7 +33,9 @@ Version 1.0 (roadmap)
 
 Version 0.8.2 (planned)
 -----------------------
-- Add example tasks
+- Add demo tasks
+    - tutorial
+    - crawler
 - Add documentation
     - INSTALL: Installation manual
     - QUICKSTART: Getting Started
