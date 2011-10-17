@@ -19,10 +19,10 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     protected $_statistics;
 
     protected function setUp() {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
 
         $semaphore = __DIR__ . '/_data/constructor.shm';
         $this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass($semaphore);
@@ -52,6 +52,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertFalse($this->_queue->updateStatistics('test'));
     }
 
+    /*
     public function testUpdateStatisticsClassAlreadySet() {
         $this->assertNull($this->_queue->getStatistics());
         $this->_queue->setStatistics($this->_statistics);
@@ -76,6 +77,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertTrue($this->_queue->updateQueue());
         $this->assertEquals(9, $this->_queue->getStatistics()->get('queued'));
     }
+    */
 
     public function testLoad() {
         $result = $this->_queue->load();
