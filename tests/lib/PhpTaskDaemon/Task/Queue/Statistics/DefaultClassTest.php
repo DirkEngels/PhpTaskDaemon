@@ -29,6 +29,8 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 		
 	}
 	protected function tearDown() {
+		unset($this->_statistics);
+		unset($this->_ipc);
 //		$this->_ipc->remove();
 //		unset($this->_ipc);
 //		$ipc = $this->_statistics->getIpc();
