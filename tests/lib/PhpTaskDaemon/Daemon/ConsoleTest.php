@@ -42,9 +42,24 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($instance, $this->_console->getInstance());
     }
 
+    public function testsetInstanceUnset() {
+        $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Instance', $this->_console->getInstance());
+        $this->assertEquals(new \PhpTaskDaemon\Daemon\Instance(), $this->_console->getInstance());
+
+        $tasks = new \PhpTaskDaemon\Daemon\Tasks();
+        $tasks->loadManagerByTaskName('Tutorial\\Minimal');
+        $instance = new \PhpTaskDaemon\Daemon\Instance();
+        $instance->setTasks($tasks);
+        $this->_console->setInstance($instance);
+
+        $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Instance', $this->_console->getInstance());
+        $this->assertEquals($instance, $this->_console->getInstance());
+    }
+
     public function testListTasks() {
         $this->assertInternalType('string', $this->_console->listTasks());
     }
+
 
     public function testSettings() {
         $this->assertInternalType('string', $this->_console->settings());
