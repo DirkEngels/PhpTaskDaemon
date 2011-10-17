@@ -181,12 +181,12 @@ class Console {
 
     /**
      * Displays the configuration settings for each tasks.
-     */ 
+     */
     public function settings() {
         $out  = '';
         $out .= $this->_settingsDaemon();
-//      $this->_settingsDefaults();
-//      $this->_settingsTasks();
+        //$this->_settingsDefaults();
+        //$this->_settingsTasks();
         $out .= "\n";
         return $out;
     }
@@ -218,7 +218,7 @@ class Console {
     public function stop() {
         if (!$this->getInstance()->isRunning()) {
             $out .= 'Daemon is NOT running!!!' . "\n";
-        } else {    
+        } else {
             $out .= 'Terminating application  !!!' . "\n";
             $this->getInstance()->stop();
         }
@@ -240,13 +240,11 @@ class Console {
      * Action: Get daemon status
      */
     public function status() {
-        
         $status = State::getState();
         if ($status['pid'] === NULL) {
             $out .= "Daemon not running\n";
             exit;
         }
-//        $out .= var_dump($status);
 
         $out .= "PhpTaskDaemon - Status\n";
         $out .= "==========================\n";
@@ -302,7 +300,7 @@ class Console {
                     $configArgument = \APPLICATION_PATH . '/' . $configArgument;
                 }
                 array_push($configFiles, $configArgument);
-            } 
+            }
         }
 
         // Initiate config
@@ -417,9 +415,7 @@ class Console {
         $out .= "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
         $out .= "- Types:\t\tInterval, Cron, Gearman\n";
         $out .= "- Interval\n";
-//        $out .= "\t- Time:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
         $out .= "- Cron\n";
-//        $out .= "\t- Interval:\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.cron.default') . "\n";
         $out .= "\n";
 
         $out .= "Process\n";
@@ -428,7 +424,6 @@ class Console {
         $out .= "- Parallel\n";
         $out .= "\t- Childs:\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.parallel.childs') . "\n";
         $out .= "\n";
-
 
         $out .= "\n";
         return $out;
