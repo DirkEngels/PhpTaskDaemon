@@ -313,7 +313,7 @@ class Console {
      * Initializes the logging verbose mode
      */
     protected function _initLogVerbose() {
-       // Log Verbose Output
+        // Log Verbose Output
         if ($this->_consoleOpts->getOption('verbose')) {
             $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
 
