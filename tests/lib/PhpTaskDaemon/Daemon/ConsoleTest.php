@@ -19,10 +19,10 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
     protected $_console;
 
     protected function setUp() {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
 
         $this->_console = new \PhpTaskDaemon\Daemon\Console();
     }
@@ -40,14 +40,6 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->_console = new \PhpTaskDaemon\Daemon\Console($instance);
         $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Instance', $this->_console->getInstance());
         $this->assertEquals($instance, $this->_console->getInstance());
-    }
-
-    /**
-     * @expectedExpeption \Exception
-     */
-    public function testSetConsoleOptsInvalid() {
-        $consoleOpts = new \Zend_Console_Getopt(array());
-        $this->_console->setConsoleOpts($consoleOpts);
     }
 
     public function testListTasks() {
