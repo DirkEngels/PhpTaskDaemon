@@ -16,15 +16,15 @@ namespace PhpTaskDaemon\Task\Executor\Status;
 
 class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     protected $_status;
-    protected $_sharedMemory;
-    
-    protected function setUp() {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+    protected $_ipc;
 
-        $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-status');
+    protected function setUp() {
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
+
+        $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None(\TMP_PATH . '/test-status');
         $this->_status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
         
     }
