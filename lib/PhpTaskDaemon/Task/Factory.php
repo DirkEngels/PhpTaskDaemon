@@ -39,6 +39,11 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
     public static function get($taskName) {
+        $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
+	if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
+            throw new \Exception('Task has no defined executor');
+        }
+
         // Base Manager
         $manager = self::getManager($taskName);
 
@@ -58,7 +63,7 @@ class Factory {
             self::getComponentType($taskName, self::TYPE_PROCESS)
         );
         $manager->getProcess()->setExecutor(
-            self::getComponentType($taskName, self::TYPE_EXECUTOR)
+            $executor
         );
         $manager->getProcess()->getExecutor()->setStatus(
             self::getComponentType($taskName, self::TYPE_STATUS)
