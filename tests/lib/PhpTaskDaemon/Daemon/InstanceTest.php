@@ -75,18 +75,21 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testStart() {
-        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('write', 'getCurrent'), array('test'));
-        $pidFile->expects($this->once())
-             ->method('write')
-             ->will($this->returnValue(NULL));
-        $pidFile->expects($this->once())
-             ->method('getCurrent')
-             ->will($this->returnValue(12345));
-
         $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('_run'));
         $instance->expects($this->once())
              ->method('_run')
              ->will($this->returnValue(NULL));
+
+        $pidManager = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\Manager', array('getCurrent'));
+        $pidManager->expects($this->once())
+            ->method('getCurrent')
+            ->will($this->returnValue(12345));
+        $instance->setPidManager($pidManager);
+
+        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('write'), array('test'));
+        $pidFile->expects($this->once())
+            ->method('write')
+            ->will($this->returnValue(NULL));
         $instance->setPidFile($pidFile);
 
         $this->assertNull($instance->start());
