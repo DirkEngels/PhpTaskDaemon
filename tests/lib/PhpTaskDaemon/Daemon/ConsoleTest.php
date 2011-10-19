@@ -15,6 +15,8 @@
 
 namespace PhpTaskDaemon\Daemon\Pid;
 
+use PhpTaskDaemon\Daemon\Tasks;
+
 class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
     protected $_console;
 
@@ -54,6 +56,20 @@ class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
 
         $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Instance', $this->_console->getInstance());
         $this->assertEquals($instance, $this->_console->getInstance());
+    }
+
+    public function testSetTasks() {
+        $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Tasks', $this->_console->getTasks());
+        $this->assertEquals(new \PhpTaskDaemon\Daemon\Tasks(), $this->_console->getTasks());
+
+        $tasks = new Tasks();
+        $tasks->addManager(
+            new \PhpTaskDaemon\Task\Manager\DefaultClass()
+        );
+        $this->assertEquals($this->_console, $this->_console->setTasks($tasks));
+
+        $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Tasks', $this->_console->getTasks());
+        $this->assertEquals($tasks, $this->_console->getTasks());
     }
 
     public function testListTasksNoneFound() {
