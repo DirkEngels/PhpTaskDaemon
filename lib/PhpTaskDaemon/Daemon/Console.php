@@ -168,6 +168,8 @@ class Console {
         $taskLoader = new Tasks();
         $tasks = $taskLoader->scan();
 
+        echo "List Tasks\n";
+        echo "==========\n";
         if (count($tasks)==0) {
             echo "No tasks found!\n";
         } else {
@@ -278,6 +280,8 @@ class Console {
      * Displays a help message containing usage instructions.
      */
     public function help() {
+        echo "Help\n";
+        echo "====\n";
         echo $this->_consoleOpts->getUsageMessage();
     }
 
@@ -358,8 +362,7 @@ class Console {
 
 
     protected function _settingsDaemon() {
-        $out = '';
-        $out .= "Daemon Settings\n";
+        $out  = "Daemon Settings\n";
         $out .= "===============\n\n";
 
         $out .= "Global\n";
