@@ -107,4 +107,17 @@ class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
         $this->assertNull($this->_console->help());
     }
 
+    public function testRestart() {
+        $console = $this->getMock('\\PhpTaskDaemon\\Daemon\\Console', array('stop', 'start', '_exit'));
+        $console->expects($this->once())
+             ->method('stop')
+             ->will($this->returnValue(NULL));
+        $console->expects($this->once())
+             ->method('start')
+             ->will($this->returnValue(NULL));
+        $console->expects($this->once())
+             ->method('_exit')
+             ->will($this->returnValue(NULL));
+        $this->assertNull($console->restart());
+    }
 }
