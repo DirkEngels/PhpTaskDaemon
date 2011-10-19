@@ -35,8 +35,41 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Tasks', $this->_instance->getTasks());
     }
 
+    public function testSetPidManager() {
+        $this->assertEquals(new \PhpTaskDaemon\Daemon\Pid\Manager(), $this->_instance->getPidManager());
+
+        $pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager();
+        $pidManager->addChild(1234);
+
+        $this->_instance->setPidManager($pidManager);
+        $this->assertEquals($pidManager, $this->_instance->getPidManager());
+    }
+
+    public function testSetPidFile() {
+        $this->assertEquals(new \PhpTaskDaemon\Daemon\Pid\File(TMP_PATH . '/phptaskdaemond.pid'), $this->_instance->getPidFile());
+
+        $pidFile = new \PhpTaskDaemon\Daemon\Pid\File('/tmp/test.pid');
+        $this->_instance->setPidFile($pidFile);
+
+        $this->assertEquals($pidFile, $this->_instance->getPidFile());
+    }
+
+    public function testSetIpc() {
+        $this->assertEquals(new \PhpTaskDaemon\Daemon\Ipc\None('phptaskdaemond'), $this->_instance->getIpc());
+
+        $ipc = new \PhpTaskDaemon\Daemon\Ipc\None('ipc-1');
+        $this->_instance->setIpc($ipc);
+
+        $this->assertEquals($ipc, $this->_instance->getIpc());
+    }
+
     public function testSetTasks() {
+        $this->assertEquals(new \PhpTaskDaemon\Daemon\Tasks(), $this->_instance->getTasks());
+
         $tasks = new \PhpTaskDaemon\Daemon\Tasks();
+        $tasks->addManager(
+            new \PhpTaskDaemon\Task\Manager\DefaultClass()
+        );
         $this->_instance->setTasks($tasks);
         $this->assertEquals($tasks, $this->_instance->getTasks());
     }
