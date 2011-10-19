@@ -43,16 +43,11 @@ class Instance {
 
     /**
      * 
-     * The construction has one optional argument containing the parent process
-     * ID. 
+     * Empty constructor 
      * @param int $parent
      */
     public function __construct() {
-        $pidFile = \TMP_PATH . '/phptaskdaemond.pid';
-        $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid());
-        $this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
-        $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None('phptaskdaemond');
-        $this->_tasks = new \PhpTaskDaemon\Daemon\Tasks();
+        
     }
 
 
@@ -69,11 +64,90 @@ class Instance {
 
 
     /**
+     * Returns the pid manager object
+     * @return \PhpTaskDaemon\Daemon\Pid\Manager
+     */
+    public function getPidManager() {
+        if (is_null($this->_pidManager)) {
+            $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
+                getmypid()
+            );
+        }
+
+        return $this->_pidManager;
+    }
+
+
+    /**
+     * Sets the pid manager object
+     * @param $pidManager
+     * @return $this
+     */
+    public function setPidManager(\PhpTaskDaemon\Daemon\Pid\Manager $pidManager) {
+        $this->_pidManager = $pidManager;
+        return $this;
+    }
+
+
+    /**
+     * Returns the pid file object
+     * @return \PhpTaskDaemon\Daemon\Pid\File
+     */
+    public function getPidFile() {
+        if (is_null($this->_pidFile)) {
+            $pidFile = \TMP_PATH . '/phptaskdaemond.pid';
+            $this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
+        }
+
+        return $this->_pidFile;
+    }
+
+
+    /**
+     * Sets the pid file object
+     * @param $pidFile
+     * @return $this
+     */
+    public function setPidFile(\PhpTaskDaemon\Daemon\Pid\File $pidFile) {
+        $this->_pidFile = $pidFile;
+        return $this;
+    }
+
+
+    /**
+     * Gets the inter process communication object
+     * @return \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     */
+    public function getIpc() {
+        if (is_null($this->_ipc)) {
+            $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None('phptaskdaemond');
+        }
+
+        return $this->_ipc;
+    }
+
+
+    /**
+     * Sets the inter process communication object
+     * @param $ipc \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     * @return $this
+     */
+    public function setIpc(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc) {
+        $this->_ipc = $ipc;
+        return $this;
+    }
+
+
+    /**
      * 
      * Return the tasks collection object.
      * @return \PhpTaskDaemon\Daemon\Tasks
      */
     public function getTasks() {
+        if (is_null($this->_tasks)) {
+            $this->_tasks = new \PhpTaskDaemon\Daemon\Tasks();
+        }
+
         return $this->_tasks;
     }
 
@@ -84,7 +158,7 @@ class Instance {
      * @param \PhpTaskDaemon\Daemon\Tasks $tasks
      * @return $this
      */
-    public function setTasks($tasks) {
+    public function setTasks(\PhpTaskDaemon\Daemon\Tasks $tasks) {
         $this->_tasks = $tasks;
         return $this;
     }
