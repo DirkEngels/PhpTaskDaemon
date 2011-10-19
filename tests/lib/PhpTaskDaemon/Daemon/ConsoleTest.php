@@ -15,10 +15,15 @@
 
 namespace PhpTaskDaemon\Daemon\Pid;
 
-class ConsoleTest extends \PHPUnit_Framework_TestCase {
+class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
     protected $_console;
 
     protected function setUp() {
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
+
         $this->_console = new \PhpTaskDaemon\Daemon\Console();
     }
 
@@ -37,20 +42,35 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($instance, $this->_console->getInstance());
     }
 
-    /**
-     * @expectedExpeption \Exception
-     */
-    public function testSetConsoleOptsInvalid() {
-        $consoleOpts = new \Zend_Console_Getopt(array());
-        $this->_console->setConsoleOpts($consoleOpts);
+    public function testsetInstanceUnset() {
+        $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Instance', $this->_console->getInstance());
+        $this->assertEquals(new \PhpTaskDaemon\Daemon\Instance(), $this->_console->getInstance());
+
+        $tasks = new \PhpTaskDaemon\Daemon\Tasks();
+        $tasks->loadManagerByTaskName('Tutorial\\Minimal');
+        $instance = new \PhpTaskDaemon\Daemon\Instance();
+        $instance->setTasks($tasks);
+        $this->_console->setInstance($instance);
+
+        $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Instance', $this->_console->getInstance());
+        $this->assertEquals($instance, $this->_console->getInstance());
     }
 
     public function testListTasks() {
-        $this->assertInternalType('string', $this->_console->listTasks());
+        $this->expectOutputRegex('/List Tasks/');
+        $this->assertNull($this->_console->listTasks());
     }
 
+
     public function testSettings() {
-        $this->assertInternalType('string', $this->_console->settings());
+        $this->expectOutputRegex('/Daemon Settings/');
+        $this->assertNull($this->_console->settings());
+    }
+
+
+    public function testHelp() {
+        $this->expectOutputRegex('/Help/');
+        $this->assertNull($this->_console->help());
     }
 
 }

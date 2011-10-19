@@ -72,9 +72,11 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         // Save the shared memory variable
         sem_acquire($this->_semaphoreLock);
         if (!shm_has_var($this->_sharedMemory, 1)) {
-            $retInit = shm_put_var($this->_sharedMemory, 1, array());
+            $returnValue = shm_put_var($this->_sharedMemory, 1, array());
         }
         sem_release($this->_semaphoreLock);
+
+        return $returnValue;
     }
 
 
@@ -172,22 +174,21 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         if (shm_has_var($this->_sharedMemory, 1)) {
             $keys = shm_get_var($this->_sharedMemory, 1);
         }
-        $retInit = TRUE;
 
         // Update keys
         if (in_array($key, array_keys($keys))) {
             $value = shm_get_var($this->_sharedMemory, $keys[$key]);
             $value++;
-            $ret = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+            $returnValue = shm_put_var($this->_sharedMemory, $keys[$key], $value);
         } else {
             $keys[$key] = count($keys)+2;
             shm_put_var($this->_sharedMemory, 1, $keys);
-            $ret = shm_put_var($this->_sharedMemory, $keys[$key], 1);
+            $returnValue = shm_put_var($this->_sharedMemory, $keys[$key], 1);
             $value = 1;
         }
         sem_release($this->_semaphoreLock);
 
-        return $ret;
+        return $returnValue;
     }
 
 

@@ -132,12 +132,12 @@ class Console {
 
             // List Tasks & exit (--list-tasks)
             if ($this->_consoleOpts->getOption('list-tasks')) {
-                $out .= $this->listTasks();
+                $this->listTasks();
             }
 
             // Display Settings & exit (--settings)
             if ($this->_consoleOpts->getOption('settings')) {
-                $out .= $this->settings();
+                $this->settings();
             }
 
             // Add Log Files
@@ -162,33 +162,31 @@ class Console {
 
     /**
      * 
-     * Lists the current loaded tasks. 
+     * Lists the current loaded tasks.
      */
     public function listTasks() {
         $taskLoader = new Tasks();
         $tasks = $taskLoader->scan();
-        $out = '';
+
+        echo "List Tasks\n";
+        echo "==========\n";
         if (count($tasks)==0) {
-            $out .= "No tasks found!\n";
+            echo "No tasks found!\n";
         } else {
             foreach ($tasks as $task) {
-                $out .= $task . "\n";
+                echo '- ', $task, "\n";
             }
         }
-        return $out;
+        echo "\n\n";
     }
 
 
     /**
      * Displays the configuration settings for each tasks.
-     */ 
+     */
     public function settings() {
-        $out  = '';
-        $out .= $this->_settingsDaemon();
-//      $this->_settingsDefaults();
-//      $this->_settingsTasks();
-        $out .= "\n";
-        return $out;
+        echo $this->_settingsDaemon();
+        echo "\n\n";
     }
 
 
@@ -218,7 +216,7 @@ class Console {
     public function stop() {
         if (!$this->getInstance()->isRunning()) {
             $out .= 'Daemon is NOT running!!!' . "\n";
-        } else {    
+        } else {
             $out .= 'Terminating application  !!!' . "\n";
             $this->getInstance()->stop();
         }
@@ -240,30 +238,28 @@ class Console {
      * Action: Get daemon status
      */
     public function status() {
-        
         $status = State::getState();
         if ($status['pid'] === NULL) {
-            $out .= "Daemon not running\n";
+            echo "Daemon not running\n";
             exit;
         }
-//        $out .= var_dump($status);
 
-        $out .= "PhpTaskDaemon - Status\n";
-        $out .= "==========================\n";
-        $out .= "\n";
+        echo "PhpTaskDaemon - Status\n";
+        echo  "==========================\n";
+        echo "\n";
         if (count($status['childs']) == 0) {
-            $out .= "No processes!\n";
+            echo "No processes!\n";
         } else {
-            $out .= "Processes (" . count($status['childs']) . ")\n";
+            echo "Processes (" . count($status['childs']) . ")\n";
 
             foreach ($status['childs'] as $childPid) {
                 $managerData = $status['task-' . $childPid];
-                $out .= " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
-                $out .= "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
+                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
+                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
             }
 
         }
-        return TRUE;
+        echo "\n\n";
     }
 
 
@@ -273,9 +269,9 @@ class Console {
      * action refreshes every x milliseconds.
      */
     public function monitor() {
-        $out  = "PhpTaskDaemon - Monitoring\n" .
-                "==========================\n";
-        $out .= "Function not yet implemented\n";
+        echo "PhpTaskDaemon - Monitoring\n";
+        echo "==========================\n";
+        echo "Function not yet implemented\n";
     }
 
 
@@ -284,7 +280,9 @@ class Console {
      * Displays a help message containing usage instructions.
      */
     public function help() {
-        $out .= $this->_consoleOpts->getUsageMessage();
+        echo "Help\n";
+        echo "====\n";
+        echo $this->_consoleOpts->getUsageMessage();
     }
 
 
@@ -302,7 +300,7 @@ class Console {
                     $configArgument = \APPLICATION_PATH . '/' . $configArgument;
                 }
                 array_push($configFiles, $configArgument);
-            } 
+            }
         }
 
         // Initiate config
@@ -315,7 +313,7 @@ class Console {
      * Initializes the logging verbose mode
      */
     protected function _initLogVerbose() {
-       // Log Verbose Output
+        // Log Verbose Output
         if ($this->_consoleOpts->getOption('verbose')) {
             $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
 
@@ -364,8 +362,7 @@ class Console {
 
 
     protected function _settingsDaemon() {
-        $out = '';
-        $out .= "Daemon Settings\n";
+        $out  = "Daemon Settings\n";
         $out .= "===============\n\n";
 
         $out .= "Global\n";
@@ -417,9 +414,7 @@ class Console {
         $out .= "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
         $out .= "- Types:\t\tInterval, Cron, Gearman\n";
         $out .= "- Interval\n";
-//        $out .= "\t- Time:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
         $out .= "- Cron\n";
-//        $out .= "\t- Interval:\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.cron.default') . "\n";
         $out .= "\n";
 
         $out .= "Process\n";
@@ -428,7 +423,6 @@ class Console {
         $out .= "- Parallel\n";
         $out .= "\t- Childs:\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.parallel.childs') . "\n";
         $out .= "\n";
-
 
         $out .= "\n";
         return $out;

@@ -19,33 +19,35 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	protected $_ipc;
 	
 	protected function setUp() {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
 
-		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-statistics');
+		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None(\TMP_PATH . '/test-statistics');
 		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
 		
 	}
 	protected function tearDown() {
+		unset($this->_statistics);
+		unset($this->_ipc);
 //		$this->_ipc->remove();
 //		unset($this->_ipc);
-//		$sharedMemory = $this->_statistics->getIpc();
-//		if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-//			$sharedMemory->remove();
+//		$ipc = $this->_statistics->getIpc();
+//		if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//			$ipc->remove();
 //		}
 //		unset($this->_statistics);
 	}
 	
 	public function testConstructorNoArguments() {
-		$sharedMemoryCreated = $this->_statistics->getIpc();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $sharedMemoryCreated);
+		$ipcCreated = $this->_statistics->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
 	}
 	public function testConstructorSingleArguments() {
 		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($this->_ipc);
-		$sharedMemoryCreated = $this->_statistics->getIpc();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $sharedMemoryCreated);
+		$ipcCreated = $this->_statistics->getIpc();
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
 	}
 	public function testSetIpc() {
 		$ipcCreated = $this->_statistics->getIpc();
@@ -74,6 +76,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 //		$this->assertEquals(3, $this->_statistics->get('total'));
 		$this->assertEquals(null, $this->_statistics->get('loaded'));
 	}
+    /*
 	public function testIncrementStatusNoArguments() {
 		$this->_statistics->setIpc($this->_ipc);
 		$this->assertEquals(0, $this->_statistics->get('loaded'));
@@ -83,7 +86,6 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertTrue($this->_statistics->incrementStatus());
 		$this->assertEquals(2, $this->_statistics->get('done'));
 	}
-	/*
 	public function testIncrementStatusStatusArgument() {
 		$this->assertEquals(0, $this->_statistics->get('failed'));
 		$this->assertTrue($this->_statistics->incrementStatus('failed'));

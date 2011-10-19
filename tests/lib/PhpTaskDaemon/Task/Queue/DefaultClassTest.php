@@ -17,22 +17,22 @@ namespace PhpTaskDaemon\Task\Queue;
 class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     protected $_queue;
     protected $_statistics;
-    
+
     protected function setUp() {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
 
         $semaphore = __DIR__ . '/_data/constructor.shm';
         $this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass($semaphore);
-        $sharedMemory = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory(\TMP_PATH . '/test-queue');
-        $this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($sharedMemory);
+        $ipc = new \PhpTaskDaemon\Daemon\Ipc\None(\TMP_PATH . '/test-queue');
+        $this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($ipc);
     }
     protected function tearDown() {
-//        $sharedMemory = $this->_statistics->getIpc();
-//        if (is_a($sharedMemory, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-//            $sharedMemory->remove();
+//        $ipc = $this->_statistics->getIpc();
+//        if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//            $ipc->remove();
 //        }
 //        unset($this->_statistics);
     }
@@ -52,6 +52,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertFalse($this->_queue->updateStatistics('test'));
     }
 
+    /*
     public function testUpdateStatisticsClassAlreadySet() {
         $this->assertNull($this->_queue->getStatistics());
         $this->_queue->setStatistics($this->_statistics);
@@ -76,6 +77,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertTrue($this->_queue->updateQueue());
         $this->assertEquals(9, $this->_queue->getStatistics()->get('queued'));
     }
+    */
 
     public function testLoad() {
         $result = $this->_queue->load();

@@ -51,7 +51,7 @@ class Instance {
         $pidFile = \TMP_PATH . '/phptaskdaemond.pid';
         $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid());
         $this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
-        $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
+        $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None('phptaskdaemond');
         $this->_tasks = new \PhpTaskDaemon\Daemon\Tasks();
     }
 

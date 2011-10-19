@@ -1,0 +1,46 @@
+PhpTaskDaemon Installation
+==========================
+
+* Installation
+* Configuration
+* Create Tasks
+* Start at boot
+* Restart by cron
+
+
+Installation 
+------------
+After download the package you need to follow these steps:
+* Extract the package
+* Edit the default daemon configuration file: app/etc/daemon.ini
+* Create some custom tasks (default directory: app/task/)
+* Start the phptaskdaemon executable in bin (phptaskdaemon -a start)
+
+
+Create Tasks
+------------
+* Create a new package directory (MyProject) in the task directory (app/task)
+* Create a new task directory (MyTask) within the package directory
+* Create an executor object for processing a single item
+* Create a queue object for loading items to be processed
+
+
+Configuration
+-------------
+* Setup the global task defaults (file: app/etc/tasks.ini)
+* Setup the package task defaults (file app/etc/<mypackage>.ini)
+
+
+Startup on boot
+---------------
+- Copy the default init script file doc/files/init to /etc/init.d/phptaskdaemon
+- Edit the copied file (/etc/init.d/phptaskdaemon) to your needs (project path)
+
+
+Restart by cron
+---------------
+In case the daemon crashes, it can be restarted automatically using the linux
+cron.
+
+- Add the following line to your crontab  
+    * * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action start

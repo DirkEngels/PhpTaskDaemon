@@ -14,7 +14,6 @@ interface InterfaceClass {
     public function get();
     public function setStatusCount($status, $count); 
     public function incrementStatus($status);
-    public function setQueueCount($count); 
     public function decrementQueue();
 
 }

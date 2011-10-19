@@ -1,0 +1,26 @@
+PhpTaskDaemon Usage
+===================
+
+* Command Line
+* State Api
+
+
+Command Line
+------------
+A command line tool is provided to start, stop and monitor the daemon. Below a 
+
+Command line:
+* Start:        ./daemon --help
+* Start:        ./daemon --action start
+* Stop:         ./daemon --action stop
+* Status:       ./daemon --action status
+* Monitor:      ./daemon --action monitor
+
+
+State Api
+---------
+The state (tasks status & statistics) of the daemon can be requested using the
+following api call.
+
+  $state = new \PhpTaskDaemon\Daemon\State::getState();
+  var_dump($state);

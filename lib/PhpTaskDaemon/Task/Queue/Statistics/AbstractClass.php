@@ -15,7 +15,7 @@ namespace PhpTaskDaemon\Task\Queue\Statistics;
  * the status count of executed jobs and the number of loaded and processed
  * items in the queue.
  */
-abstract class AbstractClass {    
+abstract class AbstractClass {
 
     const STATUS_LOADED = 'loaded';
     const STATUS_QUEUED = 'queued';
@@ -42,7 +42,7 @@ abstract class AbstractClass {
      * Unset the shared memory at destruction time.
      */
     public function __destruct() {
-        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\Ipc')) {
+        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\None')) {
             unset($this->_ipc);
         } 
     }
@@ -61,7 +61,7 @@ abstract class AbstractClass {
     /**
      *
      * Sets a shared memory object
-     * @param \PhpTaskDaemon\Daemon\Ipc\Ipc $ipc
+     * @param \PhpTaskDaemon\Daemon\Ipc\None $ipc
      * @return $this
      */
     public function setIpc($ipc) {
@@ -120,18 +120,6 @@ abstract class AbstractClass {
      */
     public function incrementStatus($status = self::STATUS_DONE) {
         return $this->_ipc->incrementVar($status);
-    }
-
-
-    /**
-     * 
-     * (Re)Sets the queue count.
-     * @param integer $count
-     */
-    public function setQueueCount($count = 0) {
-        $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->setStatusCount(self::STATUS_LOADED, $count);
-        return $count;
     }
 
 

@@ -19,6 +19,11 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
     protected $_instance;
 
     protected function setUp() {
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
+
         $this->_instance = new \PhpTaskDaemon\Daemon\Instance();
     }
 

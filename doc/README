@@ -42,21 +42,6 @@ Requirements
 	* Zend_Config
 
 
-Installation
-------------
-Basic installation 
-* Extract the package
-* Edit the configuration file: src/application/configs/daemon.ini
-* Start the executable in src/bin
-
-Startup on boot
-* Edit the file (doc/files/init-script)
-* Copy the edited init script file to /etc/init.d/phptaskdaemon
-
-Restart by cron
-* Add a crontab job:  
-	* * * * * * /path/to/phptaskdaemon/bin/phptaskdaemon --action start
-
 
 Usage
 -----
