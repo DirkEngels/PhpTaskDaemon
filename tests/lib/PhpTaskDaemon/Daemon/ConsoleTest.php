@@ -130,6 +130,33 @@ class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
         $this->assertNull($this->_console->start());
     }
 
+    public function testStopNotRunning() {
+        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('isRunning'));
+        $instance->expects($this->once())
+             ->method('isRunning')
+             ->will($this->returnValue(FALSE));
+
+        $this->_console->setInstance($instance);
+
+        $this->expectOutputString("Daemon is NOT running!!!\n\n");
+        $this->assertNull($this->_console->stop());
+    }
+
+    public function testStopRunning() {
+        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('isRunning', 'stop'));
+        $instance->expects($this->once())
+             ->method('isRunning')
+             ->will($this->returnValue(TRUE));
+        $instance->expects($this->once())
+             ->method('stop')
+             ->will($this->returnValue(NULL));
+
+        $this->_console->setInstance($instance);
+
+        $this->expectOutputString("Terminating application  !!!\n\n");
+        $this->assertNull($this->_console->stop());
+    }
+
     public function testRestart() {
         $console = $this->getMock('\\PhpTaskDaemon\\Daemon\\Console', array('stop', 'start', '_exit'));
         $console->expects($this->once())
