@@ -95,4 +95,13 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($instance->start());
     }
 
+    public function testIsRunning() {
+        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('isRunning'), array('test'));
+        $pidFile->expects($this->once())
+            ->method('isRunning')
+            ->will($this->returnValue(TRUE));
+        $this->_instance->setPidFile($pidFile);
+
+        $this->assertTrue($this->_instance->isRunning());
+    }
 }
