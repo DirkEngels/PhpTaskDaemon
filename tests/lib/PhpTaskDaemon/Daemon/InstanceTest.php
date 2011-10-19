@@ -74,4 +74,22 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($tasks, $this->_instance->getTasks());
     }
 
+    public function testStart() {
+        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('write', 'getCurrent'), array('test'));
+        $pidFile->expects($this->once())
+             ->method('write')
+             ->will($this->returnValue(NULL));
+        $pidFile->expects($this->once())
+             ->method('getCurrent')
+             ->will($this->returnValue(12345));
+
+        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('_run'));
+        $instance->expects($this->once())
+             ->method('_run')
+             ->will($this->returnValue(NULL));
+        $instance->setPidFile($pidFile);
+
+        $this->assertNull($instance->start());
+    }
+
 }
