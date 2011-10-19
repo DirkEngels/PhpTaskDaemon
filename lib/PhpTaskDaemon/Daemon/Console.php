@@ -90,7 +90,7 @@ class Console {
         // Parse Options
         try {
             $consoleOpts->parse();
-        } catch (Zend_Console_Getopt_Exception $e) {
+        } catch (\Zend_Console_Getopt_Exception $e) {
             $out .= $e->getUsageMessage();
             $this->_exit();
         }
@@ -245,9 +245,9 @@ class Console {
      */
     public function stop() {
         if (!$this->getInstance()->isRunning()) {
-            $out .= 'Daemon is NOT running!!!' . "\n";
+            echo "Daemon is NOT running!!!\n\n";
         } else {
-            $out .= 'Terminating application  !!!' . "\n";
+            echo "Terminating application  !!!\n\n";
             $this->getInstance()->stop();
         }
     }
