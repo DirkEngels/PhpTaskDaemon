@@ -15,7 +15,7 @@
 
 namespace PhpTaskDaemon\Daemon\Pid;
 
-class ConsoleTest extends \PHPUnit_Framework_TestCase {
+class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
     protected $_console;
 
     protected function setUp() {
@@ -57,12 +57,20 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testListTasks() {
-        $this->assertInternalType('string', $this->_console->listTasks());
+        $this->expectOutputRegex('/List Tasks/');
+        $this->assertNull($this->_console->listTasks());
     }
 
 
     public function testSettings() {
-        $this->assertInternalType('string', $this->_console->settings());
+        $this->expectOutputRegex('/Daemon Settings/');
+        $this->assertNull($this->_console->settings());
+    }
+
+
+    public function testHelp() {
+        $this->expectOutputRegex('/Help/');
+        $this->assertNull($this->_console->listTasks());
     }
 
 }
