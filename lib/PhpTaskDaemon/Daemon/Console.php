@@ -230,9 +230,9 @@ class Console {
 
         // Initialize daemon tasks
         foreach($taskNames as $taskName) {
-            $tasks->loadManagerByTaskName($taskName);
+            $this->getTasks()->loadManagerByTaskName($taskName);
         }
-        $this->getInstance()->setTasks($tasks);
+        $this->getInstance()->setTasks($this->getTasks());
 
         // Start the Daemon
         $this->getInstance()->start();
