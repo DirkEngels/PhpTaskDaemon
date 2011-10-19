@@ -107,6 +107,29 @@ class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
         $this->assertNull($this->_console->help());
     }
 
+    public function testStart() {
+        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('setTasks', 'start'));
+        $instance->expects($this->once())
+             ->method('setTasks')
+             ->will($this->returnValue(NULL));
+        $instance->expects($this->once())
+             ->method('start')
+             ->will($this->returnValue(NULL));
+
+        $tasks = $this->getMock('\\PhpTaskDaemon\\Daemon\\Tasks', array('scan', 'loadManagerByTaskName'));
+        $tasks->expects($this->once())
+             ->method('scan')
+             ->will($this->returnValue(array('TaskOne')));
+        $tasks->expects($this->once())
+             ->method('loadManagerByTaskName')
+             ->will($this->returnValue(NULL));
+
+        $this->_console->setInstance($instance);
+        $this->_console->setTasks($tasks);
+
+        $this->assertNull($this->_console->start());
+    }
+
     public function testRestart() {
         $console = $this->getMock('\\PhpTaskDaemon\\Daemon\\Console', array('stop', 'start', '_exit'));
         $console->expects($this->once())
