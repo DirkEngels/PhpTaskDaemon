@@ -70,7 +70,7 @@ class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
 
     public function testHelp() {
         $this->expectOutputRegex('/Help/');
-        $this->assertNull($this->_console->listTasks());
+        $this->assertNull($this->_console->help());
     }
 
 }
