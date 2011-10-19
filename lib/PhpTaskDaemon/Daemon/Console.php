@@ -197,11 +197,11 @@ class Console {
      * Lists the current loaded tasks.
      */
     public function listTasks() {
-        $taskNames = $this->_tasks->scan();
+        $taskNames = $this->getTasks()->scan();
 
         echo "List Tasks\n";
         echo "==========\n";
-        if (count($tasks)==0) {
+        if (count($taskNames)==0) {
             echo "No tasks found!\n";
         } else {
             foreach ($taskNames as $taskName) {
@@ -226,7 +226,7 @@ class Console {
      * Action: Start Daemon
      */
     public function start() {
-        $taskNames = $this->_tasks->scan();
+        $taskNames = $this->getTasks()->scan();
 
         // Initialize daemon tasks
         foreach($taskNames as $taskName) {
@@ -466,7 +466,7 @@ class Console {
 
         $tasks = array();
         try {
-            $tasks = $this->_tasks->scan();
+            $tasks = $this->getTasks()->scan();
         } catch (Exception $e) {
             $out .= $e->getMessage();
         }
