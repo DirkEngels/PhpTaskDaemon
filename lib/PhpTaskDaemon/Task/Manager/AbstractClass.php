@@ -135,7 +135,7 @@ abstract class AbstractClass {
      * @return $this
      */
     public function setProcess($process) {
-        if (!is_subclass_of($process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
+        if (!($process instanceof \PhpTaskDaemon\Task\Manager\Process\AbstractClass)) {
             $process = new \PhpTaskDaemon\Task\Manager\Process\Same();
         }
         $this->_process = $process;
