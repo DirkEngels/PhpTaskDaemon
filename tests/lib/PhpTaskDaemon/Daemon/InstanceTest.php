@@ -104,4 +104,38 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTrue($this->_instance->isRunning());
     }
+
+    public function testStop() {
+        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('_exit'));
+        $instance->expects($this->once())
+             ->method('_exit')
+             ->will($this->returnValue(NULL));
+
+        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('read'), array('test'));
+        $pidFile->expects($this->once())
+            ->method('read')
+            ->will($this->returnValue(123456789));
+        $instance->setPidFile($pidFile);
+
+        $this->assertNull($instance->stop());
+    }
+
+    /**
+     * @expectedException \PhpTaskDaemon\Daemon\Exception\FileNotFound
+     */
+    public function testStopException() {
+        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('_exit'));
+        $instance->expects($this->any())
+             ->method('_exit')
+             ->will($this->returnValue(NULL));
+
+        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('getFilename'), array('test'));
+        $pidFile->expects($this->once())
+            ->method('getFilename')
+            ->will($this->returnValue('/pidfiledoesnotexists'));
+        $instance->setPidFile($pidFile);
+
+        $this->assertNull($instance->stop());
+    }
+
 }
