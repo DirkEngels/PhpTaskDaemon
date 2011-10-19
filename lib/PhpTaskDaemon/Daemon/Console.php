@@ -132,12 +132,12 @@ class Console {
 
             // List Tasks & exit (--list-tasks)
             if ($this->_consoleOpts->getOption('list-tasks')) {
-                $out .= $this->listTasks();
+                $this->listTasks();
             }
 
             // Display Settings & exit (--settings)
             if ($this->_consoleOpts->getOption('settings')) {
-                $out .= $this->settings();
+                $this->settings();
             }
 
             // Add Log Files
@@ -162,20 +162,20 @@ class Console {
 
     /**
      * 
-     * Lists the current loaded tasks. 
+     * Lists the current loaded tasks.
      */
     public function listTasks() {
         $taskLoader = new Tasks();
         $tasks = $taskLoader->scan();
-        $out = '';
+
         if (count($tasks)==0) {
-            $out .= "No tasks found!\n";
+            echo "No tasks found!\n";
         } else {
             foreach ($tasks as $task) {
-                $out .= $task . "\n";
+                echo '- ', $task, "\n";
             }
         }
-        return $out;
+        echo "\n\n";
     }
 
 
@@ -183,12 +183,8 @@ class Console {
      * Displays the configuration settings for each tasks.
      */
     public function settings() {
-        $out  = '';
-        $out .= $this->_settingsDaemon();
-        //$this->_settingsDefaults();
-        //$this->_settingsTasks();
-        $out .= "\n";
-        return $out;
+        echo $this->_settingsDaemon();
+        echo "\n\n";
     }
 
 
@@ -242,26 +238,26 @@ class Console {
     public function status() {
         $status = State::getState();
         if ($status['pid'] === NULL) {
-            $out .= "Daemon not running\n";
+            echo "Daemon not running\n";
             exit;
         }
 
-        $out .= "PhpTaskDaemon - Status\n";
-        $out .= "==========================\n";
-        $out .= "\n";
+        echo "PhpTaskDaemon - Status\n";
+        echo  "==========================\n";
+        echo "\n";
         if (count($status['childs']) == 0) {
-            $out .= "No processes!\n";
+            echo "No processes!\n";
         } else {
-            $out .= "Processes (" . count($status['childs']) . ")\n";
+            echo "Processes (" . count($status['childs']) . ")\n";
 
             foreach ($status['childs'] as $childPid) {
                 $managerData = $status['task-' . $childPid];
-                $out .= " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
-                $out .= "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
+                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
+                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
             }
 
         }
-        return TRUE;
+        echo "\n\n";
     }
 
 
@@ -271,9 +267,9 @@ class Console {
      * action refreshes every x milliseconds.
      */
     public function monitor() {
-        $out  = "PhpTaskDaemon - Monitoring\n" .
-                "==========================\n";
-        $out .= "Function not yet implemented\n";
+        echo "PhpTaskDaemon - Monitoring\n";
+        echo "==========================\n";
+        echo "Function not yet implemented\n";
     }
 
 
@@ -282,7 +278,7 @@ class Console {
      * Displays a help message containing usage instructions.
      */
     public function help() {
-        $out .= $this->_consoleOpts->getUsageMessage();
+        echo $this->_consoleOpts->getUsageMessage();
     }
 
 
