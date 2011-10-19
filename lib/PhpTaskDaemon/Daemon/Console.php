@@ -31,6 +31,13 @@ class Console {
      */
     protected $_instance;
 
+    /**
+     * 
+     * Tasks collection object
+     * @var Tasks
+     */
+    protected $_tasks;
+
 
     /**
      * 
@@ -120,6 +127,31 @@ class Console {
 
     /**
      * 
+     * Returns the daemon tasks collection object
+     * @return Tasks
+     */
+    public function getTasks() {
+        if ($this->_tasks === NULL) {
+            $this->_tasks = new Tasks();
+        }
+        return $this->_tasks;
+    }
+
+
+    /**
+     * 
+     * Sets a daemon tasks collection object
+     * @param Tasks $tasks
+     * @return $this
+     */
+    public function setTasks($tasks) {
+        $this->_tasks = $tasks;
+        return $this;
+    }
+
+
+    /**
+     * 
      * Reads the command line arguments and invokes the selected action.
      */
     public function run() {
@@ -165,16 +197,15 @@ class Console {
      * Lists the current loaded tasks.
      */
     public function listTasks() {
-        $taskLoader = new Tasks();
-        $tasks = $taskLoader->scan();
+        $taskNames = $this->_tasks->scan();
 
         echo "List Tasks\n";
         echo "==========\n";
         if (count($tasks)==0) {
             echo "No tasks found!\n";
         } else {
-            foreach ($tasks as $task) {
-                echo '- ', $task, "\n";
+            foreach ($taskNames as $taskName) {
+                echo '- ', $taskName, "\n";
             }
         }
         echo "\n\n";
@@ -195,8 +226,7 @@ class Console {
      * Action: Start Daemon
      */
     public function start() {
-        $tasks = new Tasks();
-        $taskNames = $tasks->scan();
+        $taskNames = $this->_tasks->scan();
 
         // Initialize daemon tasks
         foreach($taskNames as $taskName) {
@@ -436,7 +466,7 @@ class Console {
 
         $tasks = array();
         try {
-            $tasks = $this->scanTasks();
+            $tasks = $this->_tasks->scan();
         } catch (Exception $e) {
             $out .= $e->getMessage();
         }
