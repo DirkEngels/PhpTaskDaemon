@@ -185,26 +185,14 @@ class Instance {
 
     public function stop() {
         try {
-            $pidFile = new Pid\File($pidFile = \TMP_PATH . '/phptaskdaemond.pid');
-            $pid = $pidFile->read();
+            $pid = $this->getPidFile()->read();
+
+            \PhpTaskDaemon\Daemon\Logger::get()->log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
+            posix_kill($pid, SIGTERM);
         } catch (Exception $e) {
             echo $e->getMessage();
-            exit;
         }
-
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
-        posix_kill($pid, SIGTERM);
-
-        /*
-        echo "THIS PID: " . $this->_pidManager->getCurrent() . "\n";
-        echo "Child PIDs\n";
-        $childs = $this->_pidManager->getChilds();
-        echo var_dump($childs);
-        foreach($childs as $child) {
-            echo " - " . $child . "\n";
-        }
-        echo "\n";
-        */
+        $this->_exit();
     }
 
 
@@ -218,7 +206,7 @@ class Instance {
             case SIGTERM:
                 // Shutdown
                 \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
-                exit;
+                $this->_exit();
                 break;
             case SIGCHLD:
                 // Halt
@@ -246,7 +234,7 @@ class Instance {
 
         if (count($this->_tasks->getManagers())==0) {
             \PhpTaskDaemon\Daemon\Logger::get()->log("No daemon tasks found", \Zend_Log::INFO);
-            exit;
+            $this->_exit();
         }
         \PhpTaskDaemon\Daemon\Logger::get()->log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::INFO);
 
@@ -258,7 +246,7 @@ class Instance {
                 $this->_forkManager($manager);
             } catch (Exception $e) {
                 \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::CRIT);
-                exit;
+                $this->_exit();
             }
         }
 
@@ -282,7 +270,7 @@ class Instance {
         $this->_pidFile->unlink();
         $this->_ipc->remove();
 
-        exit;
+        $this->_exit();
     }
 
 
@@ -323,8 +311,12 @@ class Instance {
 
             \PhpTaskDaemon\Daemon\Logger::get()->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
             $manager->runManager();
-            exit;
+            $this->_exit();
         }
+    }
+
+    protected function _exit() {
+        exit;
     }
 
 }
