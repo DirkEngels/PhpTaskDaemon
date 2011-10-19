@@ -92,7 +92,7 @@ class Console {
             $consoleOpts->parse();
         } catch (Zend_Console_Getopt_Exception $e) {
             $out .= $e->getUsageMessage();
-            exit;
+            $this->_exit();
         }
         $this->_consoleOpts = $consoleOpts;
 
@@ -162,12 +162,12 @@ class Console {
             // Initialize Configuration
             $this->_initConfig();
 
-            // List Tasks & exit (--list-tasks)
+            // List Tasks (--list-tasks)
             if ($this->_consoleOpts->getOption('list-tasks')) {
                 $this->listTasks();
             }
 
-            // Display Settings & exit (--settings)
+            // Display Settings (--settings)
             if ($this->_consoleOpts->getOption('settings')) {
                 $this->settings();
             }
@@ -188,7 +188,7 @@ class Console {
         } catch (\Exception $e) {
             Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
-        exit;
+        $this->_exit();
     }
 
 
@@ -259,7 +259,7 @@ class Console {
     public function restart() {
         $this->stop();
         $this->start();
-        exit;
+        $this->_exit();
     }
 
 
@@ -271,7 +271,7 @@ class Console {
         $status = State::getState();
         if ($status['pid'] === NULL) {
             echo "Daemon not running\n";
-            exit;
+            $this->_exit();
         }
 
         echo "PhpTaskDaemon - Status\n";
@@ -483,6 +483,10 @@ class Console {
 
         $out .= "\n\n";
         return $out;
+    }
+
+    protected function _exit() {
+        exit;
     }
 
 }
