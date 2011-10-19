@@ -183,13 +183,16 @@ class Instance {
     }
 
 
+    /**
+     * Stops the running instance
+     */
     public function stop() {
         try {
             $pid = $this->getPidFile()->read();
 
             \PhpTaskDaemon\Daemon\Logger::get()->log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
             posix_kill($pid, SIGTERM);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo $e->getMessage();
         }
         $this->_exit();
