@@ -56,11 +56,29 @@ class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
         $this->assertEquals($instance, $this->_console->getInstance());
     }
 
-    public function testListTasks() {
-        $this->expectOutputRegex('/List Tasks/');
+    public function testListTasksNoneFound() {
+        $tasks = $this->getMock('\\PhpTaskDaemon\\Daemon\\Tasks');
+        $tasks->expects($this->any())
+             ->method('scan')
+             ->will($this->returnValue(array()));
+        $this->_console->setTasks($tasks);
+
+        $this->expectOutputString("List Tasks\n==========\nNo tasks found!\n\n\n");
         $this->assertNull($this->_console->listTasks());
     }
 
+    public function testListTasksSomeFound() {
+        $tasks = $this->getMock('\\PhpTaskDaemon\\Daemon\\Tasks');
+        $tasks->expects($this->any())
+             ->method('scan')
+             ->will($this->returnValue(array('TaskOne', 'TaskTwo')));
+        $this->_console->setTasks($tasks);
+
+        $this->expectOutputRegex('/List Tasks/');
+        $this->expectOutputRegex('/TaskOne/');
+        $this->expectOutputRegex('/TaskTwo/');
+        $this->assertNull($this->_console->listTasks());
+    }
 
     public function testSettings() {
         $this->expectOutputRegex('/Daemon Settings/');
