@@ -37,9 +37,9 @@ Version 0.8.2 (planned)
     - tutorial
     - crawler
 - Add documentation
-    - INSTALL: Installation manual
+    + INSTALL: Installation manual
     - QUICKSTART: Getting Started
-    - USAGE: Daemon Usage 
+    + USAGE: Daemon Usage 
 - Implement loading task components by config file
 
 
