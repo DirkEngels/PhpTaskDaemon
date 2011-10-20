@@ -155,9 +155,6 @@ abstract class AbstractClass {
             array(&$this, 'sigHandler')
         );
 
-        if ($this->getPidManager() === null) {
-            $this->setPidManager($this->_pidManager);
-        }
         $this->execute();
     }
 
