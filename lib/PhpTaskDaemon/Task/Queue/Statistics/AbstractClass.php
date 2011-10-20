@@ -136,15 +136,12 @@ abstract class AbstractClass {
      * Initializes the statistics array for a certain status.
      * 
      * @param string $status
-     * @return bool
      */
     private function _initializeStatus($status) {
         $keys = $this->_ipc->getKeys();
         if (!in_array($status, array_keys($keys))) {
             $this->_ipc->setVar($status, 0);
-            return TRUE;
         }
-        return FALSE;
     }
 
 }
