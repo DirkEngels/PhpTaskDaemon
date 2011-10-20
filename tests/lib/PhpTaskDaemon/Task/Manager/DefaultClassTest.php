@@ -93,4 +93,14 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
 		$this->assertEquals($this->_executor, $this->_manager->getProcess()->getExecutor());
 	}
+
+    public function testRunManager() {
+        $manager = $this->getMock('\\PhpTaskDaemon\\Task\\Manager\\DefaultClass', array('execute'));
+        $manager->expects($this->once())
+             ->method('execute')
+             ->will($this->returnValue(NULL));
+
+        $this->assertNull($manager->runManager());
+    }
+
 }
