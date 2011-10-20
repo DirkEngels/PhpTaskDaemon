@@ -28,4 +28,7 @@ class AbstractTest extends \PHPUnit_Framework_TestCase {
     protected function tearDown() {
     }
 
+    public function testNothing() {
+        $this->assertTrue(TRUE);
+    }
 }
