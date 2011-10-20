@@ -87,6 +87,43 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         );
     }
 
+    public function testUpdateQueueNoQueueClassSet() {
+        $this->assertNull($this->_queue->getStatistics());
+        $this->assertFalse($this->_queue->updateQueue('test'));
+    }
+
+    public function testUpdateQueueCountIsPositive() {
+        $statistics = $this->getMock(
+            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\\DefaultClass', 
+            array('setQueueCount')
+        );
+        $statistics->expects($this->once())
+            ->method('setQueueCount')
+            ->will($this->returnValue(NULL));
+        $this->_queue->setStatistics($statistics);
+
+        $this->assertTrue(
+            $this->_queue->updateQueue(
+                100
+            )
+        );
+    }
+
+    public function testUpdateQueueCountIsZero() {
+        $statistics = $this->getMock(
+            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\\DefaultClass', 
+            array('decrementQueue')
+        );
+        $statistics->expects($this->once())
+            ->method('decrementQueue')
+            ->will($this->returnValue(NULL));
+        $this->_queue->setStatistics($statistics);
+
+        $this->assertTrue(
+            $this->_queue->updateQueue()
+        );
+    }
+    
     /*
     public function testUpdateStatisticsClassAlreadySet() {
         $this->assertNull($this->_queue->getStatistics());
