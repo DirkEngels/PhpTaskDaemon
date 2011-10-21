@@ -214,7 +214,6 @@ class Console {
                 echo '- ', $taskName, "\n";
             }
         }
-        echo "\n\n";
     }
 
 
@@ -223,7 +222,6 @@ class Console {
      */
     public function settings() {
         echo $this->_settingsDaemon();
-        echo "\n\n";
     }
 
 
@@ -236,6 +234,11 @@ class Console {
 
         // Initialize daemon tasks
         foreach($taskNames as $taskName) {
+            if ($this->_consoleOpts->getOption('task')) {
+                if (!preg_match('#' . $this->_consoleOpts->getOption('task') . '#', $taskName)) {
+                    continue;
+                }
+            }
             $this->getTasks()->loadManagerByTaskName($taskName);
         }
         $this->getInstance()->setTasks($this->getTasks());
@@ -429,7 +432,6 @@ class Console {
         $out .= "- Level:\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
         $out .= "\n";
 
-        $out .= "\n";
         return $out;
     }
 
