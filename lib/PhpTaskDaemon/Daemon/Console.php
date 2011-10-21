@@ -165,30 +165,36 @@ class Console {
             // List Tasks (--list-tasks)
             if ($this->_consoleOpts->getOption('list-tasks')) {
                 $this->listTasks();
+                $this->_exit();
             }
 
             // Display Settings (--settings)
             if ($this->_consoleOpts->getOption('settings')) {
                 $this->settings();
+                $this->_exit();
             }
 
             // Add Log Files
             $this->_initLogFile();
 
             // Check action, otherwise display help
-            $action = $this->_consoleOpts->getOption('action');
-            $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
-            if (in_array($action, $allActions))  {
-                // Perform action
-                $this->$action();
-            } else {
-                $this->help();
+            if ($this->_consoleOpts->getOption('action')) {
+                $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
+                $action = $this->_consoleOpts->getOption('action');
+                if (in_array($action, $allActions))  {
+                    // Perform action
+                    $this->$action();
+                    $this->_exit();
+                }
             }
+
+            // Display Command Help
+            $this->help();
 
         } catch (\Exception $e) {
             Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
-        $this->_exit();
+
     }
 
 
