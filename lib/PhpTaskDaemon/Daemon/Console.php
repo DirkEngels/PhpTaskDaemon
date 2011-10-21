@@ -206,12 +206,33 @@ class Console {
         $taskNames = $this->getTasks()->scan();
 
         echo "List Tasks\n";
-        echo "==========\n";
+        echo "==========\n\n";
         if (count($taskNames)==0) {
             echo "No tasks found!\n";
         } else {
             foreach ($taskNames as $taskName) {
-                echo '- ', $taskName, "\n";
+                echo $taskName, "\n";
+                echo str_repeat('-', strlen($taskName)), "\n";
+
+                // IPC
+
+                // Manager Trigger
+                $trigger = Config::get()->getOptionValue('manager.trigger.type', $taskName);
+                echo "Trigger:\t\t", $trigger, "\n";
+                switch($trigger) {
+                    case 'interval':
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.interval.time', $taskName), "\n";
+                        break;
+                    case 'cron':
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.cron.time', $taskName), "\n";
+                        break;
+                    default:
+                        break;
+                }
+
+                echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
+                echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
+                echo "\n";
             }
         }
     }
