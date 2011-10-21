@@ -40,7 +40,7 @@ class Factory {
      */
     public static function get($taskName) {
         $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
-	if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
+        if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
             throw new \Exception('Task has no defined executor');
         }
 
