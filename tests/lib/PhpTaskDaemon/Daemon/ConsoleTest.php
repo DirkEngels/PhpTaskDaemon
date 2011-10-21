@@ -79,7 +79,7 @@ class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
              ->will($this->returnValue(array()));
         $this->_console->setTasks($tasks);
 
-        $this->expectOutputString("List Tasks\n==========\nNo tasks found!\n\n\n");
+        $this->expectOutputString("List Tasks\n==========\nNo tasks found!\n");
         $this->assertNull($this->_console->listTasks());
     }
 
