@@ -214,7 +214,9 @@ class Console {
                 echo $taskName, "\n";
                 echo str_repeat('-', strlen($taskName)), "\n";
 
-                // IPC
+                echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
+                echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
+                echo "\n";
 
                 // Manager Trigger
                 $trigger = Config::get()->getOptionValue('manager.trigger.type', $taskName);
@@ -229,10 +231,6 @@ class Console {
                     default:
                         break;
                 }
-
-                echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
-                echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
-                echo "\n";
             }
         }
     }
