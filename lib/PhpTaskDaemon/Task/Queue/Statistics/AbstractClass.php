@@ -8,6 +8,7 @@
  */
 
 namespace PhpTaskDaemon\Task\Queue\Statistics;
+use PhpTaskDaemon\Daemon\Config;
 
 /**
  * 
@@ -42,7 +43,8 @@ abstract class AbstractClass {
      * Unset the shared memory at destruction time.
      */
     public function __destruct() {
-        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\None')) {
+        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+            $this->_ipc->remove();
             unset($this->_ipc);
         } 
     }
@@ -66,10 +68,13 @@ abstract class AbstractClass {
      */
     public function setIpc($ipc) {
         if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-            $ipc = new \PhpTaskDaemon\Daemon\Ipc\None(
-                'statistics-' . getmypid()
-            );
+            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcClass)) {
+                $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $ipc = new $ipcClass('statistics-' . getmypid());
         }
+
         $this->_ipc = $ipc;
         $this->_initializeStatus(self::STATUS_LOADED);
         $this->_initializeStatus(self::STATUS_QUEUED);
