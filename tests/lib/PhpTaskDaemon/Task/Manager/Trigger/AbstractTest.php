@@ -20,13 +20,23 @@ class AbstractTest extends \PHPUnit_Framework_TestCase {
     protected $_trigger;
 
     protected function setUp() {
+        $this->_trigger = $this->getMockForAbstractClass(
+            '\\PhpTaskDaemon\\Task\\Manager\\Trigger\\AbstractClass'
+        );
     }
 
     protected function tearDown() {
     }
 
     public function testNothing() {
-        $this->assertTrue(true);
+        $this->assertTrue(TRUE);
     }
 
+    public function testSetQueueInvalidArgument() {
+        $this->_trigger->setQueue('invalid queue object');
+        $this->assertEquals(
+            new \PhpTaskDaemon\Task\Queue\DefaultClass(),
+            $this->_trigger->getQueue()
+        );
+    }
 }

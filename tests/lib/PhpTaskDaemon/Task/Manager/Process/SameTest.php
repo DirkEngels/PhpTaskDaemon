@@ -30,4 +30,19 @@ class SameTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(true);
     }
 
+    public function testRun() {
+        $process = $this->getMock('\\PhpTaskDaemon\\Task\\Manager\\Process\\Same', array('_processTask'));
+        $process->expects($this->exactly(2))
+            ->method('_processTask')
+            ->will($this->returnValue(NULL));
+
+        $process->setJobs(
+	    $jobs = array(
+                new \PhpTaskDaemon\Task\Job\DefaultClass(),
+                new \PhpTaskDaemon\Task\Job\DefaultClass(),
+            )
+        );
+
+        $this->assertNull($process->run());
+    }
 }

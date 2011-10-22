@@ -29,18 +29,25 @@ Version 1.0 (roadmap)
     - Child
     - Parallel
 - Example Tasks & Tools
+- Add documentation
+    - Doc directory
+        + INSTALL: Installation manual
+        - QUICKSTART: Getting Started
+        + USAGE: Daemon Usage 
+    - Website/Wiki
 
 
 Version 0.8.2 (planned)
 -----------------------
-- Add demo tasks
-    - tutorial
-    - crawler
-- Add documentation
-    + INSTALL: Installation manual
-    - QUICKSTART: Getting Started
-    + USAGE: Daemon Usage 
-- Implement loading task components by config file
++ Implement loading task components by config file
++ Implement running a single task
+- Implement basic IPC adapters
+    - DataBase
+    - File
+    - Shared Memory
+- Implement daemon status action
+- Add concept example tasks (interval + gearman)
++ Add more unit tests
 
 
 Version 0.8.1 (16-10-2011)

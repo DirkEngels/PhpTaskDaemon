@@ -13,7 +13,7 @@ class Same extends AbstractClass implements InterfaceClass {
 
     public function run() {
         foreach($this->getJobs() as $job) {
-            $this->_processTask($this->getJob());
+            $this->_processTask($job);
         }
 
         \PhpTaskDaemon\Daemon\Logger::get()->log('Finished current set of tasks!', \Zend_Log::INFO);

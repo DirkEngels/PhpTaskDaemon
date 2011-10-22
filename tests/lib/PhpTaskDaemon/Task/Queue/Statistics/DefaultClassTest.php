@@ -109,4 +109,24 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	}
 */
 
+    public function testIncrementStatus() {
+        $ipc = $this->getMock('\\PhpTaskDaemon\\Daemon\\Ipc\\None', array('incrementVar'), array('test'));
+        $ipc->expects($this->once())
+            ->method('incrementVar')
+            ->will($this->returnValue(2));
+        $this->_statistics->setIpc($ipc);
+
+        $this->assertEquals(2, $this->_statistics->incrementStatus());
+    }
+
+    public function testDecrementQueue() {
+        $ipc = $this->getMock('\\PhpTaskDaemon\\Daemon\\Ipc\\None', array('decrementVar'), array('test'));
+        $ipc->expects($this->once())
+            ->method('decrementVar')
+            ->will($this->returnValue(2));
+        $this->_statistics->setIpc($ipc);
+
+        $this->assertEquals(2, $this->_statistics->decrementQueue());
+    }
+
 }

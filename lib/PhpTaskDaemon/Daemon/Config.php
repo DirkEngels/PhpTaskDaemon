@@ -146,7 +146,7 @@ class Config {
             }
         }
 
-        Logger::get()->log('Config option result: ' . $option . ' => ' . $value . ' (' . $source . ')', \Zend_Log::ERR);
+        Logger::get()->log('Config option result: ' . $option . ' => ' . $value . ' (' . $source . ')', \Zend_Log::NOTICE);
         $out = array($source, $value);
         return $out;
     }
