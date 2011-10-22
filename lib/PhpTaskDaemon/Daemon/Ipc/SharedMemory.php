@@ -72,11 +72,9 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         // Save the shared memory variable
         sem_acquire($this->_semaphoreLock);
         if (!shm_has_var($this->_sharedMemory, 1)) {
-            $returnValue = shm_put_var($this->_sharedMemory, 1, array());
+            shm_put_var($this->_sharedMemory, 1, array());
         }
         sem_release($this->_semaphoreLock);
-
-        return $returnValue;
     }
 
 
