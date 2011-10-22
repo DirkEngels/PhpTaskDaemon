@@ -96,9 +96,10 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
      */
     public function getKeys() {
         sem_acquire($this->_semaphoreLock);
-        $keys = parent::getKeys();
-        if (shm_has_var($this->_sharedMemory, 1)) {    
+        $keys = array();
+        if (shm_has_var($this->_sharedMemory, 1)) {
             $keys = shm_get_var($this->_sharedMemory, 1);
+            $keys = array_flip($keys);
         }
         sem_release($this->_semaphoreLock);
 
