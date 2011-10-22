@@ -124,6 +124,18 @@ abstract class AbstractClass {
 
 
     /**
+     *
+     * (Re)Sets the queue count.
+     * @param integer $count
+     */
+    public function setQueueCount($count = 0) {
+        $this->setStatusCount(self::STATUS_QUEUED, $count);
+        $this->setStatusCount(self::STATUS_LOADED, $count);
+        return $count;
+    }
+
+
+    /**
      * 
      * Decrements the queue count (after finishing a single job).
      */

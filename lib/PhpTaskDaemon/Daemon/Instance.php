@@ -170,7 +170,7 @@ class Instance {
      * available managers before running the daemon.
      */
     public function start() {
-        $this->_pidFile->write($this->_pidManager->getCurrent());
+        $this->getPidFile()->write($this->getPidManager()->getCurrent());
         $this->_run();
     }
 
@@ -179,7 +179,7 @@ class Instance {
      * Dispatches the isRunning method to the Pid\File object
      */
     public function isRunning() {
-        return $this->_pidFile->isRunning();
+        return $this->getPidFile()->isRunning();
     }
 
 
@@ -241,7 +241,7 @@ class Instance {
         }
         \PhpTaskDaemon\Daemon\Logger::get()->log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::INFO);
 
-        $this->_ipc->setVar('childs', array());
+        $this->getIpc()->setVar('childs', array());
         $managers = $this->_tasks->getManagers();
         foreach ($managers as $manager) {
             \PhpTaskDaemon\Daemon\Logger::get()->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
@@ -261,7 +261,7 @@ class Instance {
         );
 
         // Write pids to shared memory
-        $this->_ipc->setVar('childs', $this->_pidManager->getChilds());
+        $this->getIpc()->setVar('childs', $this->getPidManager()->getChilds());
 
         // Wait till all childs are done
         \PhpTaskDaemon\Daemon\Logger::get()->log("Waiting for childs to complete", \Zend_Log::NOTICE);
@@ -270,8 +270,8 @@ class Instance {
         }
         \PhpTaskDaemon\Daemon\Logger::get()->log("Running done.", \Zend_Log::NOTICE);
 
-        $this->_pidFile->unlink();
-        $this->_ipc->remove();
+        $this->getPidFile()->unlink();
+        $this->getIpc()->remove();
 
         $this->_exit();
     }
@@ -287,24 +287,21 @@ class Instance {
     {
         $pid = pcntl_fork();
         if ($pid === -1) {
-            // Error
+            // Error: Throw exception: Fork Failed
             \PhpTaskDaemon\Daemon\Logger::get()->log('Managers could not be forked!!!', \Zend_Log::CRIT);
-
-            // Throw exception: Fork Failed
             throw new \PhpTaskDaemon\Daemon\Exception\ForkFailed();
-
-            return FALSE;
 
         } elseif ($pid) {
             // Parent
-            $this->_pidManager->addChild($pid);
             $managerName = substr(substr(get_class($manager), 6), 0, -8);
-            $this->_ipc->setVar('status-'. $pid, $managerName);
+            $this->getPidManager()->addChild($pid);
+            $this->getIpc()->setVar('status-'. $pid, $managerName);
 
-        } else { 
+        } else {
+            // Child 
             $newPid = getmypid();
-            $this->_pidManager->forkChild($newPid);
-            $manager->init($this->_pidManager->getParent());
+            $this->getPidManager()->forkChild($newPid);
+            $manager->init($this->getPidManager()->getParent());
 
             $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
             $manager->getTrigger()->getQueue()->setStatistics($statistics);

@@ -21,16 +21,16 @@ class DefaultClass extends AbstractClass implements InterfaceClass {
             $jobs = $this->getTrigger()->getQueue()->load();
 
             if (count($jobs)==0) {
-                \PhpTaskDaemon\Daemon\Logger::get()->log("Queue checked: empty!!!", \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Queue checked: empty!!!", \Zend_Log::DEBUG);
                 $this->getProcess()->getExecutor()->updateStatus(100, 'Queue empty');
             } else {
-                \PhpTaskDaemon\Daemon\Logger::get()->log("Queue loaded: " . count($jobs) . " elements", \Zend_Log::INFO);
+                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Queue loaded: " . count($jobs) . " elements", \Zend_Log::INFO);
                 $this->getTrigger()->getQueue()->updateQueue(count($jobs));
 
                 while ($job = array_shift($jobs)) {
                     $this->_processTask($job);
                 }
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Queue finished', \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ': Queue finished', \Zend_Log::DEBUG);
                 $this->getProcess()->getExecutor()->updateStatus(100, 'Queue finished');
             }
 

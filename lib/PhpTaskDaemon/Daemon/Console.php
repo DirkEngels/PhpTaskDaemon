@@ -165,30 +165,36 @@ class Console {
             // List Tasks (--list-tasks)
             if ($this->_consoleOpts->getOption('list-tasks')) {
                 $this->listTasks();
+                $this->_exit();
             }
 
             // Display Settings (--settings)
             if ($this->_consoleOpts->getOption('settings')) {
                 $this->settings();
+                $this->_exit();
             }
 
             // Add Log Files
             $this->_initLogFile();
 
             // Check action, otherwise display help
-            $action = $this->_consoleOpts->getOption('action');
-            $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
-            if (in_array($action, $allActions))  {
-                // Perform action
-                $this->$action();
-            } else {
-                $this->help();
+            if ($this->_consoleOpts->getOption('action')) {
+                $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
+                $action = $this->_consoleOpts->getOption('action');
+                if (in_array($action, $allActions))  {
+                    // Perform action
+                    $this->$action();
+                    $this->_exit();
+                }
             }
+
+            // Display Command Help
+            $this->help();
 
         } catch (\Exception $e) {
             Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
-        $this->_exit();
+
     }
 
 
@@ -200,15 +206,33 @@ class Console {
         $taskNames = $this->getTasks()->scan();
 
         echo "List Tasks\n";
-        echo "==========\n";
+        echo "==========\n\n";
         if (count($taskNames)==0) {
             echo "No tasks found!\n";
         } else {
             foreach ($taskNames as $taskName) {
-                echo '- ', $taskName, "\n";
+                echo $taskName, "\n";
+                echo str_repeat('-', strlen($taskName)), "\n";
+
+                echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
+                echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
+
+                // Manager Trigger
+                $trigger = Config::get()->getOptionValue('manager.trigger.type', $taskName);
+                echo "Trigger:\t\t", $trigger, "\n";
+                switch($trigger) {
+                    case 'interval':
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.interval.time', $taskName), "\n";
+                        break;
+                    case 'cron':
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.cron.time', $taskName), "\n";
+                        break;
+                    default:
+                        break;
+                }
+                echo "\n";
             }
         }
-        echo "\n\n";
     }
 
 
@@ -217,7 +241,6 @@ class Console {
      */
     public function settings() {
         echo $this->_settingsDaemon();
-        echo "\n\n";
     }
 
 
@@ -230,6 +253,11 @@ class Console {
 
         // Initialize daemon tasks
         foreach($taskNames as $taskName) {
+            if ($this->_consoleOpts->getOption('task')) {
+                if (!preg_match('#' . $this->_consoleOpts->getOption('task') . '#', $taskName)) {
+                    continue;
+                }
+            }
             $this->getTasks()->loadManagerByTaskName($taskName);
         }
         $this->getInstance()->setTasks($this->getTasks());
@@ -423,7 +451,6 @@ class Console {
         $out .= "- Level:\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
         $out .= "\n";
 
-        $out .= "\n";
         return $out;
     }
 
