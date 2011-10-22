@@ -9,7 +9,7 @@ define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
 
 // Define application environment
 defined('APPLICATION_ENV')
-    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'testing'));
 
 // Include Paths
 $includePaths = array(
