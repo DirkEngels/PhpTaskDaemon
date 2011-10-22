@@ -30,7 +30,45 @@ class State {
         }
         $ipc = new $ipcClass('phptaskdaemond');
 
-        $state = $ipc->getKeys();
+        $state = array();
+
+        $daemonKeys = $ipc->getKeys();
+
+        // Pid
+        $state['pid'] = null;
+        if (in_array('pid', $daemonKeys)) {
+            $state['pid'] = $ipc->getVar('pid');
+        }
+
+        // Childs
+        if (!in_array('childs', $daemonKeys)) {
+            $state['childs'] = array();
+        } else {
+            $state['childs'] = $ipc->getVar('childs');
+        }
+
+        // Loop Childs
+        foreach($state['childs'] as $process) {
+            $state['process-' . $process] = array('statistics' => array(), 'status' => array());
+            $state['process-' . $process]['statistics'] = array(
+                'type' => 'Tutorial\\Minimal', 
+                'status' => 'Processing jobs',
+                'loaded' => 2, 
+                'queued' => rand(0,1),
+                'done' => 12,
+                'failed' => 1,
+            );
+            $state['process-' . $process]['status']['executor-1234'] = array(
+                'pid' => 1234,
+                'percentage' => 60,
+                'state' => 'Resizing image',
+            );
+            $state['process-' . $process]['status']['executor-1235'] = array(
+                'pid' => 1235,
+                'percentage' => 20,
+                'state' => 'Downloading image',
+            );
+        }
 
         return $state;
     }

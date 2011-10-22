@@ -8,6 +8,7 @@
  */
 
 namespace PhpTaskDaemon\Task\Queue\Statistics;
+use PhpTaskDaemon\Daemon\Config;
 
 /**
  * 
@@ -33,7 +34,9 @@ abstract class AbstractClass {
      * @param \PhpTaskDaemon\Ipc $ipc
      */
     public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
-        $this->setIpc($ipc);
+        if (!is_null($ipc)) {
+            $this->setIpc($ipc);
+        }
     }
 
 
@@ -42,7 +45,8 @@ abstract class AbstractClass {
      * Unset the shared memory at destruction time.
      */
     public function __destruct() {
-        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\None')) {
+        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+            $this->_ipc->remove();
             unset($this->_ipc);
         } 
     }
@@ -54,6 +58,13 @@ abstract class AbstractClass {
      * @return PhpTaskDaemon\Ipc
      */
     public function getIpc() {
+        if (!is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcClass)) {
+                $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $this->_ipc = new $ipcClass('statistics-' . getmypid());
+        }
         return $this->_ipc;
     }
 
@@ -66,10 +77,9 @@ abstract class AbstractClass {
      */
     public function setIpc($ipc) {
         if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-            $ipc = new \PhpTaskDaemon\Daemon\Ipc\None(
-                'statistics-' . getmypid()
-            );
+            throw new \Exception('Injected object is not a IPC Abstract class');
         }
+
         $this->_ipc = $ipc;
         $this->_initializeStatus(self::STATUS_LOADED);
         $this->_initializeStatus(self::STATUS_QUEUED);
@@ -88,12 +98,12 @@ abstract class AbstractClass {
      */
     public function get($status = NULL) {
         if (is_NULL($status)) {
-            return $this->_ipc->get();
+            return $this->getIpc()->get();
         }
-        if (!in_array($status, $this->_ipc->getKeys())) {
+        if (!in_array($status, $this->getIpc()->getKeys())) {
             $this->_initializeStatus($status);
         }
-        return $this->_ipc->getVar($status);
+        return $this->getIpc()->getVar($status);
     }
 
 
@@ -105,10 +115,10 @@ abstract class AbstractClass {
      * @return bool
      */
     public function setStatusCount($status = self::STATUS_DONE, $count = 0) {
-        if (!in_array($status, $this->_ipc->getKeys())) {
+        if (!in_array($status, $this->getIpc()->getKeys())) {
             $this->_initializeStatus($status);
         }
-        return $this->_ipc->setVar($status, $count);
+        return $this->getIpc()->setVar($status, $count);
     }
 
 
@@ -119,7 +129,7 @@ abstract class AbstractClass {
      * @return integer
      */
     public function incrementStatus($status = self::STATUS_DONE) {
-        return $this->_ipc->incrementVar($status);
+        return $this->getIpc()->incrementVar($status);
     }
 
 
@@ -140,7 +150,7 @@ abstract class AbstractClass {
      * Decrements the queue count (after finishing a single job).
      */
     public function decrementQueue() {
-        return $this->_ipc->decrementVar(self::STATUS_QUEUED);
+        return $this->getIpc()->decrementVar(self::STATUS_QUEUED);
     }
 
 
@@ -150,9 +160,9 @@ abstract class AbstractClass {
      * @param string $status
      */
     private function _initializeStatus($status) {
-        $keys = $this->_ipc->getKeys();
+        $keys = $this->getIpc()->getKeys();
         if (!in_array($status, array_keys($keys))) {
-            $this->_ipc->setVar($status, 0);
+            $this->getIpc()->setVar($status, 0);
         }
     }
 
