@@ -305,18 +305,18 @@ class Console {
         echo "PhpTaskDaemon - Status\n";
         echo  "==========================\n";
         echo "\n";
-        if (count($status['childs']) == 0) {
-            echo "No processes!\n";
-        } else {
-            echo "Processes (" . count($status['childs']) . ")\n";
-
-            foreach ($status['childs'] as $childPid) {
-                $managerData = $status['task-' . $childPid];
-                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
-                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
-            }
-
-        }
+//        if (count($status['childs']) == 0) {
+//            echo "No processes!\n";
+//        } else {
+//            echo "Processes (" . count($status['childs']) . ")\n";
+//
+//            foreach ($status['childs'] as $childPid) {
+//                $managerData = $status['task-' . $childPid];
+//                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
+//                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
+//            }
+//
+//        }
         echo "\n\n";
     }
 
