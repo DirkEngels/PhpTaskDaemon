@@ -31,4 +31,12 @@ class AbstractTest extends \PHPUnit_Framework_TestCase {
     public function testNothing() {
         $this->assertTrue(TRUE);
     }
+
+    public function testSetQueueInvalidArgument() {
+        $this->_trigger->setQueue('invalid queue object');
+        $this->assertEquals(
+            new \PhpTaskDaemon\Task\Queue\DefaultClass(),
+            $this->_trigger->getQueue()
+        );
+    }
 }
