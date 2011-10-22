@@ -39,15 +39,14 @@ Version 1.0 (roadmap)
 
 Version 0.8.2 (planned)
 -----------------------
-- Implement loading task components by config file
++ Implement loading task components by config file
 - Implement basic IPC adapters
     - DataBase
     - File
     - Shared Memory
-- Add demo tasks
-    - tutorial
-    - crawler
-- Add more unit tests
++ Implement running a single task
+- Add concept demo tasks
++ Add more unit tests
 
 
 Version 0.8.1 (16-10-2011)
