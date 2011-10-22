@@ -120,7 +120,11 @@ class Instance {
      */
     public function getIpc() {
         if (is_null($this->_ipc)) {
-            $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None('phptaskdaemond');
+            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcClass)) {
+                $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $this->_ipc = new $ipcClass('phptaskdaemond');
         }
 
         return $this->_ipc;
@@ -295,7 +299,6 @@ class Instance {
             // Parent
             $managerName = substr(substr(get_class($manager), 6), 0, -8);
             $this->getPidManager()->addChild($pid);
-            $this->getIpc()->setVar('status-'. $pid, $managerName);
 
         } else {
             // Child 

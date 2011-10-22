@@ -24,26 +24,14 @@ class State {
      * @return array
      */
     public static function getState() {
-        $pidFile = new \PhpTaskDaemon\Daemon\Pid\File(TMP_PATH . '/phptaskdaemond.pid');
-        $pid = $pidFile->read();
-
-        $state = array('pid' => $pid);
-        if (file_exists(TMP_PATH . '/phptaskdaemond.shm')) {
-            $shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
-            $shmKeys = $shm->getKeys();
-            $state['memKeys'] = count($shmKeys); 
-            foreach($shm->getKeys() as $key => $value) {
-                $state[$key] = $shm->getVar($key);
-            }
-
-            // Child info
-            if (isset($state['childs'])) {
-                foreach($state['childs'] as $child) {
-                    $state['task-' . $child]['status'] = self::_getChildStatus($child);
-                    $state['task-' . $child]['statistics'] = self::_getChildStatistics($child);
-                }
-            }
+        $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+        if (!class_exists($ipcClass)) {
+            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
         }
+        $ipc = new $ipcClass('phptaskdaemond');
+
+        $state = $ipc->getKeys();
+
         return $state;
     }
 
