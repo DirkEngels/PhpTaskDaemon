@@ -8,6 +8,7 @@
  */
 
 namespace PhpTaskDaemon\Daemon\Ipc;
+use PhpTaskDaemon\Daemon\Logger;
 
 /**
  * 
@@ -16,11 +17,18 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * array.
  */
 class SharedMemory extends AbstractClass implements InterfaceClass {
+
     /**
-     * This variable contains the identifier string.
+     * This variable contains a unique identifier.
+     * @var unknown_type
+     */
+    protected $_id = NULL;
+
+    /**
+     * This variable contains the path string.
      * @var string|NULL
      */
-    protected $_pathNameWithPid = NULL;
+    protected $_path = NULL;
 
     /**
      * The actual resource of the shared memory segment
@@ -46,27 +54,27 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         parent::__construct($id);
 
         if (!strstr($id, '/')) {
-            $pathname = TMP_PATH . '/' . strtolower($id);
+            $path = TMP_PATH;
         } else {
-            $pathname = $id;
+            $path = realpath($id);
         }
 
-        $this->_pathNameWithPid = $pathname;
+        $this->_path = $path;
 
         // Dommel & Semaphores
-        if (!file_exists($this->_pathNameWithPid . '.sem')) {
-            touch($this->_pathNameWithPid . '.sem');
+        if (!file_exists($this->_path . '/' . $this->_id . '.sem')) {
+            touch($this->_path . '/' . $this->_id . '.sem');
         }
         $this->_semaphoreLock = sem_get(
-            ftok($this->_pathNameWithPid . '.sem', 1)
+            ftok($this->_path . '/' . $this->_id . '.sem', 1)
         );
 
         // Shared Memory Segment
-        if (!file_exists($this->_pathNameWithPid . '.shm')) {
-            touch($this->_pathNameWithPid . '.shm');
+        if (!file_exists($this->_path . '/' . $this->_id . '.shm')) {
+            touch($this->_path . '/' . $this->_id . '.shm');
         }
         $this->_sharedMemory = shm_attach(
-            ftok($this->_pathNameWithPid . '.shm', 2)
+            ftok($this->_path . '/' . $this->_id . '.shm', 2)
         );
 
         // Save the shared memory variable
@@ -75,6 +83,8 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
             shm_put_var($this->_sharedMemory, 1, array());
         }
         sem_release($this->_semaphoreLock);
+
+        Logger::get()->log($this->_id . ': Created SHM segment', \Zend_Log::DEBUG);
     }
 
 
@@ -100,6 +110,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         if (shm_has_var($this->_sharedMemory, 1)) {
             $keys = shm_get_var($this->_sharedMemory, 1);
             $keys = array_flip($keys);
+            Logger::get()->log($this->_id . ': Reading SHM keys (' . count($keys) . ')', \Zend_Log::DEBUG);
         }
         sem_release($this->_semaphoreLock);
 
@@ -122,6 +133,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         if (in_array($key, array_keys($keys))) {
             $value = shm_get_var($this->_sharedMemory, $keys[$key]);
         }
+        Logger::get()->log($this->_id . ': Reading SHM key (' . $key . ') => value (' . $value . ')', \Zend_Log::DEBUG);
         sem_release($this->_semaphoreLock);
 
         return $value;
@@ -152,6 +164,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
             $retInit = shm_put_var($this->_sharedMemory, 1, $keys);
         }
         $retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+        Logger::get()->log($this->_id . ': Writing SHM key (' . $key . ') => value (' . $value . ')', \Zend_Log::DEBUG);
         sem_release($this->_semaphoreLock);
 
         return $retInit && $retPut;
@@ -185,6 +198,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
             $returnValue = shm_put_var($this->_sharedMemory, $keys[$key], 1);
             $value = 1;
         }
+        Logger::get()->log($this->_id . ': Incrementing SHM key (' . $key . ') => value (' . $value . ')', \Zend_Log::DEBUG);
         sem_release($this->_semaphoreLock);
 
         return $returnValue;
@@ -219,6 +233,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
             if ($value<0) { $value = 0; }
         }
         $retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+        Logger::get()->log($this->_id . ': Decrementing SHM key (' . $key . ') => value (' . $value . ')', \Zend_Log::DEBUG);
         sem_release($this->_semaphoreLock);
         
         return $retInit && $retPut;
@@ -238,6 +253,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
         if (isset($keys[$key])) {
             sem_acquire($this->_semaphoreLock);
             if (shm_has_var($this->_sharedMemory, $keys[$key])) {
+                Logger::get()->log($this->_id . ': Removing SHM key (' . $key . ')', \Zend_Log::DEBUG);
                 $ret = shm_remove_var($this->_sharedMemory, $keys[$key]);
 
                 // update 
@@ -257,6 +273,7 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
      * @return bool|int
      */
     public function remove() {
+        Logger::get()->log($this->_id . ': Destroying SHM segment', \Zend_Log::DEBUG);
         return ($this->_removeSegment() && $this->_removeSemaphore());
     }
 
@@ -269,9 +286,9 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
     private function _removeSegment() {
         $ret = false;
         if (is_resource($this->_sharedMemory)) {
-            if (file_exists($this->_pathNameWithPid . '.shm')) {
+            if (file_exists($this->_path . '/' . $this->_id . '.shm')) {
                 $ret = shm_remove($this->_sharedMemory);
-                unlink($this->_pathNameWithPid . '.shm');
+                unlink($this->_path . '/' . $this->_id . '.shm');
             }
         }
         return $ret;
@@ -286,9 +303,9 @@ class SharedMemory extends AbstractClass implements InterfaceClass {
     private function _removeSemaphore() {
         $ret = false;
         if (is_resource($this->_semaphoreLock)) {
-            if (file_exists($this->_pathNameWithPid . '.sem')) {
+            if (file_exists($this->_path . '/' . $this->_id . '.sem')) {
                 $ret = sem_remove($this->_semaphoreLock);
-                unlink($this->_pathNameWithPid . '.sem');
+                unlink($this->_path . '/' . $this->_id . '.sem');
             }
         }
         return $ret;
