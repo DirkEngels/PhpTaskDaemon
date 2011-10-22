@@ -299,7 +299,6 @@ class Instance {
             // Parent
             $managerName = substr(substr(get_class($manager), 6), 0, -8);
             $this->getPidManager()->addChild($pid);
-            $this->getIpc()->setVar('status-'. $pid, $managerName);
 
         } else {
             // Child 
