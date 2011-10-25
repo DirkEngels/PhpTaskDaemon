@@ -14,8 +14,8 @@ interface InterfaceClass {
     public function getKeys();
     public function getVar($key);
     public function setVar($key, $value);
-    public function incrementVar($key);
-    public function decrementVar($key);
+    public function incrementVar($key, $count = 1);
+    public function decrementVar($key, $count = 1);
     public function removeVar($key);
     public function remove();
 
