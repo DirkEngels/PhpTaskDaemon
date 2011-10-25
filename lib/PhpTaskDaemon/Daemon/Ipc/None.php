@@ -45,7 +45,7 @@ class None extends AbstractClass implements InterfaceClass {
      * @param string $key
      * @return bool
      */
-    public function incrementVar($key) {
+    public function incrementVar($key, $count = 1) {
         return TRUE;
     }
 
@@ -56,7 +56,7 @@ class None extends AbstractClass implements InterfaceClass {
      * @param string $key
      * @return bool
      */
-    public function decrementVar($key) {
+    public function decrementVar($key, $count = 1) {
         return TRUE;
     }
 
