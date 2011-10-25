@@ -9,6 +9,9 @@
 
 namespace PhpTaskDaemon\Daemon\Ipc;
 
+use PhpTaskDaemon\Daemon\Config;
+use PhpTaskDaemon\Daemon\Logger;
+
 /**
  * 
  * The Daemon\Ipc\DataBase class is responsible for storing and retrieving
@@ -18,10 +21,22 @@ class DataBase extends AbstractClass implements InterfaceClass {
 
     /**
      * PDO Object
-     * @var PDO
+     * @var \PDO
      */
     protected $_pdo;
 
+    /**
+     * PDO Statement Object
+     * @var \PDOStatement
+     */
+    protected $_stmt;
+
+
+    public function __construct($id) {
+        parent::__construct($id);
+
+        $this->_dbSetup();
+    }
 
     /**
      * Getter for the PDO object
@@ -47,70 +62,95 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return array
      */
     public function getKeys() {
-        return array();
+        $sql = "SELECT name FROM ipc WHERE ipcId=:ipcId";
+        $params = array(
+            'ipcId' => $this->_id,
+        );
+        $this->_dbStatement($sql, $params);
+        return $this->_stmt->fetchAll();
     }
 
 
     /**
      * 
      * Returns nothing (NULL) 
-     * @param string $key
+     * @param string $name
      * @return NULL
      */
-    public function getVar($key) {
-        $sql = "SELECT value FROM ipc WHERE ipcId='" . $this->_id . "' AND key='" . $key . "'";
-        $row = $this->getPdo()->query($sql);
-//        $row = mysql_fetch_array($this->_queryDataBase($sql));
-        return $row['value'];
+    public function getVar($name) {
+        $sql = "SELECT value FROM ipc WHERE ipcId=:ipcId AND name=:name";
+        $params = array(
+            'ipcId' => $this->_id,
+            'name' => $name,
+        );
+        $this->_dbStatement($sql, $params);
+        return unserialize($this->_stmt->fetchColumn());
     }
 
 
     /**
      * 
      * Sets nothing
-     * @param string $key
+     * @param string $name
      * @param mixed $value
      * @return bool
      */
-    public function setVar($key, $value) {
-        $sql = "REPLACE INTO ipc (key, value) VALUES ('" . $key . "','" . $value . "')";
-        return $this->_queryDataBase($sql);
+    public function setVar($name, $value) {
+        $sql = "INSERT INTO ipc (ipcId, name, value) VALUES (:ipcId, :name, :value)";
+        $params = array(
+            'ipcId' => $this->_id,
+            'name' => $name,
+            'value' => serialize($value),
+        );
+        $this->_dbStatement($sql, $params);
     }
 
 
     /**
      * 
      * Increments nothing
-     * @param string $key
+     * @param string $name
      * @return bool
      */
-    public function incrementVar($key) {
-        $sql = "UPDATE ipc SET value=value+1 WHERE key='" . $key . "'";
-        return $this->_queryDataBase($sql);
+    public function incrementVar($name) {
+        $sql = "UPDATE ipc SET value=value+1 WHERE ipcId=:ipcId AND name=:name";
+        $params = array(
+            'ipcId' => $this->_id,
+            'name' => $name,
+        );
+        $this->_dbStatement($sql, $params);
     }
 
 
     /**
      * 
      * Decrements nothing
-     * @param string $key
+     * @param string $name
      * @return bool
      */
-    public function decrementVar($key) {
-        $sql = "UPDATE ipc SET value=value-1 WHERE key='" . $key . "'";
-        return $this->_queryDataBase($sql);
+    public function decrementVar($name) {
+        $sql = "UPDATE ipc SET value=value-1 WHERE name='" . $name . "'";
+        $params = array(
+            'ipcId' => $this->_id,
+            'name' => $name,
+        );
+        return $this->_dbStatement($sql, $params);
     }
 
 
     /**
      * 
      * Removes nothing 
-     * @param string $key
+     * @param string $name
      * @return bool
      */
-    public function removeVar($key) {
-        $sql = "DELETE FROM ipc WHERE key='" . $key . "'";
-        return $this->_queryDataBase($sql);
+    public function removeVar($name) {
+        $sql = "DELETE FROM ipc WHERE ipcId=:ipcId AND name=:name";
+        $params = array(
+            'ipcId' => $this->_id,
+            'name' => $name,
+        );
+//        return $this->_dbStatement($sql, $params);
     }
 
 
@@ -120,8 +160,41 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function remove() {
-        $sql = "DELETE FROM ipc";
-        return $this->_queryDataBase($sql);
+        $sql = "DELETE FROM ipc WHERE ipdKey=:ipcId";
+        $params = array(
+            'ipcId' => $this->_id,
+        );
+//        return $this->_dbStatement($sql, $params);
+    }
+
+
+    protected function _dbSetup() {
+        // Try loading PDO from config
+        try {
+            $dbname = Config::get()->getOptionValue('db.params.dbname');
+            switch(Config::get()->getOptionValue('db.adapter')) {
+                case 'mysql':
+                case 'pgsql':
+                    $hostname = Config::get()->getOptionValue('db.params.hostname');
+                    $username = Config::get()->getOptionValue('db.params.username');
+                    $password = Config::get()->getOptionValue('db.params.password');
+                    $this->_pdo = new \PDO(
+                        Config::get()->getOptionValue('db.adapter') . ':host=' . $hostname . ';dbname=' . $dbname, 
+                        $username, 
+                        $password
+                    );
+                    break;
+                case 'sqlite':
+                    $this->_pdo = new \PDO('sqlite:' . \TMP_PATH . '/' . $id . '.sdb');
+                    break;
+                default:
+                    $this->_pdo = new \PDO("sqlite::memory");
+                    break;
+            }
+            Logger::get()->log('Succesfully initialized the DB PDO driver (type: ' . Config::get()->getOptionValue('db.adapter') . ')', \Zend_Log::INFO);
+        } catch (\Exception $e) {
+            Logger::get()->log('Could not initialize the DB PDO driver:' . $e->getMessage(), \Zend_Log::ERR);
+        }
     }
 
 
@@ -130,9 +203,18 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @param string $query
      * @return integer
      */
-    protected function _queryDataBase($statement) {
-        return mysql_query();
-        return $this->_pdo->exec($statement);
+    protected function _dbStatement($sql, $params = array()) {
+        Logger::get()->log('Executing SQL Statement: ' . $sql . ' with params: ' . var_export($params, true), \Zend_Log::DEBUG);
+        $this->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        try {
+            $this->_stmt = $this->getPdo()->prepare($sql);
+            foreach($params as $name => $value) {
+                $this->_stmt->bindParam(':' . $name, $value);
+            }
+            return $this->_stmt->execute($params);
+        } catch (\Exception $e) {
+            Logger::get()->log('Failed to execute SQL Statement: ' . $e->getMessage(), \Zend_Log::DEBUG);
+        }
     }
 
 }
