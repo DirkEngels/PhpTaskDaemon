@@ -41,6 +41,11 @@ abstract class AbstractClass {
     }
 
 
+    public function __destruct() {
+        //$this->remove();
+    }
+
+
     /**
      * Returns the unique identifier
      * @return string
@@ -71,6 +76,14 @@ abstract class AbstractClass {
             $data[$nr] = $this->getVar($nr);
         }
         return $data;
+    }
+
+
+    /**
+     * Removes the ipc data
+     */
+    public function remove() {
+        $this->_keys = array();
     }
 
 }
