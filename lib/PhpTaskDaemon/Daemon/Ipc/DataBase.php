@@ -34,9 +34,9 @@ class DataBase extends AbstractClass implements InterfaceClass {
 
     public function __construct($id) {
         parent::__construct($id);
-
         $this->_dbSetup();
     }
+
 
     /**
      * Getter for the PDO object
@@ -84,6 +84,9 @@ class DataBase extends AbstractClass implements InterfaceClass {
             'name' => $name,
         );
         $this->_dbStatement($sql, $params);
+//        if ($this->_stmt->rowCount() == 0) {
+//            throw new \Exception('Value for key (' . $name . ') does not exists (ipcId: ' . $this->_id . ')', \Zend_Log::ERR);
+//        }
         return unserialize($this->_stmt->fetchColumn());
     }
 
@@ -96,7 +99,8 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function setVar($name, $value) {
-        $sql = "INSERT INTO ipc (ipcId, name, value) VALUES (:ipcId, :name, :value)";
+
+        $sql = "REPLACE INTO ipc (ipcId, name, value) VALUES (:ipcId, :name, :value)";
         $params = array(
             'ipcId' => $this->_id,
             'name' => $name,
@@ -112,13 +116,24 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @param string $name
      * @return bool
      */
-    public function incrementVar($name) {
-        $sql = "UPDATE ipc SET value=value+1 WHERE ipcId=:ipcId AND name=:name";
+    public function incrementVar($name, $count = 1) {
+        $this->_pdo->beginTransaction();
+
+        $value = $this->getVar($name);
+        if (!isset($value)) {
+            $value = 0;
+        }
+        $value += $count;
+
+        $sql = "UPDATE ipc SET value=:value WHERE ipcId=:ipcId AND name=:name";
         $params = array(
             'ipcId' => $this->_id,
             'name' => $name,
+            'value' => serialize($value),
         );
         $this->_dbStatement($sql, $params);
+
+        return $this->getPdo()->commit();
     }
 
 
@@ -128,13 +143,24 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @param string $name
      * @return bool
      */
-    public function decrementVar($name) {
-        $sql = "UPDATE ipc SET value=value-1 WHERE name='" . $name . "'";
+    public function decrementVar($name, $count = 1) {
+        $this->_pdo->beginTransaction();
+
+        $value = $this->getVar($name);
+        if (!isset($value)) {
+            $value = 0;
+        }
+        $value -= $count;
+
+        $sql = "UPDATE ipc SET value=:value WHERE ipcId=:ipcId AND name=:name";
         $params = array(
             'ipcId' => $this->_id,
             'name' => $name,
+            'value' => serialize($value),
         );
-        return $this->_dbStatement($sql, $params);
+        $this->_dbStatement($sql, $params);
+
+        return $this->getPdo()->commit();
     }
 
 
@@ -150,7 +176,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
             'ipcId' => $this->_id,
             'name' => $name,
         );
-//        return $this->_dbStatement($sql, $params);
+        return $this->_dbStatement($sql, $params);
     }
 
 
@@ -164,7 +190,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
         $params = array(
             'ipcId' => $this->_id,
         );
-//        return $this->_dbStatement($sql, $params);
+        return $this->_dbStatement($sql, $params);
     }
 
 
