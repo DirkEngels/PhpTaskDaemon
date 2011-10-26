@@ -61,7 +61,7 @@ abstract class AbstractClass {
             if (!class_exists($ipcClass)) {
                 $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
             }
-            $this->_ipc = new $ipcClass('phptaskdaemond-' . getmypid());
+            $this->_ipc = new $ipcClass('phptaskdaemond-queue-' . getmypid());
 
             $this->_initializeStatus(self::STATUS_LOADED);
             $this->_initializeStatus(self::STATUS_QUEUED);
@@ -129,8 +129,8 @@ abstract class AbstractClass {
      * @param string $status
      * @return integer
      */
-    public function incrementStatus($status = self::STATUS_DONE) {
-        return $this->_ipc->incrementVar($status);
+    public function incrementStatus($status = self::STATUS_DONE, $count = 1) {
+        return $this->_ipc->incrementVar($status, $count);
     }
 
 
@@ -141,7 +141,7 @@ abstract class AbstractClass {
      */
     public function setQueueCount($count = 0) {
         $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->setStatusCount(self::STATUS_LOADED, $count);
+        $this->_ipc->incrementVar(self::STATUS_LOADED, $count);
         return $count;
     }
 
@@ -150,8 +150,8 @@ abstract class AbstractClass {
      * 
      * Decrements the queue count (after finishing a single job).
      */
-    public function decrementQueue() {
-        return $this->_ipc->decrementVar(self::STATUS_QUEUED);
+    public function decrementQueue($count = 1) {
+        return $this->_ipc->decrementVar(self::STATUS_QUEUED, $count);
     }
 
 
