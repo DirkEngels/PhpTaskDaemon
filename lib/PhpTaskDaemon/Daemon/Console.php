@@ -31,6 +31,13 @@ class Console {
      */
     protected $_instance;
 
+    /**
+     * 
+     * Tasks collection object
+     * @var Tasks
+     */
+    protected $_tasks;
+
 
     /**
      * 
@@ -72,10 +79,10 @@ class Console {
     /**
      * 
      * Sets new console arguments
-     * @param Zend_Console_Getopt $consoleOpts
+     * @param \Zend_Console_Getopt $consoleOpts
      * @return $this
      */
-    public function setConsoleOpts(Zend_Console_Getopt $consoleOpts = NULL) {
+    public function setConsoleOpts(\Zend_Console_Getopt $consoleOpts = NULL) {
         if ($consoleOpts === NULL) {
             $consoleOpts = $this->getConsoleOpts();
         }
@@ -83,9 +90,9 @@ class Console {
         // Parse Options
         try {
             $consoleOpts->parse();
-        } catch (Zend_Console_Getopt_Exception $e) {
-            echo $e->getUsageMessage();
-            exit;
+        } catch (\Zend_Console_Getopt_Exception $e) {
+            $out .= $e->getUsageMessage();
+            $this->_exit();
         }
         $this->_consoleOpts = $consoleOpts;
 
@@ -120,6 +127,31 @@ class Console {
 
     /**
      * 
+     * Returns the daemon tasks collection object
+     * @return Tasks
+     */
+    public function getTasks() {
+        if ($this->_tasks === NULL) {
+            $this->_tasks = new Tasks();
+        }
+        return $this->_tasks;
+    }
+
+
+    /**
+     * 
+     * Sets a daemon tasks collection object
+     * @param Tasks $tasks
+     * @return $this
+     */
+    public function setTasks($tasks) {
+        $this->_tasks = $tasks;
+        return $this;
+    }
+
+
+    /**
+     * 
      * Reads the command line arguments and invokes the selected action.
      */
     public function run() {
@@ -130,63 +162,85 @@ class Console {
             // Initialize Configuration
             $this->_initConfig();
 
-            // List Tasks & exit (--list-tasks)
-            $this->listTasks();
+            // List Tasks (--list-tasks)
+            if ($this->_consoleOpts->getOption('list-tasks')) {
+                $this->listTasks();
+                $this->_exit();
+            }
 
-            // Display Settings & exit (--settings)
-            $this->settings();
+            // Display Settings (--settings)
+            if ($this->_consoleOpts->getOption('settings')) {
+                $this->settings();
+                $this->_exit();
+            }
 
             // Add Log Files
             $this->_initLogFile();
 
             // Check action, otherwise display help
-            $action = $this->_consoleOpts->getOption('action');
-            $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
-            if (in_array($action, $allActions))  {
-                // Perform action
-                $this->$action();
-                exit;
+            if ($this->_consoleOpts->getOption('action')) {
+                $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
+                $action = $this->_consoleOpts->getOption('action');
+                if (in_array($action, $allActions))  {
+                    // Perform action
+                    $this->$action();
+                    $this->_exit();
+                }
             }
+
+            // Display Command Help
             $this->help();
 
         } catch (\Exception $e) {
             Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
-        exit;
+
     }
 
 
     /**
      * 
-     * Lists the current loaded tasks. 
+     * Lists the current loaded tasks.
      */
     public function listTasks() {
-        if ($this->_consoleOpts->getOption('list-tasks')) {
-            $taskLoader = new Tasks();
-            $tasks = $taskLoader->scan();
-            if (count($tasks)==0) {
-                echo "No tasks found!\n";
-            } else {
-                foreach ($tasks as $task) {
-                    echo $task . "\n";
+        $taskNames = $this->getTasks()->scan();
+
+        echo "List Tasks\n";
+        echo "==========\n\n";
+        if (count($taskNames)==0) {
+            echo "No tasks found!\n";
+        } else {
+            foreach ($taskNames as $taskName) {
+                echo $taskName, "\n";
+                echo str_repeat('-', strlen($taskName)), "\n";
+
+                echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
+                echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
+
+                // Manager Trigger
+                $trigger = Config::get()->getOptionValue('manager.trigger.type', $taskName);
+                echo "Trigger:\t\t", $trigger, "\n";
+                switch($trigger) {
+                    case 'interval':
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.interval.time', $taskName), "\n";
+                        break;
+                    case 'cron':
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.cron.time', $taskName), "\n";
+                        break;
+                    default:
+                        break;
                 }
+                echo "\n";
             }
-            exit;
         }
     }
 
 
     /**
      * Displays the configuration settings for each tasks.
-     */ 
+     */
     public function settings() {
-        if ($this->_consoleOpts->getOption('settings')) {
-            $this->_settingsDaemon();
-//            $this->_settingsDefaults();
-//            $this->_settingsTasks();
-            echo "\n";
-            exit;
-        }
+        echo $this->_settingsDaemon();
     }
 
 
@@ -195,14 +249,18 @@ class Console {
      * Action: Start Daemon
      */
     public function start() {
-        $tasks = new Tasks();
-        $taskNames = $tasks->scan();
+        $taskNames = $this->getTasks()->scan();
 
         // Initialize daemon tasks
         foreach($taskNames as $taskName) {
-            $tasks->loadManagerByTaskName($taskName);
+            if ($this->_consoleOpts->getOption('task')) {
+                if (!preg_match('#' . $this->_consoleOpts->getOption('task') . '#', $taskName)) {
+                    continue;
+                }
+            }
+            $this->getTasks()->loadManagerByTaskName($taskName);
         }
-        $this->getInstance()->setTasks($tasks);
+        $this->getInstance()->setTasks($this->getTasks());
 
         // Start the Daemon
         $this->getInstance()->start();
@@ -215,13 +273,11 @@ class Console {
      */
     public function stop() {
         if (!$this->getInstance()->isRunning()) {
-            echo 'Daemon is NOT running!!!' . "\n";
-        } else {    
-            echo 'Terminating application  !!!' . "\n";
+            echo "Daemon is NOT running!!!\n\n";
+        } else {
+            echo "Terminating application  !!!\n\n";
             $this->getInstance()->stop();
         }
-
-        exit();
     }
 
 
@@ -231,7 +287,7 @@ class Console {
     public function restart() {
         $this->stop();
         $this->start();
-        exit;
+        $this->_exit();
     }
 
 
@@ -240,30 +296,28 @@ class Console {
      * Action: Get daemon status
      */
     public function status() {
-        
         $status = State::getState();
         if ($status['pid'] === NULL) {
             echo "Daemon not running\n";
-            exit;
+            $this->_exit();
         }
-        echo var_dump($status);
 
         echo "PhpTaskDaemon - Status\n";
-        echo "==========================\n";
+        echo  "==========================\n";
         echo "\n";
-        if (count($status['childs']) == 0) {
-            echo "No processes!\n";
-        } else {
-            echo "Processes (" . count($status['childs']) . ")\n";
-
-            foreach ($status['childs'] as $childPid) {
-                $managerData = $status['task-' . $childPid];
-                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
-                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
-            }
-
-        }
-        return TRUE;
+//        if (count($status['childs']) == 0) {
+//            echo "No processes!\n";
+//        } else {
+//            echo "Processes (" . count($status['childs']) . ")\n";
+//
+//            foreach ($status['childs'] as $childPid) {
+//                $managerData = $status['task-' . $childPid];
+//                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
+//                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
+//            }
+//
+//        }
+        echo "\n\n";
     }
 
 
@@ -273,8 +327,8 @@ class Console {
      * action refreshes every x milliseconds.
      */
     public function monitor() {
-        $out  = "PhpTaskDaemon - Monitoring\n" .
-                "==========================\n";
+        echo "PhpTaskDaemon - Monitoring\n";
+        echo "==========================\n";
         echo "Function not yet implemented\n";
     }
 
@@ -284,8 +338,9 @@ class Console {
      * Displays a help message containing usage instructions.
      */
     public function help() {
+        echo "Help\n";
+        echo "====\n";
         echo $this->_consoleOpts->getUsageMessage();
-        exit;
     }
 
 
@@ -303,7 +358,7 @@ class Console {
                     $configArgument = \APPLICATION_PATH . '/' . $configArgument;
                 }
                 array_push($configFiles, $configArgument);
-            } 
+            }
         }
 
         // Initiate config
@@ -316,7 +371,7 @@ class Console {
      * Initializes the logging verbose mode
      */
     protected function _initLogVerbose() {
-       // Log Verbose Output
+        // Log Verbose Output
         if ($this->_consoleOpts->getOption('verbose')) {
             $writerVerbose = new \Zend_Log_Writer_Stream('php://output');
 
@@ -365,95 +420,100 @@ class Console {
 
 
     protected function _settingsDaemon() {
-        echo "Daemon Settings\n";
-        echo "===============\n\n";
+        $out  = "Daemon Settings\n";
+        $out .= "===============\n\n";
 
-        echo "Global\n";
-        echo "------\n";
-        echo "- Namespace:\t\t" . Config::get()->getOptionValue('daemon.global.namespace') . "\n";
-        echo "- Interrupt:\t\t" . Config::get()->getOptionValue('daemon.global.interrupt') . "\n";
-        echo "- IPC:\t\t\t" . Config::get()->getOptionValue('daemon.global.ipc') . "\n";
-        echo "\n";
+        $out .= "Global\n";
+        $out .= "------\n";
+        $out .= "- Namespace:\t\t" . Config::get()->getOptionValue('daemon.global.namespace') . "\n";
+        $out .= "- Interrupt:\t\t" . Config::get()->getOptionValue('daemon.global.interrupt') . "\n";
+        $out .= "- IPC:\t\t\t" . Config::get()->getOptionValue('daemon.global.ipc') . "\n";
+        $out .= "\n";
 
-        echo "Paths\n";
-        echo "-----\n";
-        echo "- App Dir:\t\t" . \APPLICATION_PATH . '/'. "\n";
-        echo "- Task Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.taskdir') . "\n";
-        echo "- Tmp Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.tmpdir') . "\n";
-        echo "\n";
+        $out .= "Paths\n";
+        $out .= "-----\n";
+        $out .= "- App Dir:\t\t" . \APPLICATION_PATH . '/'. "\n";
+        $out .= "- Task Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.taskdir') . "\n";
+        $out .= "- Tmp Dir:\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.global.tmpdir') . "\n";
+        $out .= "\n";
 
-        echo "Database\n";
-        echo "--------\n";
-        echo "- Adapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
-        echo "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
-        echo "- Host:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
-        echo "- Username:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
-        echo "\n";
+        $out .= "Database\n";
+        $out .= "--------\n";
+        $out .= "- Adapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
+        $out .= "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
+        $out .= "- Host:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
+        $out .= "- Username:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
+        $out .= "\n";
 
-        echo "Log\n";
-        echo "---\n";
-        echo "- File:\t\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.log.file') . "\n";
-        echo "- Level:\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
-        echo "\n";
+        $out .= "Log\n";
+        $out .= "---\n";
+        $out .= "- File:\t\t\t" . \APPLICATION_PATH . '/'. Config::get()->getOptionValue('daemon.log.file') . "\n";
+        $out .= "- Level:\t\t" . Config::get()->getOptionValue('daemon.log.level') . "\n";
+        $out .= "\n";
 
-        echo "\n";
+        return $out;
     }
 
 
     protected function _settingsDefaults() {
-        echo "Tasks Default Settings\n";
-        echo "======================\n\n";
+        $out = '';
+        $out .= "Tasks Default Settings\n";
+        $out .= "======================\n\n";
 
-        echo "Global\n";
-        echo "------\n";
-        echo "- Namespace:\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
-        echo "- IPC:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
-        echo "\n";
+        $out .= "Global\n";
+        $out .= "------\n";
+        $out .= "- Namespace:\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
+        $out .= "- IPC:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
+        $out .= "\n";
 
-        echo "Trigger\n";
-        echo "-------\n";
-        echo "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
-        echo "- Types:\t\tInterval, Cron, Gearman\n";
-        echo "- Interval\n";
-//        echo "\t- Time:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.interval.time') . "\n";
-        echo "- Cron\n";
-//        echo "\t- Interval:\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.cron.default') . "\n";
-        echo "\n";
+        $out .= "Trigger\n";
+        $out .= "-------\n";
+        $out .= "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
+        $out .= "- Types:\t\tInterval, Cron, Gearman\n";
+        $out .= "- Interval\n";
+        $out .= "- Cron\n";
+        $out .= "\n";
 
-        echo "Process\n";
-        echo "-------\n";
-        echo "- Type:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.type') . "\n";
-        echo "- Parallel\n";
-        echo "\t- Childs:\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.parallel.childs') . "\n";
-        echo "\n";
+        $out .= "Process\n";
+        $out .= "-------\n";
+        $out .= "- Type:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.type') . "\n";
+        $out .= "- Parallel\n";
+        $out .= "\t- Childs:\t" . Config::get()->getOptionValue('tasks.defaults.manager.process.parallel.childs') . "\n";
+        $out .= "\n";
 
-
-        echo "\n";
+        $out .= "\n";
+        return $out;
     }
 
 
     protected function _settingsTasks() {
-        echo "Tasks Specific Settings\n";
-        echo "=======================\n\n";
+        $out = '';
+        $out .= "Tasks Specific Settings\n";
+        $out .= "=======================\n\n";
 
         $tasks = array();
         try {
-            $tasks = $this->scanTasks();
+            $tasks = $this->getTasks()->scan();
         } catch (Exception $e) {
-            echo $e->getMessage();
+            $out .= $e->getMessage();
         }
 
         if (count($tasks)>0) {
             foreach($tasks as $nr => $taskName) {
-                echo $taskName . "\n";
-                echo str_repeat('-', strlen($taskName)) . "\n";
-                echo "\tProcess:\t\t" . Config::get()->getOptionValue('manager.process.type') . "\t\t(" . Config::get()->getOptionValue('manager.process.type') . ")\n";
+                $out .= $taskName . "\n";
+                $out .= str_repeat('-', strlen($taskName)) . "\n";
+                $out .= "\tProcess:\t\t" . Config::get()->getOptionValue('manager.process.type') . "\t\t(" . Config::get()->getOptionValue('manager.process.type') . ")\n";
             }
         } else {
-            echo "No tasks found!!!";
+            $out .= "No tasks found!!!";
         }
 
-        echo "\n\n";
+        $out .= "\n\n";
+        return $out;
+    }
+
+    protected function _exit() {
+        exit;
     }
 
 }

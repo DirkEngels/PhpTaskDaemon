@@ -43,16 +43,11 @@ class Instance {
 
     /**
      * 
-     * The construction has one optional argument containing the parent process
-     * ID. 
+     * Empty constructor 
      * @param int $parent
      */
     public function __construct() {
-        $pidFile = \TMP_PATH . '/phptaskdaemond.pid';
-        $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(getmypid());
-        $this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
-        $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('phptaskdaemond');
-        $this->_tasks = new \PhpTaskDaemon\Daemon\Tasks();
+        
     }
 
 
@@ -69,11 +64,94 @@ class Instance {
 
 
     /**
+     * Returns the pid manager object
+     * @return \PhpTaskDaemon\Daemon\Pid\Manager
+     */
+    public function getPidManager() {
+        if (is_null($this->_pidManager)) {
+            $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
+                getmypid()
+            );
+        }
+
+        return $this->_pidManager;
+    }
+
+
+    /**
+     * Sets the pid manager object
+     * @param $pidManager
+     * @return $this
+     */
+    public function setPidManager(\PhpTaskDaemon\Daemon\Pid\Manager $pidManager) {
+        $this->_pidManager = $pidManager;
+        return $this;
+    }
+
+
+    /**
+     * Returns the pid file object
+     * @return \PhpTaskDaemon\Daemon\Pid\File
+     */
+    public function getPidFile() {
+        if (is_null($this->_pidFile)) {
+            $pidFile = \TMP_PATH . '/phptaskdaemond.pid';
+            $this->_pidFile = new \PhpTaskDaemon\Daemon\Pid\File($pidFile);
+        }
+
+        return $this->_pidFile;
+    }
+
+
+    /**
+     * Sets the pid file object
+     * @param $pidFile
+     * @return $this
+     */
+    public function setPidFile(\PhpTaskDaemon\Daemon\Pid\File $pidFile) {
+        $this->_pidFile = $pidFile;
+        return $this;
+    }
+
+
+    /**
+     * Gets the inter process communication object
+     * @return \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     */
+    public function getIpc() {
+        if (is_null($this->_ipc)) {
+            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcClass)) {
+                $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $this->_ipc = new $ipcClass('phptaskdaemond');
+        }
+
+        return $this->_ipc;
+    }
+
+
+    /**
+     * Sets the inter process communication object
+     * @param $ipc \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     * @return $this
+     */
+    public function setIpc(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc) {
+        $this->_ipc = $ipc;
+        return $this;
+    }
+
+
+    /**
      * 
      * Return the tasks collection object.
      * @return \PhpTaskDaemon\Daemon\Tasks
      */
     public function getTasks() {
+        if (is_null($this->_tasks)) {
+            $this->_tasks = new \PhpTaskDaemon\Daemon\Tasks();
+        }
+
         return $this->_tasks;
     }
 
@@ -84,7 +162,7 @@ class Instance {
      * @param \PhpTaskDaemon\Daemon\Tasks $tasks
      * @return $this
      */
-    public function setTasks($tasks) {
+    public function setTasks(\PhpTaskDaemon\Daemon\Tasks $tasks) {
         $this->_tasks = $tasks;
         return $this;
     }
@@ -96,7 +174,7 @@ class Instance {
      * available managers before running the daemon.
      */
     public function start() {
-        $this->_pidFile->write($this->_pidManager->getCurrent());
+        $this->getPidFile()->write($this->getPidManager()->getCurrent());
         $this->_run();
     }
 
@@ -105,32 +183,23 @@ class Instance {
      * Dispatches the isRunning method to the Pid\File object
      */
     public function isRunning() {
-        return $this->_pidFile->isRunning();
+        return $this->getPidFile()->isRunning();
     }
 
 
+    /**
+     * Stops the running instance
+     */
     public function stop() {
         try {
-            $pidFile = new Pid\File($pidFile = \TMP_PATH . '/phptaskdaemond.pid');
-            $pid = $pidFile->read();
-        } catch (Exception $e) {
+            $pid = $this->getPidFile()->read();
+
+            \PhpTaskDaemon\Daemon\Logger::get()->log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
+            posix_kill($pid, SIGTERM);
+        } catch (\Exception $e) {
             echo $e->getMessage();
-            exit;
         }
-
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
-        posix_kill($pid, SIGTERM);
-
-        /*
-        echo "THIS PID: " . $this->_pidManager->getCurrent() . "\n";
-        echo "Child PIDs\n";
-        $childs = $this->_pidManager->getChilds();
-        echo var_dump($childs);
-        foreach($childs as $child) {
-            echo " - " . $child . "\n";
-        }
-        echo "\n";
-        */
+        $this->_exit();
     }
 
 
@@ -144,7 +213,7 @@ class Instance {
             case SIGTERM:
                 // Shutdown
                 \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
-                exit;
+                $this->_exit();
                 break;
             case SIGCHLD:
                 // Halt
@@ -172,11 +241,11 @@ class Instance {
 
         if (count($this->_tasks->getManagers())==0) {
             \PhpTaskDaemon\Daemon\Logger::get()->log("No daemon tasks found", \Zend_Log::INFO);
-            exit;
+            $this->_exit();
         }
         \PhpTaskDaemon\Daemon\Logger::get()->log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::INFO);
 
-        $this->_ipc->setVar('childs', array());
+        $this->getIpc()->setVar('childs', array());
         $managers = $this->_tasks->getManagers();
         foreach ($managers as $manager) {
             \PhpTaskDaemon\Daemon\Logger::get()->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
@@ -184,7 +253,7 @@ class Instance {
                 $this->_forkManager($manager);
             } catch (Exception $e) {
                 \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::CRIT);
-                exit;
+                $this->_exit();
             }
         }
 
@@ -196,7 +265,7 @@ class Instance {
         );
 
         // Write pids to shared memory
-        $this->_ipc->setVar('childs', $this->_pidManager->getChilds());
+        $this->getIpc()->setVar('childs', $this->getPidManager()->getChilds());
 
         // Wait till all childs are done
         \PhpTaskDaemon\Daemon\Logger::get()->log("Waiting for childs to complete", \Zend_Log::NOTICE);
@@ -205,10 +274,10 @@ class Instance {
         }
         \PhpTaskDaemon\Daemon\Logger::get()->log("Running done.", \Zend_Log::NOTICE);
 
-        $this->_pidFile->unlink();
-        $this->_ipc->remove();
+        $this->getPidFile()->unlink();
+        $this->getIpc()->remove();
 
-        exit;
+        $this->_exit();
     }
 
 
@@ -222,24 +291,20 @@ class Instance {
     {
         $pid = pcntl_fork();
         if ($pid === -1) {
-            // Error
+            // Error: Throw exception: Fork Failed
             \PhpTaskDaemon\Daemon\Logger::get()->log('Managers could not be forked!!!', \Zend_Log::CRIT);
-
-            // Throw exception: Fork Failed
             throw new \PhpTaskDaemon\Daemon\Exception\ForkFailed();
-
-            return FALSE;
 
         } elseif ($pid) {
             // Parent
-            $this->_pidManager->addChild($pid);
             $managerName = substr(substr(get_class($manager), 6), 0, -8);
-            $this->_ipc->setVar('status-'. $pid, $managerName);
+            $this->getPidManager()->addChild($pid);
 
-        } else { 
+        } else {
+            // Child 
             $newPid = getmypid();
-            $this->_pidManager->forkChild($newPid);
-            $manager->init($this->_pidManager->getParent());
+            $this->getPidManager()->forkChild($newPid);
+            $manager->init($this->getPidManager()->getParent());
 
             $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
             $manager->getTrigger()->getQueue()->setStatistics($statistics);
@@ -249,8 +314,12 @@ class Instance {
 
             \PhpTaskDaemon\Daemon\Logger::get()->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
             $manager->runManager();
-            exit;
+            $this->_exit();
         }
+    }
+
+    protected function _exit() {
+        exit;
     }
 
 }

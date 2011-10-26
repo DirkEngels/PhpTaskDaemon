@@ -2,21 +2,21 @@
 
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Example\Minimal
+ * @subpackage Task\Tutorial\Minimal
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  *
  * @group PhpTaskDaemon
  * @group PhpTaskDaemon-Task
- * @group PhpTaskDaemon-Task-Example
- * @group PhpTaskDaemon-Task-Example-Minimal
+ * @group PhpTaskDaemon-Task-Tutorial
+ * @group PhpTaskDaemon-Task-Tutorial-Minimal
  */
 
 
-namespace PhpTaskDaemon\Task\Example\Minimal;
+namespace PhpTaskDaemon\Task\Tutorial\Minimal;
 
-require_once(APPLICATION_PATH . '/task/Example/Minimal/Executor.php');
+require_once(APPLICATION_PATH . '/task/Tutorial/Minimal/Executor.php');
 
 class ExecutorTest extends \PHPUnit_Framework_TestCase {
     protected $_executor = NULL;

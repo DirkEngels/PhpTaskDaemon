@@ -39,6 +39,11 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
     public static function get($taskName) {
+        $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
+        if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
+            throw new \Exception('Task has no defined executor');
+        }
+
         // Base Manager
         $manager = self::getManager($taskName);
 
@@ -58,7 +63,7 @@ class Factory {
             self::getComponentType($taskName, self::TYPE_PROCESS)
         );
         $manager->getProcess()->setExecutor(
-            self::getComponentType($taskName, self::TYPE_EXECUTOR)
+            $executor
         );
         $manager->getProcess()->getExecutor()->setStatus(
             self::getComponentType($taskName, self::TYPE_STATUS)
@@ -199,7 +204,7 @@ class Factory {
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
             return new $className();
         }
-        return false;
+        return NULL;
     }
 
 
@@ -220,16 +225,22 @@ class Factory {
                 $taskName
             )
         );
-        $objectClassName = '\\PhpTaskDaemon\\Task\\Manager\\' . $configType;
-        $msg = 'Testing class: ' . $objectClassName;
+
+        $nameSpace = \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
+            'global.namespace'
+        );
+        $objectClassName = $nameSpace . '\\' . $configType;
+        $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+
         if (class_exists($objectClassName, true)) {
             $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
             $object = new $objectClassName();
             return $object;
         }
-        return false;
+
+        return NULL;
     }
 
 
@@ -262,7 +273,7 @@ class Factory {
         }
         throw new Exception\UndefinedObjectType('Unknown object type: ' . $objectType);
 
-        return null;
+        return NULL;
     }
 
 }

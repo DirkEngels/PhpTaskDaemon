@@ -135,7 +135,7 @@ abstract class AbstractClass {
      * @return $this
      */
     public function setProcess($process) {
-        if (!is_subclass_of($process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
+        if (!($process instanceof \PhpTaskDaemon\Task\Manager\Process\AbstractClass)) {
             $process = new \PhpTaskDaemon\Task\Manager\Process\Same();
         }
         $this->_process = $process;
@@ -155,9 +155,6 @@ abstract class AbstractClass {
             array(&$this, 'sigHandler')
         );
 
-        if ($this->getPidManager() === null) {
-            $this->setPidManager($this->_pidManager);
-        }
         $this->execute();
     }
 
@@ -208,7 +205,7 @@ abstract class AbstractClass {
 
         // Log and sleep for a while
         usleep($this->_sleepTimeExecutor);
-        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
+        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);
         $this->getTrigger()->getQueue()->updateStatistics($job->getOutput()->getVar('returnStatus'));
 
         // Reset status and decrement queue
