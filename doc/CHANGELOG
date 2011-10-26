@@ -35,18 +35,18 @@ Version 1.0 (roadmap)
         - QUICKSTART: Getting Started
         + USAGE: Daemon Usage 
     - Website/Wiki
+- Implement daemon status & monitoring actions
+- Add concept example tasks (interval + gearman)
 
 
 Version 0.8.2 (planned)
 -----------------------
 + Implement loading task components by config file
 + Implement running a single task
-- Implement basic IPC adapters
+- Implement basic IPC adapters (storing)
     - DataBase
     - File
     - Shared Memory
-- Implement daemon status action
-- Add concept example tasks (interval + gearman)
 + Add more unit tests
 
 
