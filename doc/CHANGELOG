@@ -10,48 +10,48 @@ Features (requested)
 
 Version 1.0 (roadmap)
 ---------------------
-- multiple IPC adapters (none, filesystem, shared memory, database)
++ multiple IPC adapters `(none, filesystem, shared memory, database)
 - multiple Manager Process Adapters (same, child, parallel)
 - multiple Manager Trigger (interval, cron, gearman)
-- fully unit tested: Functional tests start a daemon and send interrupt signals
 - Add tools
     - cron restart script (for restarting after critical errors)
     - boot script (/etc/init.d/phptaskdaemon)
-- Create user documentation (website/wiki)
-- Implement extra IPC adapters
-    + SharedMemory
-    - FileSystem
-    - DataBase
-- Implement extra Trigger adapters
+- Example Tasks
+    - Tutorial (minimal, advanced, gearman)
+    - Statistics (gatherStatistics, sendReport, checkExcessiveRuntime)
+- Create user documentation
+    - Doc directory (INSTALL, USAGE, TUTORIAL)
+    - Website/Wiki
+
+
+Version 0.8.3 (planned)
+-----------------------
+- Implement daemon status action
+    - define (recursive) data structure of ipc segments
+    - read multiple ipc adapter types 
+- Implement manager triggers
+    + Interval
     - Cron
     - Gearman
-- Implement extra Process adapters
-    - Child
-    - Parallel
-- Example Tasks & Tools
-- Add documentation
-    - Doc directory
-        + INSTALL: Installation manual
-        - QUICKSTART: Getting Started
-        + USAGE: Daemon Usage 
-    - Website/Wiki
-- Implement daemon status & monitoring actions
-- Add concept example tasks (interval + gearman)
+- Implement daemon monitoring action
+- Add tutorial tasks
+    + Minimal
+    - Gearman
 
 
-Version 0.8.2 (planned)
------------------------
+Version 0.8.2 (26-10-2011)
+==========================
 + Implement loading task components by config file
 + Implement running a single task
-- Implement basic IPC adapters (storing)
-    - DataBase
-    - File
-    - Shared Memory
++ Implement IPC adapters
+    + DataBase
+    + File
+    + Shared Memory
 + Add more unit tests
 
 
 Version 0.8.1 (16-10-2011)
-==========================
+--------------------------
 + Implement Task loader class
 + Implement basic IPC adapters
     + None
