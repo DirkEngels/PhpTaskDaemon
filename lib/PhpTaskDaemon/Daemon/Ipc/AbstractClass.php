@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Daemon\Ipc;
 
+use PhpTaskDaemon\Daemon\Logger;
+
 /**
  * The abstract class implements storing the variable keys and provides a
  * method for retrieving all registered keys.
@@ -37,7 +39,13 @@ abstract class AbstractClass {
      */
     public function __construct($id) {
         $this->_id = $id;
+        Logger::get()->log('Initialized IPC (' . get_class($this) . ')', \Zend_Log::DEBUG);
         return TRUE;
+    }
+
+
+    public function __destruct() {
+        //$this->remove();
     }
 
 
@@ -71,6 +79,14 @@ abstract class AbstractClass {
             $data[$nr] = $this->getVar($nr);
         }
         return $data;
+    }
+
+
+    /**
+     * Removes the ipc data
+     */
+    public function remove() {
+        $this->_keys = array();
     }
 
 }

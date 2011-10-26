@@ -58,13 +58,20 @@ abstract class AbstractClass {
      * @return PhpTaskDaemon\Ipc
      */
     public function getIpc() {
-        if (!is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+        if (is_null($this->_ipc)) {
             $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
             if (!class_exists($ipcClass)) {
                 $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
             }
-            $this->_ipc = new $ipcClass('statistics-' . getmypid());
+            $this->_ipc = new $ipcClass('phptaskdaemond-queue-' . getmypid());
+
+            $this->_initializeStatus(self::STATUS_LOADED);
+            $this->_initializeStatus(self::STATUS_QUEUED);
+            $this->_initializeStatus(self::STATUS_RUNNING);
+            $this->_initializeStatus(self::STATUS_DONE);
+            $this->_initializeStatus(self::STATUS_FAILED);
         }
+
         return $this->_ipc;
     }
 
@@ -76,10 +83,6 @@ abstract class AbstractClass {
      * @return $this
      */
     public function setIpc($ipc) {
-        if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-            throw new \Exception('Injected object is not a IPC Abstract class');
-        }
-
         $this->_ipc = $ipc;
         $this->_initializeStatus(self::STATUS_LOADED);
         $this->_initializeStatus(self::STATUS_QUEUED);
@@ -128,8 +131,8 @@ abstract class AbstractClass {
      * @param string $status
      * @return integer
      */
-    public function incrementStatus($status = self::STATUS_DONE) {
-        return $this->getIpc()->incrementVar($status);
+    public function incrementStatus($status = self::STATUS_DONE, $count = 1) {
+        return $this->_ipc->incrementVar($status, $count);
     }
 
 
@@ -140,7 +143,7 @@ abstract class AbstractClass {
      */
     public function setQueueCount($count = 0) {
         $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->setStatusCount(self::STATUS_LOADED, $count);
+        $this->_ipc->incrementVar(self::STATUS_LOADED, $count);
         return $count;
     }
 
@@ -149,8 +152,8 @@ abstract class AbstractClass {
      * 
      * Decrements the queue count (after finishing a single job).
      */
-    public function decrementQueue() {
-        return $this->getIpc()->decrementVar(self::STATUS_QUEUED);
+    public function decrementQueue($count = 1) {
+        return $this->_ipc->decrementVar(self::STATUS_QUEUED, $count);
     }
 
 

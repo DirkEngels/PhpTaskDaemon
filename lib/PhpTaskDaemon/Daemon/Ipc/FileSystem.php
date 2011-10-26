@@ -55,10 +55,10 @@ class FileSystem extends AbstractClass implements InterfaceClass {
      * @param string $key
      * @return bool
      */
-    public function incrementVar($key) {
+    public function incrementVar($key, $count = 1) {
         $keyFile = $this->_getFileForKey($key);
         $value = (int) file_get_contents($keyFile);
-        $value++;
+        $value += $count;
         return file_put_contents($keyFile, $value);
     }
 
@@ -69,11 +69,11 @@ class FileSystem extends AbstractClass implements InterfaceClass {
      * @param string $key
      * @return bool
      */
-    public function decrementVar($key) {
+    public function decrementVar($key, $count = 1) {
         $keyFile = $this->_getFileForKey($key);
         $value = (int) file_get_contents($keyFile);
         if ($value > 0) {
-            $value--;
+            $value -= $count;
             return file_put_contents($keyFile, $value);
         }
         return false;
