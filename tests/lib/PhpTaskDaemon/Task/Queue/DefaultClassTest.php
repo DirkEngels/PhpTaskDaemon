@@ -65,7 +65,8 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertTrue(
             $this->_queue->updateStatistics(
                 \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass::STATUS_DONE,
-                100
+                100,
+                true
             )
         );
     }

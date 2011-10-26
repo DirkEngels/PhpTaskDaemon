@@ -205,7 +205,7 @@ abstract class AbstractClass {
 
         // Log and sleep for a while
         usleep($this->_sleepTimeExecutor);
-        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
+        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);
         $this->getTrigger()->getQueue()->updateStatistics($job->getOutput()->getVar('returnStatus'));
 
         // Reset status and decrement queue

@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Task\Executor\Status;
 
+use PhpTaskDaemon\Daemon\Config;
+
 /**
  * 
  * The abstract class encapsulate a set of methods of the Ipc class. 
@@ -37,7 +39,6 @@ abstract class AbstractClass {
      * Unset the shared memory at destruction time.
      */
     public function __destruct() {
-        $this->_ipc->remove();
         unset($this->_ipc); 
     }
 
@@ -48,6 +49,14 @@ abstract class AbstractClass {
      * @return PhpTaskDaemon\Ipc
      */
     public function getIpc() {
+        if (is_null($this->_ipc)) {
+            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcClass)) {
+                $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $this->_ipc = new $ipcClass('phptaskdaemond-executor-' . getmypid());
+        }
+
         return $this->_ipc;
     }
 
@@ -59,9 +68,9 @@ abstract class AbstractClass {
      * @return $this
      */
     public function setIpc($ipc) {
-        if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-            $ipc = new \PhpTaskDaemon\Daemon\Ipc\None('status-' . getmypid());
-        }
+//        if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//            $ipc = new \PhpTaskDaemon\Daemon\Ipc\None('status-' . getmypid());
+//        }
         $this->_ipc = $ipc;
         return TRUE;
     }
@@ -76,9 +85,9 @@ abstract class AbstractClass {
      */
     public function get($key = NULL) {
         if ($key != NULL) {
-            return $this->_ipc->getVar($key);
+            return $this->getIpc()->getVar($key);
         }
-        return $this->_ipc->getKeys();
+        return $this->getIpc()->getKeys();
     }
 
 
@@ -90,9 +99,9 @@ abstract class AbstractClass {
      * @return bool
      */
     public function set($percentage, $message = NULL) {
-        $this->_ipc->setVar('percentage', $percentage);
+        $this->getIpc()->setVar('percentage', $percentage);
         if ($message != NULL) {
-            $this->_ipc->setVar('message', $message);
+            $this->getIpc()->setVar('message', $message);
         }
         return TRUE;
     }
