@@ -195,22 +195,24 @@ abstract class AbstractClass {
      */
     protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
         // Set manager input
-         \PhpTaskDaemon\Daemon\Logger::get()->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
-        $this->getProcess()->getExecutor()->setJob($job);
+        \PhpTaskDaemon\Daemon\Logger::get()->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
+        $executor = $this->getProcess()->getExecutor();
+        $executor->setJob($job);
 
         // Update Status before and after running the task
-        $this->getProcess()->getExecutor()->updateStatus(0);
-        $job = $this->getProcess()->getExecutor()->run();
-        $this->getProcess()->getExecutor()->updateStatus(100);
+        $executor->updateStatus(0);
+        $job = $executor->run();
+        $executor->updateStatus(100);
 
         // Log and sleep for a while
         usleep($this->_sleepTimeExecutor);
         \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);
-        $this->getTimer()->getQueue()->updateStatistics($job->getOutput()->getVar('returnStatus'));
 
         // Reset status and decrement queue
-        $this->getProcess()->getExecutor()->updateStatus(0);
-        $this->getTimer()->getQueue()->updateQueue();
+        $executor->updateStatus(0);
+        $queue = $this->getTimer()->getQueue();
+        $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
+        $queue->updateQueue();
 
         return $job->getOutput()->getVar('returnStatus');
     }
