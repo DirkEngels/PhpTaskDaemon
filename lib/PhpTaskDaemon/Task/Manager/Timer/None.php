@@ -9,6 +9,14 @@
 
 namespace PhpTaskDaemon\Task\Manager\Timer;
 
-class Gearman extends AbstractClass implements InterfaceClass {
+class None extends AbstractClass implements InterfaceClass {
+
+    /**
+     * Returns the time to wait.
+     * @output integer
+     */
+    public function getTimeToWait() {
+        return 0;
+    }
 
 }
