@@ -39,6 +39,10 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
     public static function get($taskName) {
+        $msg = 'Task Factory: ' . $taskName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
+
         $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
         if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
             throw new \Exception('Task has no defined executor');
@@ -69,6 +73,7 @@ class Factory {
             self::getComponentType($taskName, self::TYPE_STATUS)
         );
 
+        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
         return $manager;
     }
 
@@ -229,7 +234,36 @@ class Factory {
         $nameSpace = \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
             'global.namespace'
         );
+
+        $nameSpace = '\\PhpTaskDaemon\\Task\\';
+        switch($objectType) {
+            case 'manager':
+                $nameSpace .= 'Manager';
+                break;
+            case 'trigger':
+                $nameSpace .= 'Manager\\Trigger';
+                break;
+            case 'process':
+                $nameSpace .= 'Manager\\Process';
+                break;
+            case 'queue':
+                $nameSpace .= 'Manager\\Queue';
+                break;
+            case 'statistics':
+                $nameSpace .= 'Manager\\Queue\\Statistics';
+                break;
+            case 'executor':
+                $nameSpace .= 'Manager\\Executor';
+                break;
+            case 'status':
+                $nameSpace .= 'Manager\\Executor\\Status';
+                break;
+            default:
+                $nameSpace .= 'Manager';
+                break;
+        }
         $objectClassName = $nameSpace . '\\' . $configType;
+
         $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
