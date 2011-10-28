@@ -11,7 +11,7 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
         $job = $this->getJob();
 
         // Sleep
-        $sleepTimeProgress = round($job->getInput()->getVar('sleepTime')/10);
+        $sleepTimeProgress = round($job->getInput()->getVar('sleepTime'));
         for ($i=1; $i<10; $i++) {
             usleep($sleepTimeProgress);
             $this->updateStatus(($i*10), 'Task data: ' . $job->getJobId());

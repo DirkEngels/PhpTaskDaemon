@@ -217,15 +217,15 @@ class Console {
                 echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
                 echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
 
-                // Manager Trigger
-                $trigger = Config::get()->getOptionValue('manager.trigger.type', $taskName);
-                echo "Trigger:\t\t", $trigger, "\n";
-                switch($trigger) {
+                // Manager Timer
+                $timer = Config::get()->getOptionValue('manager.timer.type', $taskName);
+                echo "Timer:\t\t", $timer, "\n";
+                switch($timer) {
                     case 'interval':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.interval.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.interval.time', $taskName), "\n";
                         break;
                     case 'cron':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.cron.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.cron.time', $taskName), "\n";
                         break;
                     default:
                         break;
@@ -481,9 +481,9 @@ class Console {
         $out .= "- IPC:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
         $out .= "\n";
 
-        $out .= "Trigger\n";
+        $out .= "Timer\n";
         $out .= "-------\n";
-        $out .= "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
+        $out .= "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.timer.type') . "\n";
         $out .= "- Types:\t\tInterval, Cron, Gearman\n";
         $out .= "- Interval\n";
         $out .= "- Cron\n";
