@@ -26,9 +26,9 @@ abstract class AbstractClass {
 
     /**
      * Queue object
-     * @var \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @var \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
-    protected $_trigger = null;
+    protected $_timer = null;
 
     /**
      * Executor object
@@ -89,27 +89,27 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the current loaded queue array
-     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
-    public function getTrigger() {
-        if (!is_a($this->_trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
-            $this->_trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+    public function getTimer() {
+        if (!is_a($this->_timer, '\PhpTaskDaemon\Task\Manager\Timer\AbstractClass')) {
+            $this->_timer = new \PhpTaskDaemon\Task\Manager\Timer\Interval();
         }
-        return $this->_trigger;
+        return $this->_timer;
     }
 
 
     /**
      * 
      * Sets the current queue to process.
-     * @param \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass $trigger
+     * @param \PhpTaskDaemon\Task\Manager\Timer\AbstractClass $timer
      * @return $this
      */
-    public function setTrigger($trigger) {
-        if (!is_a($trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
-            $trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+    public function setTimer($timer) {
+        if (!is_a($timer, '\PhpTaskDaemon\Task\Manager\Timer\AbstractClass')) {
+            $timer = new \PhpTaskDaemon\Task\Manager\Timer\Interval();
         }
-        $this->_trigger = $trigger;
+        $this->_timer = $timer;
 
         return $this;
     }
@@ -210,7 +210,7 @@ abstract class AbstractClass {
 
         // Reset status and decrement queue
         $executor->updateStatus(0);
-        $queue = $this->getTrigger()->getQueue();
+        $queue = $this->getTimer()->getQueue();
         $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
         $queue->updateQueue();
 
