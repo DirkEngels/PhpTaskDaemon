@@ -198,7 +198,7 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectClass($taskName, $objectType) {
+    protected static function _getObjectClass($taskName, $objectType) {
         $className = self::_getClassName($taskName, $objectType);
 
         $msg = 'Trying ' . $objectType . ' class component: ' . self::_getClassName($taskName, $objectType);
@@ -220,7 +220,7 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectConfig($taskName, $objectType) {
+    protected static function _getObjectConfig($taskName, $objectType) {
         $msg = 'Trying ' . $objectType . ' config component: ' . $taskName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
@@ -235,6 +235,23 @@ class Factory {
             'global.namespace'
         );
 
+        $objectClassName = self::_getObjectConfigNamespace($objectType) . '\\' . $configType;
+
+        $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+
+        if (class_exists($objectClassName, true)) {
+            $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
+            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+            $object = new $objectClassName();
+            return $object;
+        }
+
+        return NULL;
+    }
+
+
+    protected static function _getObjectConfigNamespace($objectType) {
         $nameSpace = '\\PhpTaskDaemon\\Task\\';
         switch($objectType) {
             case 'manager':
@@ -262,19 +279,7 @@ class Factory {
                 $nameSpace .= 'Manager';
                 break;
         }
-        $objectClassName = $nameSpace . '\\' . $configType;
-
-        $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
-        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
-
-        if (class_exists($objectClassName, true)) {
-            $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
-            $object = new $objectClassName();
-            return $object;
-        }
-
-        return NULL;
+        return $nameSpace;
     }
 
 
