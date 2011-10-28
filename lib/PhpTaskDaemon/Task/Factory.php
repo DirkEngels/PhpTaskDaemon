@@ -39,6 +39,10 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
     public static function get($taskName) {
+        $msg = 'Task Factory: ' . $taskName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
+
         $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
         if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
             throw new \Exception('Task has no defined executor');
@@ -69,6 +73,7 @@ class Factory {
             self::getComponentType($taskName, self::TYPE_STATUS)
         );
 
+        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
         return $manager;
     }
 
@@ -193,7 +198,7 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectClass($taskName, $objectType) {
+    protected static function _getObjectClass($taskName, $objectType) {
         $className = self::_getClassName($taskName, $objectType);
 
         $msg = 'Trying ' . $objectType . ' class component: ' . self::_getClassName($taskName, $objectType);
@@ -215,7 +220,7 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectConfig($taskName, $objectType) {
+    protected static function _getObjectConfig($taskName, $objectType) {
         $msg = 'Trying ' . $objectType . ' config component: ' . $taskName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
@@ -229,7 +234,9 @@ class Factory {
         $nameSpace = \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
             'global.namespace'
         );
-        $objectClassName = $nameSpace . '\\' . $configType;
+
+        $objectClassName = self::_getObjectConfigNamespace($objectType) . '\\' . $configType;
+
         $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
@@ -241,6 +248,38 @@ class Factory {
         }
 
         return NULL;
+    }
+
+
+    protected static function _getObjectConfigNamespace($objectType) {
+        $nameSpace = '\\PhpTaskDaemon\\Task\\';
+        switch($objectType) {
+            case 'manager':
+                $nameSpace .= 'Manager';
+                break;
+            case 'trigger':
+                $nameSpace .= 'Manager\\Trigger';
+                break;
+            case 'process':
+                $nameSpace .= 'Manager\\Process';
+                break;
+            case 'queue':
+                $nameSpace .= 'Manager\\Queue';
+                break;
+            case 'statistics':
+                $nameSpace .= 'Manager\\Queue\\Statistics';
+                break;
+            case 'executor':
+                $nameSpace .= 'Manager\\Executor';
+                break;
+            case 'status':
+                $nameSpace .= 'Manager\\Executor\\Status';
+                break;
+            default:
+                $nameSpace .= 'Manager';
+                break;
+        }
+        return $nameSpace;
     }
 
 
