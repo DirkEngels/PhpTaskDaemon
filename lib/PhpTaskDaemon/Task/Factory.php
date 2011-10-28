@@ -15,7 +15,7 @@ use \PhpTaskDaemon\Daemon;
  * The Task Factory object uses the Factory Design Pattern for instantiating
  * task related objects. It handles different kind of components and is also
  * able to create a complete task component instantiation. (Which is basically
- * a manager object with manager trigger and manager process instances, a queue
+ * a manager object with manager timer and manager process instances, a queue
  * and queue statistics instances and also an executor and executor status
  * instances, which are injected into the manager base class.  
  *
@@ -23,7 +23,7 @@ use \PhpTaskDaemon\Daemon;
 class Factory {
     const TYPE_MANAGER = 'manager';
 
-    const TYPE_TRIGGER = 'trigger';
+    const TYPE_TRIGGER = 'timer';
     const TYPE_QUEUE = 'queue';
     const TYPE_STATISTICS = 'statistics';
 
@@ -47,14 +47,14 @@ class Factory {
         // Base Manager
         $manager = self::getManager($taskName);
 
-        // Trigger, Queue & Statistics
-        $manager->setTrigger(
+        // Timer, Queue & Statistics
+        $manager->setTimer(
             self::getComponentType($taskName, self::TYPE_TRIGGER)
         );
-        $manager->getTrigger()->setQueue(
+        $manager->getTimer()->setQueue(
             self::getComponentType($taskName, self::TYPE_QUEUE)
         );
-        $manager->getTrigger()->getQueue()->setStatistics(
+        $manager->getTimer()->getQueue()->setStatistics(
             self::getComponentType($taskName, self::TYPE_STATISTICS)
         );
 
@@ -98,9 +98,9 @@ class Factory {
 
 
     /**
-     * Returns the manager trigger for the specified task
+     * Returns the manager timer for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
     public static function getManager($taskName) {
         return self::getComponentType($taskName, self::TYPE_MANAGER);
@@ -108,11 +108,11 @@ class Factory {
 
 
     /**
-     * Returns the manager trigger for the specified task
+     * Returns the manager timer for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
-    public static function getManagerTrigger($taskName) {
+    public static function getManagerTimer($taskName) {
         return self::getComponentType($taskName, self::TYPE_TRIGGER);
     }
 
@@ -258,8 +258,8 @@ class Factory {
                 return new \PhpTaskDaemon\Task\Manager\DefaultClass(
                     self::getComponentType($taskName, self::TYPE_EXECUTOR)
                 );
-            case 'trigger':
-                return new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+            case 'timer':
+                return new \PhpTaskDaemon\Task\Manager\Timer\Interval();
             case 'queue':
                 return new \PhpTaskDaemon\Task\Queue\DefaultClass();
             case 'statistics':
