@@ -41,18 +41,6 @@ abstract class AbstractClass {
 
 
     /**
-     * 
-     * Unset the shared memory at destruction time.
-     */
-    public function __destruct() {
-        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-            $this->_ipc->remove();
-            unset($this->_ipc);
-        } 
-    }
-
-
-    /**
      *
      * Returns the shared memory object
      * @return PhpTaskDaemon\Ipc
