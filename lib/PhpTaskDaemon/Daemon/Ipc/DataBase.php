@@ -67,7 +67,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
             'ipcId' => $this->_id,
         );
         $this->_dbStatement($sql, $params);
-        return $this->_stmt->fetchAll();
+        return $this->_stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 
 
