@@ -32,7 +32,7 @@ Version 0.8.3 (planned)
 - Implement manager triggers
     + Interval
     - Cron
-    - Gearman
+    + Gearman
 - Implement daemon monitoring action
 - Add tutorial tasks
     + Minimal
