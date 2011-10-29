@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Daemon\Pid;
 
+use \PhpTaskDaemon\Exception;
+
 /**
  * The Daemon Pid File object is responsible for reading and writing
  * the process ID to a file. Currently only the main daemon and it's managers
@@ -87,7 +89,7 @@ class File {
     public function read() {
         $pid = 0;
         if (!file_exists($this->getFilename())) {
-            throw new \PhpTaskDaemon\Daemon\Exception\FileNotFound('Pidfile not found');
+            throw new Exception\FileNotFound('Pidfile not found');
         } else {
             $pid = (int) file_get_contents($this->getFilename());
             return $pid;
@@ -104,7 +106,7 @@ class File {
      */
     public function unlink() {
         if (!file_exists($this->getFilename())) {
-            throw new \PhpTaskDaemon\Daemon\Exception\FileNotFound('Pidfile not found');
+            throw new Exception\FileNotFound('Pidfile not found');
         } else {
             return unlink($this->getFilename());
         }

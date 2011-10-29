@@ -8,7 +8,7 @@
  */
 
 namespace PhpTaskDaemon\Task;
-use \PhpTaskDaemon\Task\Exception as Exception;
+use \PhpTaskDaemon\Exception as Exception;
 use \PhpTaskDaemon\Daemon;
 
 /**
