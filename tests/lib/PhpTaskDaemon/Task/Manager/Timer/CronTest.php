@@ -2,7 +2,7 @@
 
 /**
  * @package PhpTaskDaemon
- * @subpackage Daemon\Gearman
+ * @subpackage Daemon\Cron
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
@@ -10,17 +10,16 @@
  * @group PhpTaskDaemon
  * @group PhpTaskDaemon-Task
  * @group PhpTaskDaemon-Task-Manager
- * @group PhpTaskDaemon-Task-Manager-Trigger
+ * @group PhpTaskDaemon-Task-Manager-Timer
  */
 
 
-namespace PhpTaskDaemon\Task\Manager\Trigger;
+namespace PhpTaskDaemon\Task\Manager\Timer;
 
-class GearmanTest extends \PHPUnit_Framework_TestCase {
-    protected $_trigger;
+class CronTest extends \PHPUnit_Framework_TestCase {
+    protected $_timer;
 
     protected function setUp() {
-        $this->_trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Gearman();
     }
 
     protected function tearDown() {
