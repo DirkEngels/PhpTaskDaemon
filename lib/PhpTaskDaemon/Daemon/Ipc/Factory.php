@@ -28,7 +28,10 @@ class Factory {
     public static function get($ipcType, $id) {
         $ipcObject = NULL;
         switch($ipcType) {
-            case self::TYPE_SHAREDMEMORY:
+            case self::TYPE_FILESYSTEM:
+                $ipcObject = new FileSystem($id);
+                break;
+        	case self::TYPE_SHAREDMEMORY:
                 $ipcObject = new SharedMemory($id);
                 break;
             case self::TYPE_DATABASE:

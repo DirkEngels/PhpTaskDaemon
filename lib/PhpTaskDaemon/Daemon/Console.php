@@ -297,27 +297,42 @@ class Console {
      */
     public function status() {
         $status = State::getState();
-        if ($status['pid'] === NULL) {
-            echo "Daemon not running\n";
-            $this->_exit();
-        }
+//        if ($status['pid'] === NULL) {
+//            echo "Daemon not running\n";
+//            $this->_exit();
+//        }
 
         echo "PhpTaskDaemon - Status\n";
         echo  "==========================\n";
         echo "\n";
-//        if (count($status['childs']) == 0) {
-//            echo "No processes!\n";
-//        } else {
-//            echo "Processes (" . count($status['childs']) . ")\n";
-//
-//            foreach ($status['childs'] as $childPid) {
-//                $managerData = $status['task-' . $childPid];
-//                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
-//                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
-//            }
-//
-//        }
-        echo "\n\n";
+        if (count($status['childs']) == 0) {
+            echo "No processes!\n";
+        } else {
+            echo "Processes (" . count($status['childs']) . ")\n";
+
+            foreach ($status['childs'] as $childPid) {
+                $process = $status['process-' . $childPid];
+
+                // Statistics
+                echo "[" . $childPid . "]: ";
+                echo "\t" . $process['statistics']['type'];
+                echo "\t(Queued: " . $process['statistics']['queued'] . '/' . $process['statistics']['loaded'];
+                echo "\tDone: " . $process['statistics']['done'];
+                echo "\tFailed: " . $process['statistics']['failed'];
+                echo ")\n";
+
+                // Status
+                foreach($process['status'] as $jobPid => $jobStatus) {
+                    echo "- [" . $jobStatus['pid'] . "]:";
+                    echo "\t" . $jobStatus['percentage'] . "%:";
+                    echo "\t" . $jobStatus['state'];
+                    echo "\n";
+                }
+                echo "\n";
+            }
+
+        }
+        echo "\n";
     }
 
 

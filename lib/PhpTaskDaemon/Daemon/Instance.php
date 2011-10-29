@@ -175,6 +175,7 @@ class Instance {
      */
     public function start() {
         $this->getPidFile()->write($this->getPidManager()->getCurrent());
+        $this->getIpc()->setVar('pid', $this->getPidManager()->getCurrent());
         $this->_run();
     }
 
