@@ -81,7 +81,7 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
              ->will($this->returnValue(NULL));
 
         $pidManager = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\Manager', array('getCurrent'));
-        $pidManager->expects($this->once())
+        $pidManager->expects($this->any())
             ->method('getCurrent')
             ->will($this->returnValue(12345));
         $instance->setPidManager($pidManager);

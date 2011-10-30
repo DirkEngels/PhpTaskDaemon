@@ -175,6 +175,7 @@ class Instance {
      */
     public function start() {
         $this->getPidFile()->write($this->getPidManager()->getCurrent());
+        $this->getIpc()->setVar('pid', $this->getPidManager()->getCurrent());
         $this->_run();
     }
 
@@ -307,7 +308,7 @@ class Instance {
             $manager->init($this->getPidManager()->getParent());
 
             $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
-            $manager->getTrigger()->getQueue()->setStatistics($statistics);
+            $manager->getTimer()->getQueue()->setStatistics($statistics);
 
             $status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
             $manager->getProcess()->getExecutor()->setStatus($status);

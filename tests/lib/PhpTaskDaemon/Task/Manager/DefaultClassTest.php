@@ -32,8 +32,8 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	public function testConstructor() {
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
 		$this->assertEquals($this->_executor, $this->_manager->getProcess()->getExecutor());
-//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTrigger()->getQueue());
-//		$this->assertEquals($this->_queue, $this->_manager->getTrigger()->getQueue());
+//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTimer()->getQueue());
+//		$this->assertEquals($this->_queue, $this->_manager->getTimer()->getQueue());
 	}
 	public function testInitNoArguments() {
 		$this->_manager->init();
@@ -54,16 +54,16 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 		$this->assertEquals($pidManager, $this->_manager->getPidManager());
 	}
 
-    public function testSetTrigger() {
-        $interval = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
-        $cron = new \PhpTaskDaemon\Task\Manager\Trigger\Cron();
-        $this->assertEquals($interval, $this->_manager->getTrigger());
+    public function testSetTimer() {
+        $interval = new \PhpTaskDaemon\Task\Manager\Timer\Interval();
+        $cron = new \PhpTaskDaemon\Task\Manager\Timer\Cron();
+        $this->assertEquals($interval, $this->_manager->getTimer());
 
-        $this->_manager->setTrigger($cron);
-        $this->assertEquals($cron, $this->_manager->getTrigger());
+        $this->_manager->setTimer($cron);
+        $this->assertEquals($cron, $this->_manager->getTimer());
 
-        $this->assertEquals($this->_manager, $this->_manager->setTrigger('default trigger'));
-        $this->assertEquals($interval, $this->_manager->getTrigger());
+        $this->assertEquals($this->_manager, $this->_manager->setTimer('default timer'));
+        $this->assertEquals($interval, $this->_manager->getTimer());
     }
 
     public function testSetProcess() {
@@ -79,9 +79,9 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     }
 
 	public function testSetQueue() {
-//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTrigger()->getQueue());
-		$this->_manager->getTrigger()->setQueue($this->_queue);
-		$this->assertEquals($this->_queue, $this->_manager->getTrigger()->getQueue());
+//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTimer()->getQueue());
+		$this->_manager->getTimer()->setQueue($this->_queue);
+		$this->assertEquals($this->_queue, $this->_manager->getTimer()->getQueue());
 	}
 	public function testSetExecutor() {
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());

@@ -31,9 +31,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Manager\\AbstractClass', $manager);
     }
 
-    public function testFactoryGetManagerTriggerWithTaskName() {
-        $trigger = \PhpTaskDaemon\Task\Factory::getManagerTrigger('Tutorial\\Minimal');
-        $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Manager\\Trigger\\AbstractClass', $trigger);
+    public function testFactoryGetManagerTimerWithTaskName() {
+        $timer = \PhpTaskDaemon\Task\Factory::getManagerTimer('Tutorial\\Minimal');
+        $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Manager\\Timer\\AbstractClass', $timer);
     }
 
     public function testFactoryGetManagerProcessWithTaskName() {

@@ -44,7 +44,7 @@ class FileTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException \PhpTaskDaemon\Daemon\Exception\FileNotFound
+     * @expectedException \PhpTaskDaemon\Exception\FileNotFound
      */
     public function testReadFileDoesNotExists() {
         $this->_file = new \PhpTaskDaemon\Daemon\Pid\File();
@@ -69,7 +69,7 @@ class FileTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException \PhpTaskDaemon\Daemon\Exception\FileNotFound
+     * @expectedException \PhpTaskDaemon\Exception\FileNotFound
      */    
     public function testIsRunningAndHasNoValidPidFile() {
         $this->_file = new \PhpTaskDaemon\Daemon\Pid\File();
@@ -100,7 +100,7 @@ class FileTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException \PhpTaskDaemon\Daemon\Exception\FileNotFound
+     * @expectedException \PhpTaskDaemon\Exception\FileNotFound
      */
     public function testUnlinkFileDoesNotExists() {
         $pidFile = __DIR__ . '/_data/tmp.pid';

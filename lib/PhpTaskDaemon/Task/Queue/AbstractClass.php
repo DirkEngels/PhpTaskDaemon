@@ -62,7 +62,7 @@ abstract class AbstractClass {
      * @param integer|NULL $count
      * @return bool
      */
-    public function updateStatistics($status, $count = NULL, $reset = false) {
+    public function updateStatistics($status, $count = 1, $reset = false) {
         if ($this->_statistics != NULL) {
             if ($reset) {
                 $this->_statistics->setStatusCount($status, $count);
@@ -82,7 +82,7 @@ abstract class AbstractClass {
      * @param integer|NULL $count
      * @return boolean
      */
-    public function updateQueue($count = NULL, $loaded = false) {
+    public function updateQueue($count = NULL) {
         if ($this->_statistics != NULL) {
             if ($count != NULL) {
                 $this->_statistics->setQueueCount($count);

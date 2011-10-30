@@ -30,7 +30,41 @@ class State {
         }
         $ipc = new $ipcClass('phptaskdaemond');
 
-        $state = $ipc->getKeys();
+        $state = array();
+
+        $daemonKeys = $ipc->getKeys();
+
+        // Pid
+        $state['pid'] = null;
+        if (in_array('pid', $daemonKeys)) {
+            $state['pid'] = $ipc->getVar('pid');
+        }
+
+        // Childs
+        if (!in_array('childs', $daemonKeys)) {
+            $state['childs'] = array();
+        } else {
+            $state['childs'] = $ipc->getVar('childs');
+        }
+
+        // Loop Childs
+        foreach($state['childs'] as $process) {
+            // Queue Statistics
+            $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcQueueClass)) {
+                $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $ipcQueue = new $ipcQueueClass('phptaskdaemond-queue-' . $process);
+            $state[$ipcQueue->getId()] = $ipcQueue->get();
+
+            // Executor Status
+            $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcExecutorClass)) {
+                $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $ipcExecutor = new $ipcExecutorClass('phptaskdaemond-executor-' . $process);
+            $state[$ipcExecutor->getId()] = $ipcExecutor->get();
+        }
 
         return $state;
     }

@@ -10,18 +10,18 @@
  * @group PhpTaskDaemon
  * @group PhpTaskDaemon-Task
  * @group PhpTaskDaemon-Task-Manager
- * @group PhpTaskDaemon-Task-Manager-Trigger
+ * @group PhpTaskDaemon-Task-Manager-Timer
  */
 
 
-namespace PhpTaskDaemon\Task\Manager\Trigger;
+namespace PhpTaskDaemon\Task\Manager\Timer;
 
 class AbstractTest extends \PHPUnit_Framework_TestCase {
-    protected $_trigger;
+    protected $_timer;
 
     protected function setUp() {
-        $this->_trigger = $this->getMockForAbstractClass(
-            '\\PhpTaskDaemon\\Task\\Manager\\Trigger\\AbstractClass'
+        $this->_timer = $this->getMockForAbstractClass(
+            '\\PhpTaskDaemon\\Task\\Manager\\Timer\\AbstractClass'
         );
     }
 
@@ -33,10 +33,10 @@ class AbstractTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetQueueInvalidArgument() {
-        $this->_trigger->setQueue('invalid queue object');
+        $this->_timer->setQueue('invalid queue object');
         $this->assertEquals(
             new \PhpTaskDaemon\Task\Queue\DefaultClass(),
-            $this->_trigger->getQueue()
+            $this->_timer->getQueue()
         );
     }
 }

@@ -8,14 +8,14 @@
  */
 
 namespace PhpTaskDaemon\Task;
-use \PhpTaskDaemon\Task\Exception as Exception;
+use \PhpTaskDaemon\Exception as Exception;
 use \PhpTaskDaemon\Daemon;
 
 /**
  * The Task Factory object uses the Factory Design Pattern for instantiating
  * task related objects. It handles different kind of components and is also
  * able to create a complete task component instantiation. (Which is basically
- * a manager object with manager trigger and manager process instances, a queue
+ * a manager object with manager timer and manager process instances, a queue
  * and queue statistics instances and also an executor and executor status
  * instances, which are injected into the manager base class.  
  *
@@ -23,7 +23,7 @@ use \PhpTaskDaemon\Daemon;
 class Factory {
     const TYPE_MANAGER = 'manager';
 
-    const TYPE_TRIGGER = 'trigger';
+    const TYPE_TRIGGER = 'timer';
     const TYPE_QUEUE = 'queue';
     const TYPE_STATISTICS = 'statistics';
 
@@ -39,6 +39,10 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
     public static function get($taskName) {
+        $msg = 'Task Factory: ' . $taskName;
+        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
+
         $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
         if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
             throw new \Exception('Task has no defined executor');
@@ -47,14 +51,14 @@ class Factory {
         // Base Manager
         $manager = self::getManager($taskName);
 
-        // Trigger, Queue & Statistics
-        $manager->setTrigger(
+        // Timer, Queue & Statistics
+        $manager->setTimer(
             self::getComponentType($taskName, self::TYPE_TRIGGER)
         );
-        $manager->getTrigger()->setQueue(
+        $manager->getTimer()->setQueue(
             self::getComponentType($taskName, self::TYPE_QUEUE)
         );
-        $manager->getTrigger()->getQueue()->setStatistics(
+        $manager->getTimer()->getQueue()->setStatistics(
             self::getComponentType($taskName, self::TYPE_STATISTICS)
         );
 
@@ -69,6 +73,7 @@ class Factory {
             self::getComponentType($taskName, self::TYPE_STATUS)
         );
 
+        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
         return $manager;
     }
 
@@ -98,9 +103,9 @@ class Factory {
 
 
     /**
-     * Returns the manager trigger for the specified task
+     * Returns the manager timer for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
     public static function getManager($taskName) {
         return self::getComponentType($taskName, self::TYPE_MANAGER);
@@ -108,11 +113,11 @@ class Factory {
 
 
     /**
-     * Returns the manager trigger for the specified task
+     * Returns the manager timer for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
-    public static function getManagerTrigger($taskName) {
+    public static function getManagerTimer($taskName) {
         return self::getComponentType($taskName, self::TYPE_TRIGGER);
     }
 
@@ -193,7 +198,7 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectClass($taskName, $objectType) {
+    protected static function _getObjectClass($taskName, $objectType) {
         $className = self::_getClassName($taskName, $objectType);
 
         $msg = 'Trying ' . $objectType . ' class component: ' . self::_getClassName($taskName, $objectType);
@@ -215,7 +220,7 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected function _getObjectConfig($taskName, $objectType) {
+    protected static function _getObjectConfig($taskName, $objectType) {
         $msg = 'Trying ' . $objectType . ' config component: ' . $taskName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
@@ -229,7 +234,9 @@ class Factory {
         $nameSpace = \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
             'global.namespace'
         );
-        $objectClassName = $nameSpace . '\\' . $configType;
+
+        $objectClassName = self::_getObjectConfigNamespace($objectType) . '\\' . $configType;
+
         $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
@@ -241,6 +248,38 @@ class Factory {
         }
 
         return NULL;
+    }
+
+
+    protected static function _getObjectConfigNamespace($objectType) {
+        $nameSpace = '\\PhpTaskDaemon\\Task\\';
+        switch($objectType) {
+            case 'manager':
+                $nameSpace .= 'Manager';
+                break;
+            case 'trigger':
+                $nameSpace .= 'Manager\\Trigger';
+                break;
+            case 'process':
+                $nameSpace .= 'Manager\\Process';
+                break;
+            case 'queue':
+                $nameSpace .= 'Manager\\Queue';
+                break;
+            case 'statistics':
+                $nameSpace .= 'Manager\\Queue\\Statistics';
+                break;
+            case 'executor':
+                $nameSpace .= 'Manager\\Executor';
+                break;
+            case 'status':
+                $nameSpace .= 'Manager\\Executor\\Status';
+                break;
+            default:
+                $nameSpace .= 'Manager';
+                break;
+        }
+        return $nameSpace;
     }
 
 
@@ -258,8 +297,8 @@ class Factory {
                 return new \PhpTaskDaemon\Task\Manager\DefaultClass(
                     self::getComponentType($taskName, self::TYPE_EXECUTOR)
                 );
-            case 'trigger':
-                return new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+            case 'timer':
+                return new \PhpTaskDaemon\Task\Manager\Timer\Interval();
             case 'queue':
                 return new \PhpTaskDaemon\Task\Queue\DefaultClass();
             case 'statistics':

@@ -64,10 +64,12 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase {
         $this->_executor->run();
 
         $this->assertArrayHasKey('returnStatus', $this->_executor->getJob()->getOutput()->get());
-        $this->assertEquals(2, count($this->_executor->getJob()->getOutput()->get()));
-        
-        $this->assertGreaterThanOrEqual(1, $this->_executor->getJob()->getOutput()->getVar('waitTime'));
-        $this->assertLessThanOrEqual(5, $this->_executor->getJob()->getOutput()->getVar('waitTime'));
+        $this->assertEquals(1, count($this->_executor->getJob()->getOutput()->get()));
+
+        $this->assertTrue(in_array(
+            $this->_executor->getJob()->getOutput()->getVar('returnStatus'), 
+            array('done', 'failed')
+        ));
     }
 
 }
