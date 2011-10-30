@@ -29,12 +29,13 @@ Version 0.8.3 (planned)
 + Implement daemon status action
     + define (recursive) data structure of ipc segments
     + read multiple ipc adapter types 
++ Implement manager
+    + Gearman
 - Implement manager timers
     + Refactor triggers to timers
     + Interval
     - Cron
-    + Gearman
-- Implement daemon monitoring action
++ Implement daemon monitoring action
 + Add tutorial tasks
     + Minimal
     + Advanced
