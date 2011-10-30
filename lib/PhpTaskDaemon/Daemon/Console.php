@@ -344,7 +344,11 @@ class Console {
     public function monitor() {
         echo "PhpTaskDaemon - Monitoring\n";
         echo "==========================\n";
-        echo "Function not yet implemented\n";
+        while (true) {
+            System('clear');
+            $this->status();
+            sleep(1);
+        }
     }
 
 
