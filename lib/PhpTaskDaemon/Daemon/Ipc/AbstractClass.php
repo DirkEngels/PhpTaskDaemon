@@ -76,7 +76,7 @@ abstract class AbstractClass {
         $keys = $this->getKeys();
         $data = array();
         foreach($keys as $nr => $key) {
-            $data[$nr] = $this->getVar($key);
+            $data[$key] = $this->getVar($key);
         }
         return $data;
     }
