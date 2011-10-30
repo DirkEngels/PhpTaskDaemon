@@ -345,9 +345,17 @@ class Console {
         echo "PhpTaskDaemon - Monitoring\n";
         echo "==========================\n";
         while (true) {
-            System('clear');
+            // Put the status output into a buffer before clearing the screen.
+            // This prevents the screen from flickering.
+            ob_start();
             $this->status();
-            sleep(1);
+            $state = ob_get_contents();
+            ob_end_clean();
+
+            // Clear screen, print buffer & sleep
+            System('clear');
+            echo $state;
+            sleep(Config::get()->getOptionValue('daemon.monitor.sleep'));
         }
     }
 
