@@ -20,7 +20,6 @@ abstract class AbstractClass {
 
     const STATUS_LOADED = 'loaded';
     const STATUS_QUEUED = 'queued';
-    const STATUS_RUNNING = 'running';
     const STATUS_DONE = 'done';
     const STATUS_FAILED = 'failed';
 
@@ -55,7 +54,6 @@ abstract class AbstractClass {
 
             $this->_initializeStatus(self::STATUS_LOADED);
             $this->_initializeStatus(self::STATUS_QUEUED);
-            $this->_initializeStatus(self::STATUS_RUNNING);
             $this->_initializeStatus(self::STATUS_DONE);
             $this->_initializeStatus(self::STATUS_FAILED);
         }
@@ -74,7 +72,6 @@ abstract class AbstractClass {
         $this->_ipc = $ipc;
         $this->_initializeStatus(self::STATUS_LOADED);
         $this->_initializeStatus(self::STATUS_QUEUED);
-        $this->_initializeStatus(self::STATUS_RUNNING);
         $this->_initializeStatus(self::STATUS_DONE);
         $this->_initializeStatus(self::STATUS_FAILED);
         return TRUE;
@@ -151,10 +148,7 @@ abstract class AbstractClass {
      * @param string $status
      */
     private function _initializeStatus($status) {
-        $keys = $this->getIpc()->getKeys();
-        if (!in_array($status, array_keys($keys))) {
-            $this->getIpc()->setVar($status, 0);
-        }
+        $this->getIpc()->setVar($status, 0);
     }
 
 }
