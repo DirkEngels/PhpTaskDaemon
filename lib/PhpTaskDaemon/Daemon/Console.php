@@ -296,38 +296,38 @@ class Console {
      * Action: Get daemon status
      */
     public function status() {
-        $status = State::getState();
-//        if ($status['pid'] === NULL) {
-//            echo "Daemon not running\n";
-//            $this->_exit();
-//        }
+        $state = State::getState();
+        if ($state['pid'] === NULL) {
+            echo "Daemon not running\n";
+            $this->_exit();
+        }
 
         echo "PhpTaskDaemon - Status\n";
-        echo  "==========================\n";
+        echo "======================\n";
         echo "\n";
-        if (count($status['childs']) == 0) {
+        if (count($state['childs']) == 0) {
             echo "No processes!\n";
         } else {
-            echo "Processes (" . count($status['childs']) . ")\n";
+            echo "Processes (" . count($state['childs']) . ")\n";
 
-            foreach ($status['childs'] as $childPid) {
-                $process = $status['process-' . $childPid];
+            foreach ($state['childs'] as $childPid) {
+                $queue = $state['phptaskdaemond-queue-' . $childPid];
+                $status = $state['phptaskdaemond-executor-' . $childPid];
 
                 // Statistics
                 echo "[" . $childPid . "]: ";
-                echo "\t" . $process['statistics']['type'];
-                echo "\t(Queued: " . $process['statistics']['queued'] . '/' . $process['statistics']['loaded'];
-                echo "\tDone: " . $process['statistics']['done'];
-                echo "\tFailed: " . $process['statistics']['failed'];
+                echo "Queue ";
+                echo "\t(Progress: " . ($queue['loaded']-$queue['queued']) . '/' . $queue['loaded'];
+                echo "\tDone: " . $queue['done'];
+                echo "\tFailed: " . $queue['failed'];
                 echo ")\n";
 
                 // Status
-                foreach($process['status'] as $jobPid => $jobStatus) {
-                    echo "- [" . $jobStatus['pid'] . "]:";
-                    echo "\t" . $jobStatus['percentage'] . "%:";
-                    echo "\t" . $jobStatus['state'];
-                    echo "\n";
-                }
+                echo "- [" . $childPid . "]: ";
+                echo "\t" . $status['percentage'] . "%:";
+                echo "\t" . $status['message'];
+                echo "\n";
+
                 echo "\n";
             }
 
