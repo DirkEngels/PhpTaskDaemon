@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Timer;
 
-require_once \LIBRARY_PATH . 'cron.phar';
+require_once \LIBRARY_PATH . '/cron.phar';
 
 class Cron extends Interval {
 
