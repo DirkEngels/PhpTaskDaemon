@@ -20,7 +20,6 @@ abstract class AbstractClass {
 
     const STATUS_LOADED = 'loaded';
     const STATUS_QUEUED = 'queued';
-    const STATUS_RUNNING = 'running';
     const STATUS_DONE = 'done';
     const STATUS_FAILED = 'failed';
 
@@ -41,18 +40,6 @@ abstract class AbstractClass {
 
 
     /**
-     * 
-     * Unset the shared memory at destruction time.
-     */
-    public function __destruct() {
-        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-            $this->_ipc->remove();
-            unset($this->_ipc);
-        } 
-    }
-
-
-    /**
      *
      * Returns the shared memory object
      * @return PhpTaskDaemon\Ipc
@@ -67,7 +54,6 @@ abstract class AbstractClass {
 
             $this->_initializeStatus(self::STATUS_LOADED);
             $this->_initializeStatus(self::STATUS_QUEUED);
-            $this->_initializeStatus(self::STATUS_RUNNING);
             $this->_initializeStatus(self::STATUS_DONE);
             $this->_initializeStatus(self::STATUS_FAILED);
         }
@@ -86,7 +72,6 @@ abstract class AbstractClass {
         $this->_ipc = $ipc;
         $this->_initializeStatus(self::STATUS_LOADED);
         $this->_initializeStatus(self::STATUS_QUEUED);
-        $this->_initializeStatus(self::STATUS_RUNNING);
         $this->_initializeStatus(self::STATUS_DONE);
         $this->_initializeStatus(self::STATUS_FAILED);
         return TRUE;
@@ -143,7 +128,7 @@ abstract class AbstractClass {
      */
     public function setQueueCount($count = 0) {
         $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->_ipc->incrementVar(self::STATUS_LOADED, $count);
+        $this->_ipc->setVar(self::STATUS_LOADED, $count);
         return $count;
     }
 
@@ -163,10 +148,7 @@ abstract class AbstractClass {
      * @param string $status
      */
     private function _initializeStatus($status) {
-        $keys = $this->getIpc()->getKeys();
-        if (!in_array($status, array_keys($keys))) {
-            $this->getIpc()->setVar($status, 0);
-        }
+        $this->getIpc()->setVar($status, 0);
     }
 
 }

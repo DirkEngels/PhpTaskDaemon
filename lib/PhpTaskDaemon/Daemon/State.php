@@ -49,25 +49,21 @@ class State {
 
         // Loop Childs
         foreach($state['childs'] as $process) {
-            $state['process-' . $process] = array('statistics' => array(), 'status' => array());
-            $state['process-' . $process]['statistics'] = array(
-                'type' => 'Tutorial\\Minimal', 
-                'status' => 'Processing jobs',
-                'loaded' => 2, 
-                'queued' => rand(0,1),
-                'done' => 12,
-                'failed' => 1,
-            );
-            $state['process-' . $process]['status']['executor-1234'] = array(
-                'pid' => 1234,
-                'percentage' => 60,
-                'state' => 'Resizing image',
-            );
-            $state['process-' . $process]['status']['executor-1235'] = array(
-                'pid' => 1235,
-                'percentage' => 20,
-                'state' => 'Downloading image',
-            );
+            // Queue Statistics
+            $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcQueueClass)) {
+                $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $ipcQueue = new $ipcQueueClass('phptaskdaemond-queue-' . $process);
+            $state[$ipcQueue->getId()] = $ipcQueue->get();
+
+            // Executor Status
+            $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+            if (!class_exists($ipcExecutorClass)) {
+                $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            }
+            $ipcExecutor = new $ipcExecutorClass('phptaskdaemond-executor-' . $process);
+            $state[$ipcExecutor->getId()] = $ipcExecutor->get();
         }
 
         return $state;
