@@ -1,40 +1,32 @@
 Change Log
 ==========
 
-Features (requested)
---------------------
-- Add new Manager Trigger 
-    - Beanstalk
-- Add new Manager Process
-    - System (isolates a process)
-
 Version 1.0 (roadmap)
 ---------------------
-+ multiple IPC adapters `(none, filesystem, shared memory, database)
-- multiple Manager Process Adapters (same, child, parallel)
-- multiple Manager Trigger (interval, cron, gearman)
-- Add tools
-    - cron restart script (for restarting after critical errors)
-    - boot script (/etc/init.d/phptaskdaemon)
-- Example Tasks
-    - Tutorial (minimal, advanced, gearman)
-    - Statistics (gatherStatistics, sendReport, checkExcessiveRuntime)
-- Create user documentation
-    - Doc directory (INSTALL, USAGE, TUTORIAL)
-    - Website/Wiki
+- Add tools (init.d script)
+- Add example tasks
+- Create user documentation (doc dir + website/wiki)
 
 
-Version 0.8.3 (planned)
+Version 0.8.4 (planned)
 -----------------------
+- Implement manager process
+    + Same
+    - Child
+    - Parallel
+
+
+Version 0.8.3 (30-10-2011)
+==========================
 + Implement daemon status action
     + define (recursive) data structure of ipc segments
     + read multiple ipc adapter types 
 + Implement manager
     + Gearman
-- Implement manager timers
++ Implement manager timers
     + Refactor triggers to timers
     + Interval
-    - Cron
+    + Cron
 + Implement daemon monitoring action
 + Add tutorial tasks
     + Minimal
@@ -42,7 +34,7 @@ Version 0.8.3 (planned)
 
 
 Version 0.8.2 (26-10-2011)
-==========================
+--------------------------
 + Implement loading task components by config file
 + Implement running a single task
 + Implement IPC adapters
