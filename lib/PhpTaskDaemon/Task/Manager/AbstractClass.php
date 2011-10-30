@@ -26,9 +26,9 @@ abstract class AbstractClass {
 
     /**
      * Queue object
-     * @var \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @var \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
-    protected $_trigger = null;
+    protected $_timer = null;
 
     /**
      * Executor object
@@ -89,27 +89,27 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the current loaded queue array
-     * @return \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
-    public function getTrigger() {
-        if (!is_a($this->_trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
-            $this->_trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+    public function getTimer() {
+        if (!is_a($this->_timer, '\PhpTaskDaemon\Task\Manager\Timer\AbstractClass')) {
+            $this->_timer = new \PhpTaskDaemon\Task\Manager\Timer\Interval();
         }
-        return $this->_trigger;
+        return $this->_timer;
     }
 
 
     /**
      * 
      * Sets the current queue to process.
-     * @param \PhpTaskDaemon\Task\Manager\Trigger\AbstractClass $trigger
+     * @param \PhpTaskDaemon\Task\Manager\Timer\AbstractClass $timer
      * @return $this
      */
-    public function setTrigger($trigger) {
-        if (!is_a($trigger, '\PhpTaskDaemon\Task\Manager\Trigger\AbstractClass')) {
-            $trigger = new \PhpTaskDaemon\Task\Manager\Trigger\Interval();
+    public function setTimer($timer) {
+        if (!is_a($timer, '\PhpTaskDaemon\Task\Manager\Timer\AbstractClass')) {
+            $timer = new \PhpTaskDaemon\Task\Manager\Timer\Interval();
         }
-        $this->_trigger = $trigger;
+        $this->_timer = $timer;
 
         return $this;
     }
@@ -195,22 +195,24 @@ abstract class AbstractClass {
      */
     protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
         // Set manager input
-         \PhpTaskDaemon\Daemon\Logger::get()->log("Started: " . $job->getJobId(), \Zend_Log::DEBUG);
-        $this->getProcess()->getExecutor()->setJob($job);
+         \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Started: " . $job->getJobId(), \Zend_Log::DEBUG);
+        $executor = $this->getProcess()->getExecutor();
+        $executor->setJob($job);
+        $queue = $this->getTimer()->getQueue();
 
         // Update Status before and after running the task
-        $this->getProcess()->getExecutor()->updateStatus(0);
-        $job = $this->getProcess()->getExecutor()->run();
-        $this->getProcess()->getExecutor()->updateStatus(100);
+        $executor->updateStatus(0);
+        $job = $executor->run();
+        $executor->updateStatus(100);
 
         // Log and sleep for a while
         usleep($this->_sleepTimeExecutor);
-        \PhpTaskDaemon\Daemon\Logger::get()->log($job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);
-        $this->getTrigger()->getQueue()->updateStatistics($job->getOutput()->getVar('returnStatus'));
+        \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ': ' . $job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
 
         // Reset status and decrement queue
-        $this->getProcess()->getExecutor()->updateStatus(0);
-        $this->getTrigger()->getQueue()->updateQueue();
+        $executor->updateStatus(0);
+        $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
+        $queue->updateQueue();
 
         return $job->getOutput()->getVar('returnStatus');
     }

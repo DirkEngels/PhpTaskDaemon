@@ -217,15 +217,15 @@ class Console {
                 echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
                 echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
 
-                // Manager Trigger
-                $trigger = Config::get()->getOptionValue('manager.trigger.type', $taskName);
-                echo "Trigger:\t\t", $trigger, "\n";
-                switch($trigger) {
+                // Manager Timer
+                $timer = Config::get()->getOptionValue('manager.timer.type', $taskName);
+                echo "Timer:\t\t", $timer, "\n";
+                switch($timer) {
                     case 'interval':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.interval.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.interval.time', $taskName), "\n";
                         break;
                     case 'cron':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.trigger.cron.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.cron.time', $taskName), "\n";
                         break;
                     default:
                         break;
@@ -296,28 +296,43 @@ class Console {
      * Action: Get daemon status
      */
     public function status() {
-        $status = State::getState();
-        if ($status['pid'] === NULL) {
+        $state = State::getState();
+        if ($state['pid'] === NULL) {
             echo "Daemon not running\n";
             $this->_exit();
         }
 
         echo "PhpTaskDaemon - Status\n";
-        echo  "==========================\n";
+        echo "======================\n";
         echo "\n";
-//        if (count($status['childs']) == 0) {
-//            echo "No processes!\n";
-//        } else {
-//            echo "Processes (" . count($status['childs']) . ")\n";
-//
-//            foreach ($status['childs'] as $childPid) {
-//                $managerData = $status['task-' . $childPid];
-//                echo " - [" . $childPid . "]: " . $status['status-' . $childPid] . "\t(Queued: " . $managerData['statistics']['queued'] . "\tDone: " . $managerData['statistics']['done'] . "\tFailed:" . $managerData['statistics']['failed'] . ")\n";
-//                echo "  - [" . $childPid . "]: (" . $managerData['status']['percentage'] . ") => " . $managerData['status']['message'] . "\n";
-//            }
-//
-//        }
-        echo "\n\n";
+        if (count($state['childs']) == 0) {
+            echo "No processes!\n";
+        } else {
+            echo "Processes (" . count($state['childs']) . ")\n";
+
+            foreach ($state['childs'] as $childPid) {
+                $queue = $state['phptaskdaemond-queue-' . $childPid];
+                $status = $state['phptaskdaemond-executor-' . $childPid];
+
+                // Statistics
+                echo "[" . $childPid . "]: ";
+                echo "Queue ";
+                echo "\t(Progress: " . ($queue['loaded']-$queue['queued']) . '/' . $queue['loaded'];
+                echo "\tDone: " . $queue['done'];
+                echo "\tFailed: " . $queue['failed'];
+                echo ")\n";
+
+                // Status
+                echo "- [" . $childPid . "]: ";
+                echo "\t" . $status['percentage'] . "%:";
+                echo "\t" . $status['message'];
+                echo "\n";
+
+                echo "\n";
+            }
+
+        }
+        echo "\n";
     }
 
 
@@ -329,7 +344,19 @@ class Console {
     public function monitor() {
         echo "PhpTaskDaemon - Monitoring\n";
         echo "==========================\n";
-        echo "Function not yet implemented\n";
+        while (true) {
+            // Put the status output into a buffer before clearing the screen.
+            // This prevents the screen from flickering.
+            ob_start();
+            $this->status();
+            $state = ob_get_contents();
+            ob_end_clean();
+
+            // Clear screen, print buffer & sleep
+            System('clear');
+            echo $state;
+            sleep(Config::get()->getOptionValue('daemon.monitor.sleep'));
+        }
     }
 
 
@@ -466,9 +493,9 @@ class Console {
         $out .= "- IPC:\t\t\t" . Config::get()->getOptionValue('tasks.defaults.namespace') . "\n";
         $out .= "\n";
 
-        $out .= "Trigger\n";
+        $out .= "Timer\n";
         $out .= "-------\n";
-        $out .= "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.trigger.type') . "\n";
+        $out .= "- Default:\t\t" . Config::get()->getOptionValue('tasks.defaults.manager.timer.type') . "\n";
         $out .= "- Types:\t\tInterval, Cron, Gearman\n";
         $out .= "- Interval\n";
         $out .= "- Cron\n";

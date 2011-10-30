@@ -8,7 +8,6 @@
  */
 
 namespace PhpTaskDaemon\Task\Queue\Statistics;
-
 use PhpTaskDaemon\Daemon\Config;
 
 /**
@@ -21,7 +20,6 @@ abstract class AbstractClass {
 
     const STATUS_LOADED = 'loaded';
     const STATUS_QUEUED = 'queued';
-    const STATUS_RUNNING = 'running';
     const STATUS_DONE = 'done';
     const STATUS_FAILED = 'failed';
 
@@ -35,18 +33,9 @@ abstract class AbstractClass {
      * @param \PhpTaskDaemon\Ipc $ipc
      */
     public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
-        $this->setIpc($ipc);
-    }
-
-
-    /**
-     * 
-     * Unset the shared memory at destruction time.
-     */
-    public function __destruct() {
-        if (is_a($this->_ipc, '\PhpTaskDaemon\Daemon\Ipc\None')) {
-            unset($this->_ipc);
-        } 
+        if (!is_null($ipc)) {
+            $this->setIpc($ipc);
+        }
     }
 
 
@@ -65,7 +54,6 @@ abstract class AbstractClass {
 
             $this->_initializeStatus(self::STATUS_LOADED);
             $this->_initializeStatus(self::STATUS_QUEUED);
-            $this->_initializeStatus(self::STATUS_RUNNING);
             $this->_initializeStatus(self::STATUS_DONE);
             $this->_initializeStatus(self::STATUS_FAILED);
         }
@@ -84,7 +72,6 @@ abstract class AbstractClass {
         $this->_ipc = $ipc;
         $this->_initializeStatus(self::STATUS_LOADED);
         $this->_initializeStatus(self::STATUS_QUEUED);
-        $this->_initializeStatus(self::STATUS_RUNNING);
         $this->_initializeStatus(self::STATUS_DONE);
         $this->_initializeStatus(self::STATUS_FAILED);
         return TRUE;
@@ -99,12 +86,12 @@ abstract class AbstractClass {
      */
     public function get($status = NULL) {
         if (is_NULL($status)) {
-            return $this->_ipc->get();
+            return $this->getIpc()->get();
         }
-        if (!in_array($status, $this->_ipc->getKeys())) {
+        if (!in_array($status, $this->getIpc()->getKeys())) {
             $this->_initializeStatus($status);
         }
-        return $this->_ipc->getVar($status);
+        return $this->getIpc()->getVar($status);
     }
 
 
@@ -116,10 +103,10 @@ abstract class AbstractClass {
      * @return bool
      */
     public function setStatusCount($status = self::STATUS_DONE, $count = 0) {
-        if (!in_array($status, $this->_ipc->getKeys())) {
+        if (!in_array($status, $this->getIpc()->getKeys())) {
             $this->_initializeStatus($status);
         }
-        return $this->_ipc->setVar($status, $count);
+        return $this->getIpc()->setVar($status, $count);
     }
 
 
@@ -141,7 +128,7 @@ abstract class AbstractClass {
      */
     public function setQueueCount($count = 0) {
         $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->_ipc->incrementVar(self::STATUS_LOADED, $count);
+        $this->_ipc->setVar(self::STATUS_LOADED, $count);
         return $count;
     }
 
@@ -161,10 +148,7 @@ abstract class AbstractClass {
      * @param string $status
      */
     private function _initializeStatus($status) {
-        $keys = $this->getIpc()->getKeys();
-        if (!in_array($status, array_keys($keys))) {
-            $this->getIpc()->setVar($status, 0);
-        }
+        $this->getIpc()->setVar($status, 0);
     }
 
 }
