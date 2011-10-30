@@ -26,17 +26,18 @@ Version 1.0 (roadmap)
 
 Version 0.8.3 (planned)
 -----------------------
-- Implement daemon status action
-    - define (recursive) data structure of ipc segments
-    - read multiple ipc adapter types 
-- Implement manager triggers
++ Implement daemon status action
+    + define (recursive) data structure of ipc segments
+    + read multiple ipc adapter types 
+- Implement manager timers
+    + Refactor triggers to timers
     + Interval
     - Cron
     + Gearman
 - Implement daemon monitoring action
-- Add tutorial tasks
++ Add tutorial tasks
     + Minimal
-    - Gearman
+    + Advanced
 
 
 Version 0.8.2 (26-10-2011)
