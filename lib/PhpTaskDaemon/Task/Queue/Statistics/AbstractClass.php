@@ -131,7 +131,7 @@ abstract class AbstractClass {
      */
     public function setQueueCount($count = 0) {
         $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->_ipc->incrementVar(self::STATUS_LOADED, $count);
+        $this->_ipc->setVar(self::STATUS_LOADED, $count);
         return $count;
     }
 
