@@ -370,7 +370,7 @@ class Console {
             System('clear');
             echo $state;
 
-            sleep(Config::get()->getOptionValue('daemon.monitor.sleep'));
+            usleep(Config::get()->getOptionValue('daemon.monitor.sleep'));
         }
     }
 
