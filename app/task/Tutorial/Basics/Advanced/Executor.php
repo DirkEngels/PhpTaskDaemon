@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpTaskDaemon\Task\Tutorial\Advanced;
+namespace PhpTaskDaemon\Task\Tutorial\Basics\Advanced;
 
 use \PhpTaskDaemon\Task\Executor as TaskExecutor;
 use \PhpTaskDaemon\Task\Queue\Statistics;
