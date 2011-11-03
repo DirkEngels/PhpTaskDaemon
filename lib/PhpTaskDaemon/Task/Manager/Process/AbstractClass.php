@@ -11,8 +11,36 @@ namespace PhpTaskDaemon\Task\Manager\Process;
 
 abstract class AbstractClass {
 
+    const SLEEPTIME = 100;
+    protected $_queue = null;
     protected $_executor = null;
     protected $_jobs = array();
+
+
+    /**
+     * 
+     * Returns the current loaded queue array
+     * @return \PhpTaskDaemon\Task\Queue\AbstractClass
+     */
+    public function getQueue() {
+        return $this->_queue;
+    }
+
+
+    /**
+     * 
+     * Sets the current queue to process.
+     * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
+     * @return $this
+     */
+    public function setQueue($queue) {
+        if (!($queue instanceof \PhpTaskDaemon\Task\Queue\AbstractClass)) {
+            $queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
+        }
+        $this->_queue = $queue;
+
+        return $this;
+    }
 
 
     /**
@@ -62,6 +90,37 @@ abstract class AbstractClass {
 
 
     /**
+     * 
+     * Process a single task: set job input, reset status, run and update
+     * statistics
+     * @param \PhpTaskDaemon\Task\Job\AbstractClass $job
+     */
+    protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
+        // Set manager input
+         \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Started: " . $job->getJobId(), \Zend_Log::DEBUG);
+        $executor = $this->getExecutor();
+        $executor->setJob($job);
+        $queue = $this->getQueue();
+
+        // Update Status before and after running the task
+        $executor->updateStatus(0);
+        $job = $executor->run();
+        $executor->updateStatus(100);
+
+        // Log and sleep for a while
+        usleep(self::SLEEPTIME);
+        \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ': ' . $job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
+
+        // Reset status and decrement queue
+        $executor->updateStatus(0);
+        $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
+        $queue->updateQueue();
+
+        return $job->getOutput()->getVar('returnStatus');
+    }
+
+
+    /**
      * Forks a single tasks.
      * @param unknown_type $job
      */
@@ -73,10 +132,15 @@ abstract class AbstractClass {
             die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
         } elseif ($pid) {
             // The manager waits later
-            $childs++;
         } else {
+            // Initiate resources
+            // @todo: Initiate resources
+
             // Set manager input and start the manager
             $this->_processTask($job);
+
+            // Cleanup resources
+            // @todo: Cleanup resources
 
             // Exit after finishing the forked
             exit;

@@ -9,8 +9,6 @@
 
 namespace PhpTaskDaemon\Daemon;
 
-use PhpTaskDaemon\Daemon\Config;
-
 /**
 * The main Console class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon daemon options.
@@ -91,7 +89,7 @@ class Console {
         try {
             $consoleOpts->parse();
         } catch (\Zend_Console_Getopt_Exception $e) {
-            $out .= $e->getUsageMessage();
+            echo $e->getUsageMessage();
             $this->_exit();
         }
         $this->_consoleOpts = $consoleOpts;
@@ -192,7 +190,7 @@ class Console {
             $this->help();
 
         } catch (\Exception $e) {
-            Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
+            Logger::log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
 
     }
@@ -302,14 +300,24 @@ class Console {
             $this->_exit();
         }
 
-        echo "PhpTaskDaemon - Status\n";
-        echo "======================\n";
+        echo "PhpTaskDaemon - Status (" . count($state['childs']) . ")\n";
+        echo "==========================\n";
         echo "\n";
+
+	$this->_status($state);
+    }
+
+
+    protected function _status($state = null) {
+        // Get state when not provided as method argument
+        if (is_null($state)) {
+            $state = State::getState();
+        }
+//echo var_dump($state);
         if (count($state['childs']) == 0) {
             echo "No processes!\n";
-        } else {
-            echo "Processes (" . count($state['childs']) . ")\n";
 
+        } else {
             foreach ($state['childs'] as $childPid) {
                 $queue = $state['phptaskdaemond-queue-' . $childPid];
                 $status = $state['phptaskdaemond-executor-' . $childPid];
@@ -342,20 +350,25 @@ class Console {
      * action refreshes every x milliseconds.
      */
     public function monitor() {
-        echo "PhpTaskDaemon - Monitoring\n";
-        echo "==========================\n";
         while (true) {
             // Put the status output into a buffer before clearing the screen.
             // This prevents the screen from flickering.
             ob_start();
-            $this->status();
+
+            $state = State::getState();
+            echo "PhpTaskDaemon - Monitoring (" . count($state['childs']) . ")\n";
+            echo "==============================\n";
+            echo "\n";
+            $this->_status($state);
+
             $state = ob_get_contents();
             ob_end_clean();
 
             // Clear screen, print buffer & sleep
             System('clear');
             echo $state;
-            sleep(Config::get()->getOptionValue('daemon.monitor.sleep'));
+
+            usleep(Config::get()->getOptionValue('daemon.monitor.sleep'));
         }
     }
 
@@ -411,7 +424,7 @@ class Console {
 
             \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
             $msg = 'Adding log writer: verbose (level: ' . $logLevel . ')';
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+            \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
         }
     }
 
@@ -438,9 +451,9 @@ class Console {
                 // Adding logfile
                 $writerFile = new \Zend_Log_Writer_Stream($logFile);
                 \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
             } catch (\Exception $e) {
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
+                \PhpTaskDaemon\Daemon\Logger::log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
             }
         }
     }
