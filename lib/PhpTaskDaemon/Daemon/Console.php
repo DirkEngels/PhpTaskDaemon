@@ -9,8 +9,6 @@
 
 namespace PhpTaskDaemon\Daemon;
 
-use PhpTaskDaemon\Daemon\Config;
-
 /**
 * The main Console class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon daemon options.
@@ -192,7 +190,7 @@ class Console {
             $this->help();
 
         } catch (\Exception $e) {
-            Logger::get()->log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
+            Logger::log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
 
     }
@@ -426,7 +424,7 @@ class Console {
 
             \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
             $msg = 'Adding log writer: verbose (level: ' . $logLevel . ')';
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+            \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
         }
     }
 
@@ -453,9 +451,9 @@ class Console {
                 // Adding logfile
                 $writerFile = new \Zend_Log_Writer_Stream($logFile);
                 \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
             } catch (\Exception $e) {
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
+                \PhpTaskDaemon\Daemon\Logger::log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
             }
         }
     }

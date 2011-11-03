@@ -40,4 +40,11 @@ class Logger {
         return self::$_instance;
     }
 
+    public static function log($message, $level = null) {
+        if (is_null($level)) {
+            $level = Config::get()->getOptionValue('daemon.log.level');
+        }
+
+        return self::get()->log('[' . getmypid() . '] ' . $message, $level);
+    }
 }

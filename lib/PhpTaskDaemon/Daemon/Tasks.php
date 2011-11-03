@@ -52,14 +52,14 @@ class Tasks {
      * @return boolean
      */
     public function loadManagerByTaskName($taskName) {
-        \PhpTaskDaemon\Daemon\Logger::get()->log('Loading task: ' . $taskName, \Zend_Log::INFO);
+        Logger::log('Loading task: ' . $taskName, \Zend_Log::INFO);
         try {
             $taskManager = \PhpTaskDaemon\Task\Factory::get($taskName);
             $this->addManager($taskManager);
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Succesfully loaded task: ' . $taskName, \Zend_Log::INFO);
+            Logger::log('Succesfully loaded task: ' . $taskName, \Zend_Log::INFO);
 
         } catch (\Exception $e) {
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Failed loading task: ' . $taskName . ' => ' . $e->getMessage(), \Zend_Log::INFO);
+            Logger::log('Failed loading task: ' . $taskName . ' => ' . $e->getMessage(), \Zend_Log::INFO);
             return false;
         }
         return true;
@@ -77,7 +77,7 @@ class Tasks {
 //            \PhpTaskDaemon\Daemon\Config::get()
 //        );
         $tasksFoundInConfig = array();
-        \PhpTaskDaemon\Daemon\Logger::get()->log('Scanned config and found ' . count($tasksFoundInConfig) . ' tasks', \Zend_Log::DEBUG);
+        Logger::log('Scanned config and found ' . count($tasksFoundInConfig) . ' tasks', \Zend_Log::DEBUG);
 
         // Directories
         try {
@@ -87,7 +87,7 @@ class Tasks {
         } catch (Exception $e) {
             $tasksFoundInDirs = array();
         }
-        \PhpTaskDaemon\Daemon\Logger::get()->log('Scanned directories and found ' . count($tasksFoundInDirs) . ' tasks', \Zend_Log::DEBUG);
+        Logger::log('Scanned directories and found ' . count($tasksFoundInDirs) . ' tasks', \Zend_Log::DEBUG);
 
         // Merge Tasks
         $tasks = array_merge($tasksFoundInConfig, $tasksFoundInDirs);
@@ -115,7 +115,7 @@ class Tasks {
         foreach($items as $item) {
             if ($item== '.' || $item == '..') { continue; }
             $base = (is_NULL($subdir)) ? $item : $subdir . '/'. $item;
-                    \PhpTaskDaemon\Daemon\Logger::get()->log(
+                    Logger::log(
                         "Trying file: /Task/" . $base, 
                         \Zend_Log::DEBUG
                     );
@@ -125,7 +125,7 @@ class Tasks {
                 include_once($dir . '/' . $base);
 
                 if (class_exists('\\' . $class)) {
-                    \PhpTaskDaemon\Daemon\Logger::get()->log(
+                    Logger::log(
                         "Found executor file: /Task/" . $base, 
                         \Zend_Log::NOTICE
                     );
