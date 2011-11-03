@@ -14,9 +14,9 @@
  */
 
 
-namespace PhpTaskDaemon\Task\Tutorial\Advanced;
+namespace PhpTaskDaemon\Task\Tutorial\Basics\Advanced;
 
-require_once(APPLICATION_PATH . '/task/Tutorial/Advanced/Executor.php');
+require_once(APPLICATION_PATH . '/task/Tutorial/Basics/Advanced/Executor.php');
 
 class ExecutorTest extends \PHPUnit_Framework_TestCase {
     protected $_executor = NULL;

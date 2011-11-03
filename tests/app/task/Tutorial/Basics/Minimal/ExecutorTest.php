@@ -14,9 +14,9 @@
  */
 
 
-namespace PhpTaskDaemon\Task\Tutorial\Minimal;
+namespace PhpTaskDaemon\Task\Tutorial\Basics\Minimal;
 
-require_once(APPLICATION_PATH . '/task/Tutorial/Minimal/Executor.php');
+require_once(APPLICATION_PATH . '/task/Tutorial/Basics/Minimal/Executor.php');
 
 class ExecutorTest extends \PHPUnit_Framework_TestCase {
     protected $_executor = NULL;

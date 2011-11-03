@@ -14,9 +14,9 @@
  */
 
 
-namespace PhpTaskDaemon\Task\Example\Advanced;
+namespace PhpTaskDaemon\Task\Tutorial\Basics\Advanced;
 
-require_once(APPLICATION_PATH . '/task/Tutorial/Advanced/Queue.php');
+require_once(APPLICATION_PATH . '/task/Tutorial/Basics/Advanced/Queue.php');
 
 class QueueTest extends \PHPUnit_Framework_TestCase {
     protected $_queue = NULL;
