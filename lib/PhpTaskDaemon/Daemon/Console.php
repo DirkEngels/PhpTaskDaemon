@@ -91,7 +91,7 @@ class Console {
         try {
             $consoleOpts->parse();
         } catch (\Zend_Console_Getopt_Exception $e) {
-            $out .= $e->getUsageMessage();
+            echo $e->getUsageMessage();
             $this->_exit();
         }
         $this->_consoleOpts = $consoleOpts;
@@ -302,14 +302,24 @@ class Console {
             $this->_exit();
         }
 
-        echo "PhpTaskDaemon - Status\n";
-        echo "======================\n";
+        echo "PhpTaskDaemon - Status (" . count($state['childs']) . ")\n";
+        echo "==========================\n";
         echo "\n";
+
+	$this->_status($state);
+    }
+
+
+    protected function _status($state = null) {
+        // Get state when not provided as method argument
+        if (is_null($state)) {
+            $state = State::getState();
+        }
+//echo var_dump($state);
         if (count($state['childs']) == 0) {
             echo "No processes!\n";
-        } else {
-            echo "Processes (" . count($state['childs']) . ")\n";
 
+        } else {
             foreach ($state['childs'] as $childPid) {
                 $queue = $state['phptaskdaemond-queue-' . $childPid];
                 $status = $state['phptaskdaemond-executor-' . $childPid];
@@ -342,19 +352,24 @@ class Console {
      * action refreshes every x milliseconds.
      */
     public function monitor() {
-        echo "PhpTaskDaemon - Monitoring\n";
-        echo "==========================\n";
         while (true) {
             // Put the status output into a buffer before clearing the screen.
             // This prevents the screen from flickering.
             ob_start();
-            $this->status();
+
+            $state = State::getState();
+            echo "PhpTaskDaemon - Monitoring (" . count($state['childs']) . ")\n";
+            echo "==============================\n";
+            echo "\n";
+            $this->_status($state);
+
             $state = ob_get_contents();
             ob_end_clean();
 
             // Clear screen, print buffer & sleep
             System('clear');
             echo $state;
+
             sleep(Config::get()->getOptionValue('daemon.monitor.sleep'));
         }
     }
