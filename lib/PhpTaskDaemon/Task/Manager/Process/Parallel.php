@@ -21,18 +21,19 @@ class Parallel extends AbstractClass implements InterfaceClass {
     public function run() {
         $currentChilds = 0;
 
-        while(count($this->_jobs)>0) {
+        $jobs = $this->getJobs();
+        while(count($jobs)>0) {
             if ($currentChilds<$this->_maxProcess) {
-                $job = array_shift($this->_jobs);
+                $job = array_shift($jobs);
+
                 $this->_forkTask($job);
             }
         }
+
         for ($i = $currentChilds; $i<$this->_maxProcess; $i++) {
             $this->_forkTask($job);
             $currentChilds++;
         }
-
-        $this->_executeTask($this->getJob());
     }
 
 }

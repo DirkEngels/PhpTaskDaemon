@@ -11,35 +11,6 @@ namespace PhpTaskDaemon\Task\Manager\Timer;
 
 abstract class AbstractClass {
 
-    protected $_queue;
-
-
-    /**
-     * 
-     * Returns the current loaded queue array
-     * @return \PhpTaskDaemon\Task\Queue\AbstractClass
-     */
-    public function getQueue() {
-        return $this->_queue;
-    }
-
-
-    /**
-     * 
-     * Sets the current queue to process.
-     * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
-     * @return $this
-     */
-    public function setQueue($queue) {
-        if (!($queue instanceof \PhpTaskDaemon\Task\Queue\AbstractClass)) {
-            $queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
-        }
-        $this->_queue = $queue;
-
-        return $this;
-    }
-
-
     /**
      * Returns the time to wait before to run again.
      */

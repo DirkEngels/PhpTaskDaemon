@@ -31,6 +31,8 @@ class Factory {
     const TYPE_EXECUTOR = 'executor';
     const TYPE_STATUS = 'status';
 
+    const IPC_QUEUE = 'queue';
+    const IPC_EXECUTOR = 'executor';
 
     /**
      * Instantiates a new Manager object and injects all needed components 
@@ -51,21 +53,25 @@ class Factory {
         // Base Manager
         $manager = self::getManager($taskName);
 
-        // Timer, Queue & Statistics
+        // Timer
         $manager->setTimer(
             self::getComponentType($taskName, self::TYPE_TRIGGER)
         );
-        $manager->getTimer()->setQueue(
-            self::getComponentType($taskName, self::TYPE_QUEUE)
-        );
-        $manager->getTimer()->getQueue()->setStatistics(
-            self::getComponentType($taskName, self::TYPE_STATISTICS)
-        );
 
-        // Process, Executor & Status
+        // Process
         $manager->setProcess(
             self::getComponentType($taskName, self::TYPE_PROCESS)
         );
+
+        // Queue & Statistics
+        $manager->getProcess()->setQueue(
+            self::getComponentType($taskName, self::TYPE_QUEUE)
+        );
+        $manager->getProcess()->getQueue()->setStatistics(
+            self::getComponentType($taskName, self::TYPE_STATISTICS)
+        );
+
+        // Executor & Status
         $manager->getProcess()->setExecutor(
             $executor
         );
@@ -169,6 +175,15 @@ class Factory {
      */
     public static function getQueueStatistics($taskName) {
         return self::getComponentType($taskName, self::TYPE_STATISTICS);
+    }
+
+
+    public static function getIpc($taskName, $type = self::IPC_QUEUE) {
+        $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+        if (!class_exists($ipcClass)) {
+            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+        }
+        return new $ipcClass('phptaskdaemond-' . $type . '-' . getmypid());
     }
 
 

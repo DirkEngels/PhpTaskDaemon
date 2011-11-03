@@ -8,6 +8,7 @@
  */
 
 namespace PhpTaskDaemon\Task\Manager\Process;
+use PhpTaskDaemon\Daemon\Logger;
 
 class Child extends AbstractClass implements InterfaceClass {
 
@@ -21,18 +22,18 @@ class Child extends AbstractClass implements InterfaceClass {
 
         if ($pid == -1) {
             $err = 'Could not fork.. dunno why not... shutting down... bleep bleep.. blap...';
-            \PhpTaskDaemon\Daemon\Logger::get()->log($err, \Zend_Log::CRIT);
+            \PhpTaskDaemon\Daemon\Logger::log($err, \Zend_Log::CRIT);
             die ($err);
         } elseif ($pid) {
             // The manager waits later
-            $childs++;
 
         } else {
-            foreach($this->getJobs() as $job) {                
+            $jobs = $this->getJobs();
+            foreach($jobs as $job) {
                 // Set manager input and start the manager
-                $this->_forkTask($this->getJob());
+//                $this->_forkTask($job);
             }
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Finished current set of tasks! Child exits!', \Zend_Log::INFO);
+            Logger::log('Finished current set of tasks! Child exits!', \Zend_Log::INFO);
             exit;
         }
     } 
