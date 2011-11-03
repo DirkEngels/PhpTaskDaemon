@@ -10,10 +10,14 @@ Version 1.0 (roadmap)
 
 Version 0.8.4 (planned)
 -----------------------
++ Refactor manager
+    + Move queue class to the process class
+    + Add process pid ID to the logger log method
 - Implement manager process
     + Same
     - Child
     - Parallel
+- Clean up pid & ipc resources
 
 
 Version 0.8.3 (30-10-2011)
