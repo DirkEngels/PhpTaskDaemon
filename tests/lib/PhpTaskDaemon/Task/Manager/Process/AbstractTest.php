@@ -25,8 +25,21 @@ class AbstractTest extends \PHPUnit_Framework_TestCase {
     protected function tearDown() {
     }
 
+    /**
+     * @todo
+     */
     public function testNothing() {
         $this->assertTrue(true);
     }
+
+    /*
+    public function testSetQueueInvalidArgument() {
+        $this->_process->setQueue('invalid queue object');
+        $this->assertEquals(
+            new \PhpTaskDaemon\Task\Queue\DefaultClass(),
+            $this->_process->getQueue()
+        );
+    }
+    */
 
 }

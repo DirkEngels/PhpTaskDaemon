@@ -32,8 +32,8 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	public function testConstructor() {
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
 		$this->assertEquals($this->_executor, $this->_manager->getProcess()->getExecutor());
-//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTimer()->getQueue());
-//		$this->assertEquals($this->_queue, $this->_manager->getTimer()->getQueue());
+//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getProcess()->getQueue());
+//		$this->assertEquals($this->_queue, $this->_manager->getProcess()->getQueue());
 	}
 	public function testInitNoArguments() {
 		$this->_manager->init();
@@ -79,9 +79,9 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     }
 
 	public function testSetQueue() {
-//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getTimer()->getQueue());
-		$this->_manager->getTimer()->setQueue($this->_queue);
-		$this->assertEquals($this->_queue, $this->_manager->getTimer()->getQueue());
+//		$this->assertInstanceOf('\PhpTaskDaemon\Task\Queue\AbstractClass', $this->_manager->getProcess()->getQueue());
+		$this->_manager->getProcess()->setQueue($this->_queue);
+		$this->assertEquals($this->_queue, $this->_manager->getProcess()->getQueue());
 	}
 	public function testSetExecutor() {
 		$this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\AbstractClass', $this->_manager->getProcess()->getExecutor());
