@@ -114,7 +114,9 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
      */
     public static function getManager($taskName) {
-        return self::getComponentType($taskName, self::TYPE_MANAGER);
+        $manager = self::getComponentType($taskName, self::TYPE_MANAGER);
+        $manager->setName($taskName);
+        return $manager;
     }
 
 
