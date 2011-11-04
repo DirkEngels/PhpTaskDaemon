@@ -58,12 +58,14 @@ class State {
             $state[$ipcQueue->getId()] = $ipcQueue->get();
 
             // Executor Status
-            $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-            if (!class_exists($ipcExecutorClass)) {
-                $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+            foreach ($state[$ipcQueue->getId()]['executors'] as $executorPid) {
+                $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
+                if (!class_exists($ipcExecutorClass)) {
+                    $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+                }
+                $ipcExecutor = new $ipcExecutorClass('phptaskdaemond-executor-' . $executorPid);
+                $state[$ipcExecutor->getId()] = $ipcExecutor->get();
             }
-            $ipcExecutor = new $ipcExecutorClass('phptaskdaemond-executor-' . $process);
-            $state[$ipcExecutor->getId()] = $ipcExecutor->get();
         }
 
         return $state;
