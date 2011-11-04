@@ -16,6 +16,11 @@ abstract class AbstractClass {
     protected $_executor = null;
     protected $_jobs = array();
 
+    /**
+     * Empty constructor
+     */
+    public function __construct() {
+    }
 
     /**
      * 
@@ -23,6 +28,9 @@ abstract class AbstractClass {
      * @return \PhpTaskDaemon\Task\Queue\AbstractClass
      */
     public function getQueue() {
+        if (!($this->_queue instanceof \PhpTaskDaemon\Task\Queue\AbstractClass)) {
+            $this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
+        }
         return $this->_queue;
     }
 
@@ -35,7 +43,7 @@ abstract class AbstractClass {
      */
     public function setQueue($queue) {
         if (!($queue instanceof \PhpTaskDaemon\Task\Queue\AbstractClass)) {
-            $queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
+            throw new \Exception('Invalid Queue object');
         }
         $this->_queue = $queue;
 
