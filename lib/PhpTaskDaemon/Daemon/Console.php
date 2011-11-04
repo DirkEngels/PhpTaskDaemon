@@ -318,23 +318,26 @@ class Console {
             echo "No processes!\n";
 
         } else {
-            foreach ($state['childs'] as $childPid) {
-                $queue = $state['phptaskdaemond-queue-' . $childPid];
-                $status = $state['phptaskdaemond-executor-' . $childPid];
+            foreach ($state['childs'] as $queuePid) {
+                $queue = $state['phptaskdaemond-queue-' . $queuePid];
 
                 // Statistics
-                echo "[" . $childPid . "]: ";
-                echo "Queue ";
+                echo "[" . $queuePid . "]: ";
+                echo $queue['name'] . " ";
                 echo "\t(Progress: " . ($queue['loaded']-$queue['queued']) . '/' . $queue['loaded'];
                 echo "\tDone: " . $queue['done'];
                 echo "\tFailed: " . $queue['failed'];
                 echo ")\n";
 
-                // Status
-                echo "- [" . $childPid . "]: ";
-                echo "\t" . $status['percentage'] . "%:";
-                echo "\t" . $status['message'];
-                echo "\n";
+//                // Status
+                foreach ($queue['executors'] as $executorPid) {
+                    $status = $state['phptaskdaemond-executor-' . $executorPid];
+                    
+                    echo "- [" . $executorPid . "]: ";
+                    echo "\t" . $status['percentage'] . "%:";
+                    echo "\t" . $status['message'];
+                    echo "\n";
+                }
 
                 echo "\n";
             }
