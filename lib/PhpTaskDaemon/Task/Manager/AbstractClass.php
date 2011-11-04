@@ -17,6 +17,12 @@ namespace PhpTaskDaemon\Task\Manager;
 abstract class AbstractClass {
 
     /**
+     * Task name
+     * @var string
+     */
+    protected $_name = 'unknown';
+
+    /**
      * 
      * Pid manager object. This class is repsonsible for storing the current, 
      * parent and child process IDs.
@@ -61,6 +67,28 @@ abstract class AbstractClass {
             getmypid(), 
             $parentPid
         );
+    }
+
+
+    /**
+     *
+     * Returns the task name 
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
+    }
+
+
+    /**
+     *
+     * Sets the task name 
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name) {
+        $this->_name = $name;
+        return $this;
     }
 
 
@@ -154,6 +182,10 @@ abstract class AbstractClass {
             get_class($this),
             array(&$this, 'sigHandler')
         );
+
+        // Set taskname to queue ipc
+        $queueIpc = $this->getProcess()->getQueue()->getStatistics()->getIpc();
+        $queueIpc->setVar('name', $this->getName());
 
         $this->execute();
     }
