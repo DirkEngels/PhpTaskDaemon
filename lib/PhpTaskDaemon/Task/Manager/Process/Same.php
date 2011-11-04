@@ -12,6 +12,8 @@ namespace PhpTaskDaemon\Task\Manager\Process;
 class Same extends AbstractClass implements InterfaceClass {
 
     public function run() {
+        $this->getQueue()->getStatistics()->getIpc()->setVar('executors', array(getmypid()));
+
         foreach($this->getJobs() as $job) {
             $this->_processTask($job);
         }

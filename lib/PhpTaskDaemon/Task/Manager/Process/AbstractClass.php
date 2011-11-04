@@ -16,11 +16,6 @@ abstract class AbstractClass {
     protected $_executor = null;
     protected $_jobs = array();
 
-    /**
-     * Empty constructor
-     */
-    public function __construct() {
-    }
 
     /**
      * 
