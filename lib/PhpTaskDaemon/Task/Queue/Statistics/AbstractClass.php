@@ -52,10 +52,7 @@ abstract class AbstractClass {
             }
             $this->_ipc = new $ipcClass('phptaskdaemond-queue-' . getmypid());
 
-            $this->_initializeStatus(self::STATUS_LOADED);
-            $this->_initializeStatus(self::STATUS_QUEUED);
-            $this->_initializeStatus(self::STATUS_DONE);
-            $this->_initializeStatus(self::STATUS_FAILED);
+            $this->_initializeIpc();
         }
 
         return $this->_ipc;
@@ -70,10 +67,7 @@ abstract class AbstractClass {
      */
     public function setIpc($ipc) {
         $this->_ipc = $ipc;
-        $this->_initializeStatus(self::STATUS_LOADED);
-        $this->_initializeStatus(self::STATUS_QUEUED);
-        $this->_initializeStatus(self::STATUS_DONE);
-        $this->_initializeStatus(self::STATUS_FAILED);
+        $this->_initializeIpc();
         return TRUE;
     }
 
@@ -143,12 +137,14 @@ abstract class AbstractClass {
 
 
     /**
-     * Initializes the statistics array for a certain status.
      * 
-     * @param string $status
+     * Initializes the statistics array with default values.
      */
-    private function _initializeStatus($status) {
-        $this->getIpc()->setVar($status, 0);
+    public function _initializeIpc() {
+        $this->getIpc()->setVar(self::STATUS_LOADED, 0);
+        $this->getIpc()->setVar(self::STATUS_QUEUED, 0);
+        $this->getIpc()->setVar(self::STATUS_DONE, 0);
+        $this->getIpc()->setVar(self::STATUS_FAILED, 0);
+        $this->getIpc()->setVar('executors', array());
     }
-
 }
