@@ -100,7 +100,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
      */
     public function setVar($name, $value) {
 
-        $sql = "REPLACE INTO ipc (ipcId, name, value) VALUES (:ipcId, :name, :value)";
+        $sql = "REPLACE INTO ipc (ipcUpdated, ipcId, name, value) VALUES (NOW(), :ipcId, :name, :value)";
         $params = array(
             'ipcId' => $this->_id,
             'name' => $name,
@@ -144,14 +144,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
             $value = 0;
         }
         $value -= $count;
-
-        $sql = "UPDATE ipc SET value=:value WHERE ipcId=:ipcId AND name=:name";
-        $params = array(
-            'ipcId' => $this->_id,
-            'name' => $name,
-            'value' => serialize($value),
-        );
-        $this->_dbStatement($sql, $params);
+        $this->setVar($name, $value);
 
         return $this->getPdo()->commit();
     }
