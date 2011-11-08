@@ -79,13 +79,14 @@ abstract class AbstractClass {
      * @return array
      */
     public function get($status = NULL) {
+        $ipc = $this->getIpc();
         if (is_NULL($status)) {
-            return $this->getIpc()->get();
+            return $ipc->get();
         }
-        if (!in_array($status, $this->getIpc()->getKeys())) {
-            $this->_initializeStatus($status);
+        if (!in_array($status, $ipc->getKeys())) {
+            $ipc->setVar($status, 0);
         }
-        return $this->getIpc()->getVar($status);
+        return $ipc->getVar($status);
     }
 
 
@@ -97,10 +98,11 @@ abstract class AbstractClass {
      * @return bool
      */
     public function setStatusCount($status = self::STATUS_DONE, $count = 0) {
-        if (!in_array($status, $this->getIpc()->getKeys())) {
-            $this->_initializeStatus($status);
+        $ipc = $this->getIpc();
+        if (!in_array($status, $ipc->getKeys())) {
+            $ipc->setVar($status, 0);
         }
-        return $this->getIpc()->setVar($status, $count);
+        return $ipc->setVar($status, $count);
     }
 
 
