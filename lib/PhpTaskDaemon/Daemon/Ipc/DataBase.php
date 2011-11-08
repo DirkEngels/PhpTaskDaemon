@@ -172,7 +172,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function remove() {
-        $sql = "DELETE FROM ipc WHERE ipdKey=:ipcId";
+        $sql = "DELETE FROM ipc WHERE ipcId=:ipcId";
         $params = array(
             'ipcId' => $this->_id,
         );
