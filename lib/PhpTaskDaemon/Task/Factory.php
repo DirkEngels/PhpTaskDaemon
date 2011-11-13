@@ -307,7 +307,7 @@ class Factory {
      */
     protected function _getObjectDefault($taskName, $objectType) {
         $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Default';
-        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+        \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
 
         switch($objectType) {
             case 'manager':
