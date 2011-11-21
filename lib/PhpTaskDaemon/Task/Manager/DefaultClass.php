@@ -7,6 +7,7 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 namespace PhpTaskDaemon\Task\Manager;
+use PhpTaskDaemon\Task\Job;
 
 /**
  * 
@@ -22,14 +23,13 @@ class DefaultClass extends AbstractClass implements InterfaceClass {
 
             if (count($jobs)==0) {
                 \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Queue checked: empty!!!", \Zend_Log::DEBUG);
-                $this->getProcess()->getExecutor()->updateStatus(100, 'Queue empty');
-            } else {
-                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Queue loaded: " . count($jobs) . " elements", \Zend_Log::INFO);
-                $this->getProcess()->getQueue()->updateQueue(count($jobs));
 
-                $process = $this->getProcess();
-                $process->setJobs($jobs);
-                $process->run();
+            } else {
+                $this->getProcess()->getQueue()->updateQueue(count($jobs));
+                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Queue loaded: " . count($jobs) . " elements", \Zend_Log::NOTICE);
+
+                // Pass the jobs to the Process compomnent
+                $this->getProcess()->setJobs($jobs)->run();
                 \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ': Queue finished', \Zend_Log::DEBUG);
             }
 
