@@ -43,9 +43,10 @@ abstract class AbstractClass {
         return TRUE;
     }
 
+    public function initResource() {
+    }
 
-    public function __destruct() {
-        //$this->remove();
+    public function cleanupResource() {
     }
 
 
