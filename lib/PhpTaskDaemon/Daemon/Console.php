@@ -212,7 +212,7 @@ class Console {
                 echo $taskName, "\n";
                 echo str_repeat('-', strlen($taskName)), "\n";
 
-                echo "Process:\t\t", Config::get()->getOptionValue('manager.process.type', $taskName), "\n";
+                echo "Process:\t\t", Config::get()->getOptionValue('process.type', $taskName), "\n";
                 echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
 
                 // Manager Timer
@@ -304,7 +304,7 @@ class Console {
         echo "==========================\n";
         echo "\n";
 
-	$this->_status($state);
+        $this->_status($state);
     }
 
 
@@ -313,26 +313,24 @@ class Console {
         if (is_null($state)) {
             $state = State::getState();
         }
-//echo var_dump($state);
+
         if (count($state['childs']) == 0) {
             echo "No processes!\n";
 
         } else {
             foreach ($state['childs'] as $queuePid) {
-                $queue = $state['phptaskdaemond-queue-' . $queuePid];
+                $queue = $state['queue-' . $queuePid];
 
                 // Statistics
                 echo "[" . $queuePid . "]: ";
-                echo $queue['name'] . " ";
                 echo "\t(Progress: " . ($queue['loaded']-$queue['queued']) . '/' . $queue['loaded'];
                 echo "\tDone: " . $queue['done'];
                 echo "\tFailed: " . $queue['failed'];
                 echo ")\n";
 
-//                // Status
+                // Status
                 foreach ($queue['executors'] as $executorPid) {
-                    $status = $state['phptaskdaemond-executor-' . $executorPid];
-                    
+                    $status = $state['executor-' . $executorPid];
                     echo "- [" . $executorPid . "]: ";
                     echo "\t" . $status['percentage'] . "%:";
                     echo "\t" . $status['message'];
