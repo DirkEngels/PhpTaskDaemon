@@ -53,7 +53,7 @@ class Config {
      * Singleton getter
      * @return \PhpTaskDaemon\Daemon\Config
      */
-    public function get($configFiles = array()) {
+    public static function get($configFiles = array()) {
         if (count($configFiles) > 0) {
             self::$_instance = NULL;
         }
