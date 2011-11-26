@@ -244,15 +244,16 @@ class Instance {
             Logger::log("No daemon tasks found", \Zend_Log::INFO);
             $this->_exit();
         }
-        Logger::log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::INFO);
+        Logger::log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::NOTICE);
 
         $this->getIpc()->setVar('childs', array());
         $managers = $this->_tasks->getManagers();
         foreach ($managers as $manager) {
-            Logger::log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
+            Logger::log("Starting manager: "  . $manager->getName(), \Zend_Log::NOTICE);
             try {
                 $this->_forkManager($manager);
             } catch (Exception $e) {
+                echo $e->getMessage();
                 Logger::log($e->getMessage(), \Zend_Log::CRIT);
                 $this->_exit();
             }
@@ -276,7 +277,6 @@ class Instance {
         Logger::log("Running done.", \Zend_Log::NOTICE);
 
         $this->getPidFile()->unlink();
-        $this->getIpc()->remove();
 
         $this->_exit();
     }
