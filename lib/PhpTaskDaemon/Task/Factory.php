@@ -31,6 +31,7 @@ class Factory {
     const TYPE_EXECUTOR = 'executor';
     const TYPE_STATUS = 'status';
 
+    const IPC_DAEMON = 'queue';
     const IPC_QUEUE = 'queue';
     const IPC_EXECUTOR = 'executor';
 
@@ -136,7 +137,9 @@ class Factory {
      * @return \PhpTaskDaemon\Task\Manager\Process\AbstractClass
      */
     public static function getManagerProcess($taskName) {
-        return self::getComponentType($taskName, self::TYPE_PROCESS);
+        $process = self::getComponentType($taskName, self::TYPE_PROCESS);
+        $process->setName($taskName);
+        return $process;
     }
 
 
@@ -180,22 +183,13 @@ class Factory {
     }
 
 
-    public static function getIpc($taskName, $type = self::IPC_QUEUE) {
-        $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-        if (!class_exists($ipcClass)) {
-            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
-        }
-        return new $ipcClass('phptaskdaemond-' . $type . '-' . getmypid());
-    }
-
-
     /**
      * Returns the classname based on the taskName and objectType
      * @param string $taskName
      * @param string $objectType
      * @return string
      */
-    protected function _getClassName($taskName, $objectType) {
+    public static function _getClassName($taskName, $objectType) {
         return Daemon\Config::get()->getOptionValue('global.namespace') . '\\'. str_replace('/', '\\', $taskName) . '\\' . ucfirst($objectType);
     }
 
@@ -305,7 +299,7 @@ class Factory {
      * @param string $objectType
      * @return null|StdClass
      */
-    protected function _getObjectDefault($taskName, $objectType) {
+    public static function _getObjectDefault($taskName, $objectType) {
         $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Default';
         \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
 
