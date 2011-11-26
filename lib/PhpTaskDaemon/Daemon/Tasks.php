@@ -127,7 +127,7 @@ class Tasks {
                 if (class_exists('\\' . $class)) {
                     Logger::log(
                         "Found executor file: /Task/" . $base, 
-                        \Zend_Log::NOTICE
+                        \Zend_Log::DEBUG
                     );
                     array_push($tasks, substr($base, 0, -13));
                 }
