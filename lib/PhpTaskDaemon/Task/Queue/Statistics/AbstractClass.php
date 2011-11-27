@@ -54,13 +54,11 @@ abstract class AbstractClass {
         if (getmypid() != $this->_pid) {
             if (!(is_null($this->_ipc))) {
                 $this->_ipc = NULL;
-                $this->_ipc->initResource();
             }
         }
 
         if (is_null($this->_ipc)) {
             $this->_ipc = IpcFactory::get(IpcFactory::NAME_QUEUE, $this->_pid);
-            $this->_initializeIpc();
         }
 
         return $this->_ipc;
