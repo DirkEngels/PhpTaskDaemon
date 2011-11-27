@@ -17,25 +17,42 @@ class Child extends AbstractClass implements InterfaceClass {
      * @param \PhpTaskDaemon\Task\Job $job
      */
     public function run() {
-        // Fork the manager
-        $pid = pcntl_fork();
 
-        if ($pid == -1) {
-            $err = 'Could not fork.. dunno why not... shutting down... bleep bleep.. blap...';
-            \PhpTaskDaemon\Daemon\Logger::log($err, \Zend_Log::CRIT);
-            die ($err);
-        } elseif ($pid) {
-            // The manager waits later
+        $jobs = $this->getJobs();
+        foreach($jobs as $job) {
+            $pid = pcntl_fork();
 
-        } else {
-            $jobs = $this->getJobs();
-            foreach($jobs as $job) {
-                // Set manager input and start the manager
-//                $this->_forkTask($job);
+            if ($pid == -1) {
+                die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
+            } elseif ($pid) {
+                // The manager waits later
+                \PhpTaskDaemon\Daemon\Logger::log('Processing manager starting!', \Zend_Log::NOTICE);
+
+                try {
+                    $res = pcntl_waitpid($pid, $status);
+                    \PhpTaskDaemon\Daemon\Logger::log('Processing manager done!', \Zend_Log::NOTICE);
+                } catch (Exception $e) {
+                    echo $e->getMessage();
+                }
+
+            } else {
+                $this->getExecutor()->getStatus()->resetPid();
+                $this->getExecutor()->getStatus()->resetIpc();
+                $this->getQueue()->getStatistics()->resetIpc();
+
+                \PhpTaskDaemon\Daemon\Logger::log('Processing task started!', \Zend_Log::NOTICE);
+                try {
+                    $this->_processTask($job);
+                } catch (\Exception $e) {
+                    echo $e->getMessage();
+                }
+
+                \PhpTaskDaemon\Daemon\Logger::log('Processing task done!', \Zend_Log::NOTICE);
+                exit(1);
             }
-            Logger::log('Finished current set of tasks! Child exits!', \Zend_Log::INFO);
-            exit;
         }
-    } 
+
+        \PhpTaskDaemon\Daemon\Logger::log('Finished current set of tasks!', \Zend_Log::NOTICE);
+    }
 
 }
