@@ -8,7 +8,7 @@
  */
 namespace PhpTaskDaemon\Task\Executor;
 
-interface InterfaceClass {
+interface ExecutorInterface {
 
     public function run();
 

@@ -13,7 +13,7 @@ namespace PhpTaskDaemon\Task\Executor;
  * The executor base class does notting, but can be used if no executor class
  * is defined.
  */
-class DefaultClass extends AbstractClass implements InterfaceClass {
+class ExecutorDefault extends ExecutorAbstract implements ExecutorInterface {
 
     public function run() {
         return $this->getJob();
