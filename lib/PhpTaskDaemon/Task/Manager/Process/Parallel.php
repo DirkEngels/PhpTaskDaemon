@@ -18,7 +18,14 @@ class Parallel extends Child {
         \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
 
         try {
-            $res = pcntl_waitpid($pid, $status);
+            echo "Checking child count: " . $this->_childCount . "/" . $this->_maxProcess . "\n";
+            if ($this->_childCount >= $this->_maxProcess) {
+                while (pcntl_waitpid(0, $status) != -1) {
+                    $status = pcntl_wexitstatus($status);
+                    echo "Child $status completed\n";
+                    $this->_childCount--;
+                }
+            }
         } catch (Exception $e) {
             echo $e->getMessage();
         }
