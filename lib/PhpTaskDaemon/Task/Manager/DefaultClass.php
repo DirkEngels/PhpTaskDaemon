@@ -18,6 +18,11 @@ class DefaultClass extends AbstractClass implements InterfaceClass {
 
     public function execute() {
         while (true) {
+            // Re-initialize the IPC components
+            $process = $this->getProcess();
+            $process->getExecutor()->getStatus()->resetIpc();
+            $process->getQueue()->getStatistics()->resetIpc();
+
             // Load Tasks in Queue
             $jobs = $this->getProcess()->getQueue()->load();
 
