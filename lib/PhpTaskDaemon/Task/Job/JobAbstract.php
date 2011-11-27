@@ -17,7 +17,7 @@ use \PhpTaskDaemon\Task\Job\Data as Data;
  * variables. The abstract class also implements a check method for the input
  * used by the managers. 
  */
-abstract class AbstractClass {
+abstract class JobAbstract {
     protected $_jobId;
     protected $_input = NULL;
     protected $_output = NULL;
@@ -28,7 +28,7 @@ abstract class AbstractClass {
      * no jobId is provided, an random ID will be generated. The second 
      * argument is an array containing the input variables.
      * @param string $jobId
-     * @param \PhpTaskDaemon\Task\Job\AbstractClass $input 
+     * @param \PhpTaskDaemon\Task\Job\JobAbstract $input 
      */
     public function __construct($jobId = NULL, $input = NULL) {
         if ($jobId === NULL) {
@@ -40,7 +40,7 @@ abstract class AbstractClass {
             $this->setInput($input);
         }
 
-        $this->_output = new \PhpTaskDaemon\Task\Job\Data\DefaultClass();
+        $this->_output = new \PhpTaskDaemon\Task\Job\Data\DataDefault();
     }
 
 
@@ -82,7 +82,7 @@ abstract class AbstractClass {
     /**
      * 
      * Returns an data object with input variables
-     * @return \PhpTaskDaemon\Task\Job\Data
+     * @return \PhpTaskDaemon\Task\Job\Data\DataAbstract
      */
     public function getInput() {
         return $this->_input;
@@ -92,11 +92,11 @@ abstract class AbstractClass {
     /**
      * 
      * (Re)Sets the input array 
-     * @param \PhpTaskDaemon\Task\Job\Data $input
+     * @param \PhpTaskDaemon\Task\Job\Data\DataAbstract $input
      * @return bool
      */
     public function setInput($input) {
-        if (!is_a($input, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
+        if (!is_a($input, '\PhpTaskDaemon\Task\Job\Data\DataAbstract')) {
             throw new \Exception('Wrong data format for job input!');
         }
         $this->_input = $input;
@@ -107,7 +107,7 @@ abstract class AbstractClass {
     /**
      * 
      * Returns an data object with output variables
-     * @return \PhpTaskDaemon\Task\Job\Data
+     * @return \PhpTaskDaemon\Task\Job\Data\DataAbstract
      */
     public function getOutput() {
         return $this->_output;
@@ -117,11 +117,11 @@ abstract class AbstractClass {
     /**
      * 
      * (Re)Sets the output array 
-     * @param \PhpTaskDaemon\Task\Job\Data $output
+     * @param \PhpTaskDaemon\Task\Job\Data\DataAbstract $output
      * @return bool
      */
     public function setOutput($output) {
-        if (!is_a($output, '\PhpTaskDaemon\Task\Job\Data\AbstractClass')) {
+        if (!is_a($output, '\PhpTaskDaemon\Task\Job\Data\DataAbstract')) {
             throw new \Exception('Wrong data format for job output!');
         }
         $this->_output = $output;

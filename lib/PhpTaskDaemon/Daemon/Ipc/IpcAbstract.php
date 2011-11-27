@@ -16,7 +16,7 @@ use PhpTaskDaemon\Daemon\Logger;
  * method for retrieving all registered keys.
  * 
  */
-abstract class AbstractClass {
+abstract class IpcAbstract {
 
     /**
      * Unique identifier
@@ -43,9 +43,10 @@ abstract class AbstractClass {
         return TRUE;
     }
 
+    public function initResource() {
+    }
 
-    public function __destruct() {
-        //$this->remove();
+    public function cleanupResource() {
     }
 
 

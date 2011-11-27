@@ -14,7 +14,7 @@ namespace PhpTaskDaemon\Task\Queue;
  * The base class encapsulates two methods for updating the current queue count
  * and the statistic information about the executed tasks.
  */
-abstract class AbstractClass {
+abstract class QueueAbstract {
 
     protected $_statistics;
 
@@ -22,7 +22,7 @@ abstract class AbstractClass {
     /**
      *
      * Optionally a statistics instance can be provided. 
-     * @param \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass $statistics
+     * @param \PhpTaskDaemon\Task\Queue\Statistics\StatisticsAbstract $statistics
      */
     public function __construct($statistics = NULL) {
         $this->setStatistics($statistics);
@@ -32,7 +32,7 @@ abstract class AbstractClass {
     /**
      *
      * Returns the statistics object 
-     * @return \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass
+     * @return \PhpTaskDaemon\Task\Queue\Statistics\StatisticsAbstract
      */
     public function getStatistics() {
         return $this->_statistics;
@@ -42,11 +42,11 @@ abstract class AbstractClass {
     /**
      *
      * Sets the statistics object 
-     * @param \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass $statistics
+     * @param \PhpTaskDaemon\Task\Queue\Statistics\StatisticsAbstract $statistics
      * @return $this
      */
     public function setStatistics($statistics) {
-        if (is_a($statistics, "\PhpTaskDaemon\Task\Queue\Statistics\AbstractClass")) {
+        if (is_a($statistics, "\PhpTaskDaemon\Task\Queue\Statistics\StatisticsAbstract")) {
             $this->_statistics = $statistics;
         }
         return $this;

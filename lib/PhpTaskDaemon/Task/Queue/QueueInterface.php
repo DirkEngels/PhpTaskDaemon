@@ -1,16 +1,16 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Executor\Status
+ * @subpackage Task\Queue
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Task\Executor\Status;
 
-interface InterfaceClass {
+namespace PhpTaskDaemon\Task\Queue;
 
-    public function get();
-    public function set($status);
+interface QueueInterface {
+
+    public function load();
 
 }

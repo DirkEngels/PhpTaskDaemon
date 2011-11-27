@@ -4,8 +4,9 @@ namespace PhpTaskDaemon\Task\Tutorial\Basics\Minimal;
 
 use \PhpTaskDaemon\Task\Executor as TaskExecutor;
 use \PhpTaskDaemon\Task\Queue\Statistics;
+use \PhpTaskDaemon\Daemon\Logger;
 
-class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+class Executor extends TaskExecutor\ExecutorAbstract implements TaskExecutor\ExecutorInterface {
 
     public function run() {
         $job = $this->getJob();
@@ -14,6 +15,8 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         // Input
         $sleepTime = (int) $job->getInput()->getVar('sleepTime');
+
+        Logger::log('Sleeping for ' . $sleepTime . ' milliseconds', \Zend_Log::NOTICE);
 
         // Sleep
         $sleepTimeProgress = round($sleepTime);
@@ -24,7 +27,7 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         // Output (status)
         $job->getOutput()->set(array(
-            'returnStatus' => Statistics\DefaultClass::STATUS_DONE,
+            'returnStatus' => Statistics\StatisticsDefault::STATUS_DONE,
         ));
 
         return $job;

@@ -1,14 +1,15 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Job\Data
+ * @subpackage Task\Executor
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+namespace PhpTaskDaemon\Task\Executor;
 
-namespace PhpTaskDaemon\Task\Job\Data;
+interface ExecutorInterface {
 
-class DefaultClass extends AbstractClass implements InterfaceClass {
+    public function run();
 
 }

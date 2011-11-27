@@ -35,11 +35,11 @@ class Tasks {
 
     /**
      * Adds a manager
-     * @param $manager
+     * @param \PhpTaskDaemn\Task\Manager\ManagerAbstract $manager
      * @return boolean
      */
     public function addManager($manager) {
-        if (!($manager instanceof \PhpTaskDaemon\Task\Manager\AbstractClass)) {
+        if (!($manager instanceof \PhpTaskDaemon\Task\Manager\ManagerAbstract)) {
             throw new \Exception('Invalid Manager instance');
         }
         return array_push($this->managers, $manager);
@@ -127,7 +127,7 @@ class Tasks {
                 if (class_exists('\\' . $class)) {
                     Logger::log(
                         "Found executor file: /Task/" . $base, 
-                        \Zend_Log::NOTICE
+                        \Zend_Log::DEBUG
                     );
                     array_push($tasks, substr($base, 0, -13));
                 }

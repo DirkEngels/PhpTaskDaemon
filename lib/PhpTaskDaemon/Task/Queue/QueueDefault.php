@@ -16,25 +16,25 @@ use \PhpTaskDaemon\Task\Job;
  * The base class implements an example load method. The base class will also 
  * be used when no queue object is available for a certain task.
  */
-class DefaultClass extends AbstractClass implements InterfaceClass {
+class QueueDefault extends QueueAbstract implements QueueInterface {
 
     public function load() {
         $queue = array(
-            new Job\DefaultClass(
+            new Job\JobDefault(
                 'base-1',
-                new Job\Data\DefaultClass(
-                    array('sleepTime' => 100000)
+                new Job\Data\DataDefault(
+                    array('sleepTime' => 1000000)
                 )
             ),
-            new Job\DefaultClass(
+            new Job\JobDefault(
                 'base-2',
-                new Job\Data\DefaultClass(
+                new Job\Data\DataDefault(
                     array('sleepTime' => 500000)
                 )
             ),
-            new Job\DefaultClass(
+            new Job\JobDefault(
                 'base-3',
-                new Job\Data\DefaultClass(
+                new Job\Data\DataDefault(
                     array('sleepTime' => 1000000)
                 )
             )

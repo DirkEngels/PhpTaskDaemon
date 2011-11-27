@@ -14,7 +14,13 @@ namespace PhpTaskDaemon\Task\Manager;
  * This is the abstract class of a Daemon_Manager. It provides the basic 
  * methods needed for almost all managers. 
  */
-abstract class AbstractClass {
+abstract class ManagerAbstract {
+
+    /**
+     * Task name
+     * @var string
+     */
+    protected $_name = 'unknown';
 
     /**
      * 
@@ -26,13 +32,13 @@ abstract class AbstractClass {
 
     /**
      * Queue object
-     * @var \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
+     * @var \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
     protected $_timer = null;
 
     /**
      * Executor object
-     * @var \PhpTaskDaemon\Task\Manager\Process\AbstractClass
+     * @var \PhpTaskDaemon\Task\Manager\Process\TimerAbstract
      */
     protected $_process = null;
 
@@ -65,6 +71,28 @@ abstract class AbstractClass {
 
 
     /**
+     *
+     * Returns the task name 
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
+    }
+
+
+    /**
+     *
+     * Sets the task name 
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name) {
+        $this->_name = $name;
+        return $this;
+    }
+
+
+    /**
      * 
      * Returns the pid manager of the task manager
      * @return \PhpTaskDaemon\Pid\Manager
@@ -89,10 +117,10 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the current loaded queue array
-     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
     public function getTimer() {
-        if (!is_a($this->_timer, '\PhpTaskDaemon\Task\Manager\Timer\AbstractClass')) {
+        if (!is_a($this->_timer, '\PhpTaskDaemon\Task\Manager\Timer\TimerAbstract')) {
             $this->_timer = new \PhpTaskDaemon\Task\Manager\Timer\Interval();
         }
         return $this->_timer;
@@ -102,11 +130,11 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current queue to process.
-     * @param \PhpTaskDaemon\Task\Manager\Timer\AbstractClass $timer
+     * @param \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract $timer
      * @return $this
      */
     public function setTimer($timer) {
-        if (!is_a($timer, '\PhpTaskDaemon\Task\Manager\Timer\AbstractClass')) {
+        if (!is_a($timer, '\PhpTaskDaemon\Task\Manager\Timer\TimerAbstract')) {
             $timer = new \PhpTaskDaemon\Task\Manager\Timer\Interval();
         }
         $this->_timer = $timer;
@@ -118,11 +146,12 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the process object
-     * @return \PhpTaskDaemon\Task\Manager\Process\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract
      */
     public function getProcess() {
-        if (!is_a($this->_process, '\PhpTaskDaemon\Task\Manager\Process\AbstractClass')) {
+        if (!is_a($this->_process, '\PhpTaskDaemon\Task\Manager\Process\ProcessAbstract')) {
             $this->_process = new \PhpTaskDaemon\Task\Manager\Process\Same();
+            $this->_process->setName($this->_name);
         }
         return $this->_process;
     }
@@ -131,14 +160,15 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current executor object.
-     * @param \PhpTaskDaemon\Task\Manager\Process\AbstractClass $process
+     * @param \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract $process
      * @return $this
      */
     public function setProcess($process) {
-        if (!($process instanceof \PhpTaskDaemon\Task\Manager\Process\AbstractClass)) {
+        if (!($process instanceof \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract)) {
             $process = new \PhpTaskDaemon\Task\Manager\Process\Same();
         }
         $this->_process = $process;
+        $this->_process->setName($this->_name);
 
         return $this;
     }
@@ -150,12 +180,27 @@ abstract class AbstractClass {
      */
     public function runManager() {
         // Override signal handler
-        $this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
-            get_class($this),
-            array(&$this, 'sigHandler')
-        );
+//        $this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
+//            get_class($this),
+//            array(&$this, 'sigHandler')
+//        );
+
+        // Set taskname to queue ipc
+        $queueIpc = $this->getProcess()->getQueue()->getStatistics()->getIpc();
+        $queueIpc->setVar('name', $this->getName());
 
         $this->execute();
+    }
+
+
+    /**
+     * 
+     * The sleep function for an interval manager
+     */
+    protected function _sleep() {
+        // Sleep
+        \PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
+        usleep($this->_sleepTimeQueue);
     }
 
 
@@ -168,33 +213,22 @@ abstract class AbstractClass {
         switch ($sig) {
             case SIGTERM:
                 // Shutdown
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::log('Application (TASK) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
                 break;
             case SIGCHLD:
                 // Halt
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);        
+                \PhpTaskDaemon\Daemon\Logger::log('Application (TASK) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);
                 while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
                 break;
             case SIGINT:
                 // Shutdown
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::log('Application (TASK) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
                 break;
             default:
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::log('Application (TASK) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
                 break;
         }
         exit;
-    }
-
-
-    /**
-     * 
-     * The sleep function for an interval manager
-     */
-    protected function _sleep() {
-        // Sleep
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
-        usleep($this->_sleepTimeQueue);
     }
 
 }

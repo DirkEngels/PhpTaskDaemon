@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Queue\Statistics;
 
-interface InterfaceClass {
+interface StatisticsInterface {
 
     public function get();
     public function setStatusCount($status, $count); 

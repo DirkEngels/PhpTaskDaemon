@@ -8,53 +8,57 @@
  */
 
 namespace PhpTaskDaemon\Task\Executor\Status;
-
+use PhpTaskDaemon\Daemon\Ipc\IpcFactory;
 use PhpTaskDaemon\Daemon\Config;
+use PhpTaskDaemon\Daemon\Logger;
 
 /**
  * 
  * The abstract class encapsulate a set of methods of the Ipc class. 
  *
  */
-abstract class AbstractClass {
+abstract class StatusAbstract {
     /**
-     * @var \PhpTaskDaemon\Ipc
+     * @var \PhpTaskDaemon\Ipc\IpcAbstract
      */
     protected $_ipc;
+
+    /**
+     * Process ID
+     * @var integer
+     */
+    private $_pid;
 
 
     /**
      * 
      * The constructor sets the shared memory object. A default shared memory
      * object instance will be created when none provided.
-     * @param \PhpTaskDaemon\Ipc $ipc
+     * @param \PhpTaskDaemon\Ipc\IpcAbstract $ipc
      */
-    public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
-        $this->setIpc($ipc);
-    }
-
-
-    /**
-     * 
-     * Unset the shared memory at destruction time.
-     */
-    public function __destruct() {
-        unset($this->_ipc); 
+    public function __construct(\PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc = NULL) {
+        $this->_pid = getmypid();
+        if (!is_null($ipc)) {
+            $this->setIpc($ipc);
+        }
     }
 
 
     /**
      *
      * Returns the shared memory object
-     * @return PhpTaskDaemon\Ipc
+     * @return PhpTaskDaemon\Ipc\IpcAbstract
      */
     public function getIpc() {
-        if (is_null($this->_ipc)) {
-            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-            if (!class_exists($ipcClass)) {
-                $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+        if (getmypid() != $this->_pid) {
+            if (!(is_null($this->_ipc))) {
+                $this->_ipc = NULL;
+                $this->_pid = getmypid();
             }
-            $this->_ipc = new $ipcClass('phptaskdaemond-executor-' . getmypid());
+        }
+
+        if (is_null($this->_ipc)) {
+            $this->_ipc = IpcFactory::get(IpcFactory::NAME_EXECUTOR, $this->_pid);
         }
 
         return $this->_ipc;
@@ -64,15 +68,39 @@ abstract class AbstractClass {
     /**
      *
      * Sets a shared memory object
-     * @param \PhpTaskDaemon\Daemon\Ipc\Ipc $ipc
+     * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
      * @return $this
      */
     public function setIpc($ipc) {
-//        if (!is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
-//            $ipc = new \PhpTaskDaemon\Daemon\Ipc\None('status-' . getmypid());
-//        }
         $this->_ipc = $ipc;
         return TRUE;
+    }
+
+
+    /**
+     * Resets the current IPC object, so it can be (lazy) loaded again, which
+     * is usefull when forking processes.
+     * @return $this 
+     */
+    public function resetIpc() {
+        Logger::log('Resetting Status IPC', \Zend_Log::DEBUG);
+        $this->_ipc = NULL;
+        return $this;
+    }
+
+
+    /**
+     * Resets the current pid, needed for the IPC object. 
+     * @param integer $pid
+     * @return $this
+     */
+    public function resetPid($pid = NULL) {
+        if (is_null($pid)) {
+            $pid = getmypid();
+        }
+        Logger::log('Resetting Status PID (' . $pid . ')', \Zend_Log::DEBUG);
+        $this->_pid = $pid;
+        return $this;
     }
 
 

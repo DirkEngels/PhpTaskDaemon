@@ -1,0 +1,310 @@
+PhpTaskDaemon Tutorial
+======================
+
+Introduction
+------------
+PhpTaskDaemon is a library for creating a daemon running one or more background
+tasks. The daemon library scans for tasks and for each task a task manager will
+be started. The task manager determines what component types (for the executor 
+status, queue statistics and manager process, timer components) by looking at
+the configuration files and/or overloaded task component classes.
+
+Before you start the the tutorial you must have succesfully installed
+PhpTaskDaemon (See the INSTALL file for more information). The tutorial
+contains X tutorial lessons divided into Y sections. Many chapters contain an
+example task, which can be found in the application directory (<dir>/app/task).
+
+
+My first task
+-------------
+PhpTaskDaemon is an application framework library for creating daemons. It
+expects a certain class and directory structure for defining tasks in order to
+work properly. 
+
+To create a new task we will first create a new directory in the app/task
+directory for storing the task classes. The minimal example contains only a
+single class, called Executor, with a single 'run' method. The executor class
+manages executing a single job instance. Normally each tasks should at least
+contain three parts: reading the input, processing and returning the output.
+The task in the example below sleeps for a random amount of time before
+outputting the status 'done' and does not require any input.
+
+  <?php
+
+  namespace PhpTaskDaemon\Task\MyFirstTask;
+  use \PhpTaskDaemon\Task\Executor as TaskExecutor;
+
+  class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+      public function run() {
+          $job = $this->getJob();
+          $output = $job->getOutput();
+
+          // Sleep
+          usleep(random(100, 10000);
+
+          // Output (status)
+          $output()->set(array(
+              'returnStatus' => Statistics\DefaultClass::STATUS_DONE,
+          ));
+
+          return $job;
+      }
+  }
+
+
+Input & Output
+--------------
+Most task jobs require input in order to execute. The first step is to define a
+Queue object which loads task jobs which needs to be processed. In the example
+below a custom Queue object is defined, which loads randomly between 50 and 500
+jobs. Each job will contain a single input variable, called sleepTime, which
+defines the amount of sleep time for each executor.
+
+  <?php
+
+  namespace PhpTaskDaemon\Task\Example\Advanced;
+  use PhpTaskDaemon\Task\Queue as TaskQueue;
+  use \PhpTaskDaemon\Task\Job;
+
+  class Queue extends TaskQueue\AbstractClass implements TaskQueue\InterfaceClass {
+
+      public function load() {
+          $queue = array();
+          for ($i=0; $i<rand(50,500); $i++) {
+              array_push($queue,
+                  new Job\DefaultClass(
+                      'advanced-' . $i,
+                      new Job\Data\DefaultClass(
+                          array('sleepTime' => rand(10000, 100000))
+                      )
+                  )
+              );
+          }
+          return $queue;
+      }
+  }
+
+Next we need to adapt the earlier created task to use the input variable for
+the sleep method.
+
+  <?php
+
+  namespace PhpTaskDaemon\Task\MyFirstTask;
+
+  use \PhpTaskDaemon\Task\Executor as TaskExecutor;
+  use \PhpTaskDaemon\Task\Queue\Statistics;
+
+  class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+      public function run() {
+          $job = $this->getJob();
+          $input = $job->getInput();
+          $output = $job->getOutput();
+
+          // Input
+          $sleepTime = (int) $input->getVar('sleepTime');
+
+          // Sleep
+          usleep($sleepTimeProgress);
+
+          // Output (status)
+          $output->set(array(
+              'returnStatus' => Statistics\DefaultClass::STATUS_DONE,
+          ));
+
+          return $job;
+      }
+  }
+
+
+Task structure, configuration & logging
+---------------------------------------
+The PhpTaskDaemon library uses the configuration file and looks in the task
+directory for loading task components. The task directory is scanned
+recursively, so that tasks can easily be grouped. An extra argument (--task)
+for the command line tool can be used to filter tasks. Namespaces are used when
+defining tasks. 
+
+By default the daemon looks at least at two configuration files witin the 
+app/etc directory: daemon.ini, and app.ini. The daemon.ini configuration file
+contains global daemon options for logging, database access, runtime settings,
+and task defaults. The app.ini configuration file contains task specific 
+configuration options, which override the task default options. Besides the
+global configuration file, each task directory may contain a configuration file
+(task.ini) containing task specific configuration options.
+
+The daemon contains a logger component for logging messages loading the task
+queue and/or when executing tasks. The logfile and level can easily be
+overriden using one of the configuration files.
+
+
+Status & Statistics
+-------------------
+The job input in the example below only contains a sleepTime variable, which
+determines the amount of milliseconds to sleep. In the processing section of a
+task the sleep time will be divided into ten steps. Between each step the
+executor status will be saved to an IPC (inter process communication) object.
+
+By default the IPC adapter 'None' will be loaded for each task executor and
+queue object. This can easily be changed using one of the configuration files.
+By default the queue component stores the amount of loaded tasks and the
+progress of processing tasks using the ipc component. By default the manager
+updates the status of an executor before and after starting a task. The
+executor status can also be updated during the execution of a job by using the
+method updateStatus. In the example below the input variable sleepTime will be
+divided into 10 steps, and the status will be updated between each step.
+
+  <?php
+
+  namespace PhpTaskDaemon\Task\MyFirstTask;
+
+  use \PhpTaskDaemon\Task\Executor as TaskExecutor;
+  use \PhpTaskDaemon\Task\Queue\Statistics;
+
+  class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+      public function run() {
+          $job = $this->getJob();
+          $input = $job->getInput();
+          $output = $job->getOutput();
+
+          // Input
+          $sleepTime = (int) $input->getVar('sleepTime');
+
+          // Sleep
+          $sleepTimeProgress = round($sleepTime);
+          for ($i=1; $i<10; $i++) {
+              usleep($sleepTimeProgress);
+              $this->updateStatus(($i*10), 'Task data: ' . $job->getJobId());
+          }
+
+          // Output (status)
+          $output->set(array(
+              'returnStatus' => Statistics\DefaultClass::STATUS_DONE,
+          ));
+
+          return $job;
+      }
+  }
+
+
+Running & Monitoring the daemon
+-------------------------------
+A command line tool is provided with PhpTaskDaemon to start, stop and monitor
+the daemon. 
+
+  > ./phptaskdaemon 
+
+  Help
+  ====
+  Usage: ./phptaskdaemon [ options ]
+  --config-file|-c [ <string> ] Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)
+  --log-file|-l [ <string> ]    Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)
+  --action|-a <string>          Action (default: start) (options: start, stop, restart, status, monitor)
+  --list-tasks|--lt             List tasks
+  --settings|-s                 Display tasks settings
+  --task|-t <string>            Run single task
+  --verbose|-v [ <integer> ]    Verbose
+  --help|-h                     Show help message (this message)
+
+The '--list-tasks' option is used for scanning the task directory and listing
+the found tasks.
+
+  > ./phptaskdaemon --list-tasks
+
+
+The configuration of the found tasks can be displayed using the '--settings'
+argument. The '--task' option is used for filter the found tasks.
+
+  > ./phptaskdaemon --settings --task Tutorial
+
+
+The daemon can be started or stopped (with extra verbosity) using the following
+commands:
+
+  > ./phptaskdaemon --verbose 9 --action start
+
+  > ./phptaskdaemon --action stop
+
+
+The current statistics & status of the daemon can be viewed using the following
+commands. When using the '--monitor' argument the daemon state will be updated
+regularly.
+
+  > ./phptaskdaemon --status
+
+  PhpTaskDaemon - Status
+ ======================
+  [12733]: Queue 	(Progress: 1/3	Done: 28	Failed: 0)
+  - [12733]: 	70%:	Task data: base-2
+
+
+  > ./phptaskdaemon --monitor
+
+
+Managers
+========
+
+
+Processes
+---------
+PhpTaskDaemon supports multiple process types, which are used to define the
+process type of an executor. By default the jobs are executed within the same
+process as the queue (same process id). Another option is to execute a job in a
+seperate child process (process type: child). Another option is to isolate the
+execution of the job in a seperate child process using the system call (process
+type: system). Another solution is to run the jobs in parallel child processes,
+so multiple jobs can be executed in parallel. This is usefull when the job
+execution accesses external resources and the executor process has to wait for
+it (process type: parallel). 
+
+
+Timers
+------
+The default manager loaded a queue, executes all the jobs and waits for a
+certain time before running again. This sleeping time is controlled by the
+timer component. By default PhpTaskDaemon contains three timer component
+adapters: none, interval & cron. With the interval timer, each job can output a
+variable (sleepTime) for the interval timer. After finishing all jobs in a
+queue, the minimum returned sleepTime value is used for the timer. In case of
+the cron timer the timer returns the amount of seconds between now and the next
+time the cron should run. The process timer 'None' is used in cases when a
+timer does not make sense, such as the gearman manager.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Basics
+======
+
+Lesson 1: Your first tasks
+Lesson 2: Task loading
+Lesson 3: Adding queue statistics & executor status
+Lesson 4: More advanced tasks
+
+
+Managers
+========
+
+Lesson 1: Gearman
+Lesson 2: Extending
+
+Queues
+======
+Lesson 1: DataBase
+Lesson 2: FileSystem

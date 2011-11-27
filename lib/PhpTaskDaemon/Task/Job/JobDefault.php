@@ -1,21 +1,14 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Manager
+ * @subpackage Task\Job
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon\Task\Manager;
+namespace PhpTaskDaemon\Task\Job;
 
-/**
- * 
- * This is the interface for a Daemon_Manager. What more can I say?
- * 
- */
-interface InterfaceClass {
-
-    public function execute();
+class JobDefault extends JobAbstract implements JobInterface {
 
 }

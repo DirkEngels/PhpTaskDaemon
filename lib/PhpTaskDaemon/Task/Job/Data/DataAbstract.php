@@ -15,7 +15,7 @@ namespace PhpTaskDaemon\Task\Job\Data;
  * variables. The abstract class also implements a check method for the input
  * used by the managers. 
  */
-abstract class AbstractClass {
+abstract class DataAbstract {
 
     protected $_data = array();
 

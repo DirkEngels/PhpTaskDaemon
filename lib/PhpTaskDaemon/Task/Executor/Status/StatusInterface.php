@@ -1,21 +1,16 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Job\Data
+ * @subpackage Task\Executor\Status
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
+namespace PhpTaskDaemon\Task\Executor\Status;
 
-namespace PhpTaskDaemon\Task\Job\Data;
+interface StatusInterface {
 
-interface InterfaceClass {
-
-    public function getKeys();
     public function get();
-    public function set($data);
-    public function getVar($key);
-    public function setVar($key, $value);
-    public function validate();
+    public function set($status);
 
 }

@@ -31,6 +31,7 @@ class Factory {
     const TYPE_EXECUTOR = 'executor';
     const TYPE_STATUS = 'status';
 
+    const IPC_DAEMON = 'queue';
     const IPC_QUEUE = 'queue';
     const IPC_EXECUTOR = 'executor';
 
@@ -38,7 +39,7 @@ class Factory {
      * Instantiates a new Manager object and injects all needed components 
      * based on the class definitions, configurations settings and defaults.
      * @param $taskName
-     * @return \PhpTaskDaemon\Task\Manager\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */
     public static function get($taskName) {
         $msg = 'Task Factory: ' . $taskName;
@@ -46,7 +47,7 @@ class Factory {
         \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
 
         $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
-        if ($executor instanceof \PhpTaskDaemon\Task\Executor\DefaultClass) {
+        if ($executor instanceof \PhpTaskDaemon\Task\Executor\ExecutorDefault) {
             throw new \Exception('Task has no defined executor');
         }
 
@@ -111,17 +112,19 @@ class Factory {
     /**
      * Returns the manager timer for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */
     public static function getManager($taskName) {
-        return self::getComponentType($taskName, self::TYPE_MANAGER);
+        $manager = self::getComponentType($taskName, self::TYPE_MANAGER);
+        $manager->setName($taskName);
+        return $manager;
     }
 
 
     /**
      * Returns the manager timer for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Manager\Timer\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
     public static function getManagerTimer($taskName) {
         return self::getComponentType($taskName, self::TYPE_TRIGGER);
@@ -131,17 +134,19 @@ class Factory {
     /**
      * Returns the manager process for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Manager\Process\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract
      */
     public static function getManagerProcess($taskName) {
-        return self::getComponentType($taskName, self::TYPE_PROCESS);
+        $process = self::getComponentType($taskName, self::TYPE_PROCESS);
+        $process->setName($taskName);
+        return $process;
     }
 
 
     /**
      * Returns the executor status for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Executor\Status\AbstractClass
+     * @return \PhpTaskDaemon\Task\Executor\Status\StatusAbstract
      */
     public static function getExecutor($taskName) {
         return self::getComponentType($taskName, self::TYPE_EXECUTOR);
@@ -151,7 +156,7 @@ class Factory {
     /**
      * Returns the executor status for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Executor\Status\AbstractClass
+     * @return \PhpTaskDaemon\Task\Executor\Status\StatusAbstract
      */
     public static function getExecutorStatus($taskName) {
         return self::getComponentType($taskName, self::TYPE_STATUS);
@@ -161,7 +166,7 @@ class Factory {
     /**
      * Returns the queue for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Queue\AbstractClass
+     * @return \PhpTaskDaemon\Task\Queue\QueueAbstract
      */
     public static function getQueue($taskName) {
         return self::getComponentType($taskName, self::TYPE_QUEUE);
@@ -171,19 +176,10 @@ class Factory {
     /**
      * Returns the queue statistics for the specified task
      * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass
+     * @return \PhpTaskDaemon\Task\Queue\Statistics\StatisticsAbstract
      */
     public static function getQueueStatistics($taskName) {
         return self::getComponentType($taskName, self::TYPE_STATISTICS);
-    }
-
-
-    public static function getIpc($taskName, $type = self::IPC_QUEUE) {
-        $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-        if (!class_exists($ipcClass)) {
-            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
-        }
-        return new $ipcClass('phptaskdaemond-' . $type . '-' . getmypid());
     }
 
 
@@ -193,7 +189,7 @@ class Factory {
      * @param string $objectType
      * @return string
      */
-    protected function _getClassName($taskName, $objectType) {
+    public static function _getClassName($taskName, $objectType) {
         return Daemon\Config::get()->getOptionValue('global.namespace') . '\\'. str_replace('/', '\\', $taskName) . '\\' . ucfirst($objectType);
     }
 
@@ -303,27 +299,27 @@ class Factory {
      * @param string $objectType
      * @return null|StdClass
      */
-    protected function _getObjectDefault($taskName, $objectType) {
+    public static function _getObjectDefault($taskName, $objectType) {
         $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Default';
-        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+        \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
 
         switch($objectType) {
             case 'manager':
-                return new \PhpTaskDaemon\Task\Manager\DefaultClass(
+                return new \PhpTaskDaemon\Task\Manager\ManagerDefault(
                     self::getComponentType($taskName, self::TYPE_EXECUTOR)
                 );
             case 'timer':
                 return new \PhpTaskDaemon\Task\Manager\Timer\Interval();
             case 'queue':
-                return new \PhpTaskDaemon\Task\Queue\DefaultClass();
+                return new \PhpTaskDaemon\Task\Queue\QueueDefault();
             case 'statistics':
-                return new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
+                return new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault();
             case 'process':
                 return new \PhpTaskDaemon\Task\Manager\Process\Same();
             case 'executor':
-                return new \PhpTaskDaemon\Task\Executor\DefaultClass();
+                return new \PhpTaskDaemon\Task\Executor\ExecutorDefault();
             case 'status':
-                return new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
+                return new \PhpTaskDaemon\Task\Executor\Status\StatusDefault();
         }
         throw new Exception\UndefinedObjectType('Unknown object type: ' . $objectType);
 

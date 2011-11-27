@@ -7,7 +7,7 @@ use \PhpTaskDaemon\Task\Queue\Statistics;
 
 require_once(__DIR__ . '/Queue.php');
 
-class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+class Executor extends TaskExecutor\ExecutorAbstract implements TaskExecutor\ExecutorInterface {
     public function run() {
         $job = $this->getJob();
 

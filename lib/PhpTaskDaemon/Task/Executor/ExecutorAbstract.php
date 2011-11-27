@@ -13,7 +13,7 @@ namespace PhpTaskDaemon\Task\Executor;
  * The executor abstract class implements a method for updating the status and
  * provides setters and getters for the status and job instance. 
  */
-abstract class AbstractClass {
+abstract class ExecutorAbstract {
 
 	protected $_job = NULL;
 
@@ -22,7 +22,7 @@ abstract class AbstractClass {
     /**
      * 
      * Optional a executor status object can be provided. 
-     * @param \PhpTaskDaemon\Task\Executor\Status $status
+     * @param \PhpTaskDaemon\Task\Executor\StatusAbstract $status
      */
     public function __construct($status = NULL) {
         $this->setStatus($status);
@@ -32,7 +32,7 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the current job.
-     * @return \PhpTaskDaemon\Task\Job
+     * @return \PhpTaskDaemon\Task\Job\JobAbstract
      */
     public function getJob() {
         return $this->_job;
@@ -42,7 +42,7 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current job
-     * @param \PhpTaskDaemon\Task\Job $job
+     * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
      */
     public function setJob($job) {
         $this->_job = $job;
@@ -52,7 +52,7 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the current status object, if set.
-     * @return \PhpTaskDaemon\Task\Executor\Status $status
+     * @return \PhpTaskDaemon\Task\Executor\Status\StatusAbstract $status
      */
     public function getStatus() {
         return $this->_status;
@@ -62,7 +62,7 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current status object
-     * @param \PhpTaskDaemon\Task\Executor\Status $status
+     * @param \PhpTaskDaemon\Task\Executor\Status\StatusAbstract $status
      */
     public function setStatus($status) {
         $this->_status = $status;

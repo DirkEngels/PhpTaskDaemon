@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Process;
 
-interface InterfaceClass {
+interface ProcessInterface {
 
     public function run();
 

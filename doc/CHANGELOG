@@ -6,6 +6,7 @@ Version 1.0 (roadmap)
 - Add tools (init.d script)
 - Add example tasks
 - Create user documentation (doc dir + website/wiki)
+- Clean up pid & ipc resources
 
 
 Version 0.8.4 (planned)
@@ -13,11 +14,11 @@ Version 0.8.4 (planned)
 + Refactor manager
     + Move queue class to the process class
     + Add process pid ID to the logger log method
-- Implement manager process
++ Implement manager process
     + Same
-    - Child
-    - Parallel
-- Clean up pid & ipc resources
+    + Child
+    + Parallel
++ Refactor AbstractClasses -> ObjectAbstract
 
 
 Version 0.8.3 (30-10-2011)
@@ -110,6 +111,7 @@ Version 0.7 (05-07-2011)
     + Same
 + Refactor manager to use processes & triggers
 
+
 Verison 0.6 (04-06-2011)
 ---------------------
 + read and use configuration file
@@ -117,15 +119,18 @@ Verison 0.6 (04-06-2011)
 + update status shared memory variables
 + store batch nr, and status counts
 
+
 Version 0.5 (11-04-2011)
 ------------------------
 + add unit tests for all classes, except for some daemon classes (forks)
 + fix broken unit tests caused by the class restructuring in version 0.4
 
+
 Version 0.4.1 (06-04-2011)
 --------------------------
 + cleanup code
 + add code documentation
+
 
 Version 0.4 (06-04-2011)
 ------------------------
@@ -134,19 +139,23 @@ Version 0.4 (06-04-2011)
 + implement verbose logging
 + refactor class structure (seperate queue loading and task exection)
 
+
 Version 0.3 (04-02-2011)
 ------------------------
 + namespaces
 + restructure shared memory variables
+
 
 Version 0.2 (22-01-2011)
 ------------------------
 + simple concept of web interface for monitoring the daemon
 + move files according zend framework structure
 
+
 Version 0.1.1 (21-01-2011)
 --------------------------
 + Added this line
+
 
 Version 0.1 (21-01-2011)
 ------------------------

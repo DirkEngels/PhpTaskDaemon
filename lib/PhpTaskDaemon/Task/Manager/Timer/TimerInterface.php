@@ -1,15 +1,16 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Executor
+ * @subpackage Task\Manager\Timer
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
-namespace PhpTaskDaemon\Task\Executor;
 
-interface InterfaceClass {
+namespace PhpTaskDaemon\Task\Manager\Timer;
 
-    public function run();
+interface TimerInterface {
+
+    public function timeToWait();
 
 }

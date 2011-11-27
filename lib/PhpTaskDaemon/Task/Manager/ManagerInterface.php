@@ -1,16 +1,19 @@
 <?php
 /**
  * @package PhpTaskDaemon
- * @subpackage Task\Manager\Timer
+ * @subpackage Task\Manager
  * @copyright Copyright (C) 2011 Dirk Engels Websolutions. All rights reserved.
  * @author Dirk Engels <d.engels@dirkengels.com>
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 
-namespace PhpTaskDaemon\Task\Manager\Timer;
+namespace PhpTaskDaemon\Task\Manager;
 
-interface InterfaceClass {
+/**
+ * This is the interface for a Daemon_Manager. What more can I say?
+ */
+interface ManagerInterface {
 
-    public function timeToWait();
+    public function execute();
 
 }

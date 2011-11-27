@@ -17,7 +17,7 @@ use PhpTaskDaemon\Daemon\Logger;
  * The Daemon\Ipc\DataBase class is responsible for storing and retrieving
  * inter process communication data from the database.
  */
-class DataBase extends AbstractClass implements InterfaceClass {
+class DataBase extends IpcAbstract implements IpcInterface {
 
     /**
      * PDO Object
@@ -38,11 +38,21 @@ class DataBase extends AbstractClass implements InterfaceClass {
     }
 
 
+    public function initResource() {
+        $this->_pdo = NULL;
+        $this->_stmt = NULL;
+    }
+
+
     /**
      * Getter for the PDO object
      * @return \PDO
      */
     public function getPdo() {
+        if (is_null($this->_pdo)) {
+            $this->_dbSetup();
+        }
+
         return $this->_pdo;
     }
 
@@ -100,7 +110,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
      */
     public function setVar($name, $value) {
 
-        $sql = "REPLACE INTO ipc (ipcId, name, value) VALUES (:ipcId, :name, :value)";
+        $sql = "REPLACE INTO ipc (ipcUpdated, ipcId, name, value) VALUES (NOW(), :ipcId, :name, :value)";
         $params = array(
             'ipcId' => $this->_id,
             'name' => $name,
@@ -117,7 +127,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function incrementVar($name, $count = 1) {
-        $this->_pdo->beginTransaction();
+        $this->getPdo()->beginTransaction();
 
         $value = $this->getVar($name);
         if (!isset($value)) {
@@ -137,21 +147,14 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function decrementVar($name, $count = 1) {
-        $this->_pdo->beginTransaction();
+        $this->getPdo()->beginTransaction();
 
         $value = $this->getVar($name);
         if (!isset($value)) {
             $value = 0;
         }
         $value -= $count;
-
-        $sql = "UPDATE ipc SET value=:value WHERE ipcId=:ipcId AND name=:name";
-        $params = array(
-            'ipcId' => $this->_id,
-            'name' => $name,
-            'value' => serialize($value),
-        );
-        $this->_dbStatement($sql, $params);
+        $this->setVar($name, $value);
 
         return $this->getPdo()->commit();
     }
@@ -179,7 +182,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function remove() {
-        $sql = "DELETE FROM ipc WHERE ipdKey=:ipcId";
+        $sql = "DELETE FROM ipc WHERE ipcId=:ipcId";
         $params = array(
             'ipcId' => $this->_id,
         );
@@ -210,9 +213,10 @@ class DataBase extends AbstractClass implements InterfaceClass {
                     $this->_pdo = new \PDO("sqlite::memory");
                     break;
             }
-            Logger::get()->log('Succesfully initialized the DB PDO driver (type: ' . Config::get()->getOptionValue('db.adapter') . ')', \Zend_Log::INFO);
+            Logger::log('Succesfully initialized the DB PDO driver (type: ' . Config::get()->getOptionValue('db.adapter') . ')', \Zend_Log::DEBUG);
         } catch (\Exception $e) {
-            Logger::get()->log('Could not initialize the DB PDO driver:' . $e->getMessage(), \Zend_Log::ERR);
+            echo $e->getMessage();
+            Logger::log('Could not initialize the DB PDO driver:' . $e->getMessage(), \Zend_Log::ERR);
         }
     }
 
@@ -223,7 +227,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
      * @return integer
      */
     protected function _dbStatement($sql, $params = array()) {
-        Logger::get()->log('Executing SQL Statement: ' . $sql . ' with params: ' . var_export($params, true), \Zend_Log::DEBUG);
+        Logger::log('Executing SQL Statement: ' . $sql . ' with params: ' . var_export($params, true), \Zend_Log::DEBUG);
         $this->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         try {
             $this->_stmt = $this->getPdo()->prepare($sql);
@@ -232,7 +236,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
             }
             return $this->_stmt->execute($params);
         } catch (\Exception $e) {
-            Logger::get()->log('Failed to execute SQL Statement: ' . $e->getMessage(), \Zend_Log::DEBUG);
+            Logger::log('Failed to execute SQL Statement: ' . $e->getMessage(), \Zend_Log::DEBUG);
         }
     }
 

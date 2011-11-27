@@ -53,7 +53,7 @@ class Config {
      * Singleton getter
      * @return \PhpTaskDaemon\Daemon\Config
      */
-    public function get($configFiles = array()) {
+    public static function get($configFiles = array()) {
         if (count($configFiles) > 0) {
             self::$_instance = NULL;
         }
@@ -145,7 +145,7 @@ class Config {
             }
         }
 
-        Logger::log('Config option result: ' . $option . ' => ' . $value . ' (' . $source . ')', \Zend_Log::NOTICE);
+        Logger::log('Config option result: ' . $option . ' => ' . $value . ' (' . $source . ')', \Zend_Log::DEBUG);
         $out = array($source, $value);
         return $out;
     }

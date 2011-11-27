@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Timer;
 
-abstract class AbstractClass {
+abstract class TimerAbstract {
 
     /**
      * Returns the time to wait before to run again.
