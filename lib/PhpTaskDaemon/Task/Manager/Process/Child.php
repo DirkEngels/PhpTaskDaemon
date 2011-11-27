@@ -10,11 +10,10 @@
 namespace PhpTaskDaemon\Task\Manager\Process;
 use PhpTaskDaemon\Daemon\Logger;
 
-class Child extends AbstractClass implements InterfaceClass {
+class Child extends ProcessAbstract implements ProcessInterface {
 
     /**
      * Forks the task to a seperate process
-     * @param \PhpTaskDaemon\Task\Job $job
      */
     public function run() {
 

@@ -11,7 +11,7 @@ namespace PhpTaskDaemon\Task\Manager\Process;
 
 use PhpTaskDaemon\Daemon\Logger;
 
-abstract class AbstractClass {
+abstract class ProcessAbstract {
 
     const SLEEPTIME = 100;
     protected $_name = NULL;
@@ -50,11 +50,11 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the current loaded queue array
-     * @return \PhpTaskDaemon\Task\Queue\AbstractClass
+     * @return \PhpTaskDaemon\Task\Queue\QueueAbstract
      */
     public function getQueue() {
-        if (!($this->_queue instanceof \PhpTaskDaemon\Task\Queue\AbstractClass)) {
-            $this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass();
+        if (!($this->_queue instanceof \PhpTaskDaemon\Task\Queue\QueueAbstract)) {
+            $this->_queue = new \PhpTaskDaemon\Task\Queue\QueueDefault();
         }
         return $this->_queue;
     }
@@ -63,11 +63,11 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current queue to process.
-     * @param \PhpTaskDaemon\Task\Queue\AbstractClass $queue
+     * @param \PhpTaskDaemon\Task\Queue\QueueAbstract $queue
      * @return $this
      */
     public function setQueue($queue) {
-        if (!($queue instanceof \PhpTaskDaemon\Task\Queue\AbstractClass)) {
+        if (!($queue instanceof \PhpTaskDaemon\Task\Queue\QueueAbstract)) {
             throw new \Exception('Invalid Queue object');
         }
         $this->_queue = $queue;
@@ -79,11 +79,11 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the executor object
-     * @return \PhpTaskDaemon\Task\Executor\AbstractClass
+     * @return \PhpTaskDaemon\Task\Executor\ExecutorAbstract
      */
     public function getExecutor() {
-        if (!is_a($this->_executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
-            $this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass();
+        if (!is_a($this->_executor, '\PhpTaskDaemon\Task\Executor\ExecutorAbstract')) {
+            $this->_executor = new \PhpTaskDaemon\Task\Executor\ExecutorDefault();
         }
         return $this->_executor;
     }
@@ -92,11 +92,11 @@ abstract class AbstractClass {
     /**
      * 
      * Sets the current executor object.
-     * @param \PhpTaskDaemon\Task\Executor\AbstractClass $executor
+     * @param \PhpTaskDaemon\Task\Executor\ExecutorAbstract $executor
      * @return $this
      */
     public function setExecutor($executor) {
-        if (is_a($executor, '\PhpTaskDaemon\Task\Executor\AbstractClass')) {
+        if (is_a($executor, '\PhpTaskDaemon\Task\Executor\ExecutorAbstract')) {
             $this->_executor = $executor;
         }
 
@@ -106,7 +106,7 @@ abstract class AbstractClass {
 
     /**
      * Gets the job
-     * @return array[\PhpTaskDaemon\Task\Job\AbstractClass]
+     * @return array[\PhpTaskDaemon\Task\Job\JobAbstract]
      */
     public function getJobs() {
         return $this->_jobs;
@@ -115,7 +115,7 @@ abstract class AbstractClass {
 
     /**
      * Sets the jobs
-     * @param array $jobs
+     * @param array[\PhpTaskDaemon\Task\Job\JobAbstract] $jobs
      * @return $this
      */
     public function setJobs($jobs) {
@@ -128,9 +128,9 @@ abstract class AbstractClass {
      * 
      * Process a single task: set job input, reset status, run and update
      * statistics
-     * @param \PhpTaskDaemon\Task\Job\AbstractClass $job
+     * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
      */
-    protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
+    protected function _processTask(\PhpTaskDaemon\Task\Job\JobAbstract $job) {
         // Set manager input
         \PhpTaskDaemon\Daemon\Logger::log(getmypid() . ": Started: " . $job->getJobId(), \Zend_Log::DEBUG);
         $executor = $this->getExecutor();
@@ -160,7 +160,7 @@ abstract class AbstractClass {
 
     /**
      * Forks a single tasks.
-     * @param unknown_type $job
+     * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
      */
     protected function _forkTask($job) {
         // Fork the manager

@@ -9,14 +9,14 @@
 
 namespace PhpTaskDaemon\Task\Manager\Process;
 
-class Parallel extends AbstractClass implements InterfaceClass {
+class Parallel extends ProcessAbstract implements ProcessInterface {
 
     protected $_maxProcess = 3;
 
 
     /**
-     * (non-PHPdoc)
-     * @see lib/PhpTaskDaemon/Task/Manager/Process/PhpTaskDaemon\Task\Manager\Process.InterfaceClass::run()
+     * Spawns multiple child processes in order to execute proceses in
+     * parallel.
      */
     public function run() {
         $currentChilds = 0;

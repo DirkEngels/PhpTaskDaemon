@@ -9,8 +9,11 @@
 
 namespace PhpTaskDaemon\Task\Manager\Process;
 
-class Same extends AbstractClass implements InterfaceClass {
+class Same extends ProcessAbstract implements ProcessInterface {
 
+    /**
+     * Executes a job within the same process.
+     */
     public function run() {
         $this->getQueue()->getStatistics()->getIpc()->setVar('executors', array(getmypid()));
 
