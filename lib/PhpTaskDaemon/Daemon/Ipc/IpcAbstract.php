@@ -16,7 +16,7 @@ use PhpTaskDaemon\Daemon\Logger;
  * method for retrieving all registered keys.
  * 
  */
-abstract class AbstractClass {
+abstract class IpcAbstract {
 
     /**
      * Unique identifier

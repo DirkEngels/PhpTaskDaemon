@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Daemon\Ipc;
 
-interface InterfaceClass {
+interface IpcInterface {
 
     public function getKeys();
     public function getVar($key);

@@ -29,7 +29,7 @@ class IpcFactory {
     /**
      * Instantiates a new Ipc object.
      * @param $ipcType
-     * @return \PhpTaskDaemon\Task\Manager\AbstractClass
+     * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */
     public static function get($type = self::NAME_DAEMON, $id = NULL, $taskName = NULL) {
         if (is_null($id)) {

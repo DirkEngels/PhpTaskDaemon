@@ -16,7 +16,7 @@ use PhpTaskDaemon\Daemon\Logger;
  * memory segments. The keys of the shared memory variables are stored in an
  * array.
  */
-class SharedMemory extends AbstractClass implements InterfaceClass {
+class SharedMemory extends IpcAbstract implements IpcInterface {
 
     /**
      * This variable contains a unique identifier.

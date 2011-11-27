@@ -17,7 +17,7 @@ use PhpTaskDaemon\Daemon\Logger;
  * The Daemon\Ipc\DataBase class is responsible for storing and retrieving
  * inter process communication data from the database.
  */
-class DataBase extends AbstractClass implements InterfaceClass {
+class DataBase extends IpcAbstract implements IpcInterface {
 
     /**
      * PDO Object
