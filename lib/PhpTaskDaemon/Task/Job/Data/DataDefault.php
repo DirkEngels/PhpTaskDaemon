@@ -9,13 +9,6 @@
 
 namespace PhpTaskDaemon\Task\Job\Data;
 
-interface InterfaceClass {
-
-    public function getKeys();
-    public function get();
-    public function set($data);
-    public function getVar($key);
-    public function setVar($key, $value);
-    public function validate();
+class DataDefault extends DataAbstract implements DataInterface {
 
 }
