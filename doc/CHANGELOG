@@ -4,13 +4,21 @@ Change Log
 Version 1.0 (roadmap)
 ---------------------
 - Add tools (init.d script)
-- Add example tasks
 - Create user documentation (doc dir + website/wiki)
-- Clean up pid & ipc resources
 
 
-Version 0.8.4 (planned)
+Version 0.8.5 (planned)
 -----------------------
+- Clean up pid & ipc resources
+- Add example tasks
+- Add tutorial
+- Refactor status into executor
+- Refactor statistics into queue
+
+
+
+Version 0.8.4 (27-11-2011)
+==========================
 + Refactor manager
     + Move queue class to the process class
     + Add process pid ID to the logger log method
@@ -22,7 +30,7 @@ Version 0.8.4 (planned)
 
 
 Version 0.8.3 (30-10-2011)
-==========================
+--------------------------
 + Implement daemon status action
     + define (recursive) data structure of ipc segments
     + read multiple ipc adapter types 
