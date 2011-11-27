@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Process;
 
-class Parallel extends ProcessAbstract implements ProcessInterface {
+class Parallel extends Child {
 
     protected $_maxProcess = 3;
 
