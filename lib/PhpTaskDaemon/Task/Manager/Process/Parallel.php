@@ -13,26 +13,14 @@ class Parallel extends ProcessAbstract implements ProcessInterface {
 
     protected $_maxProcess = 3;
 
+    public function runParent($pid) {
+        // The manager waits later
+        \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
 
-    /**
-     * Spawns multiple child processes in order to execute proceses in
-     * parallel.
-     */
-    public function run() {
-        $currentChilds = 0;
-
-        $jobs = $this->getJobs();
-        while(count($jobs)>0) {
-            if ($currentChilds<$this->_maxProcess) {
-                $job = array_shift($jobs);
-
-                $this->_forkTask($job);
-            }
-        }
-
-        for ($i = $currentChilds; $i<$this->_maxProcess; $i++) {
-            $this->_forkTask($job);
-            $currentChilds++;
+        try {
+            $res = pcntl_waitpid($pid, $status);
+        } catch (Exception $e) {
+            echo $e->getMessage();
         }
     }
 
