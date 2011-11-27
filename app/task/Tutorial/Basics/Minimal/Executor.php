@@ -6,7 +6,7 @@ use \PhpTaskDaemon\Task\Executor as TaskExecutor;
 use \PhpTaskDaemon\Task\Queue\Statistics;
 use \PhpTaskDaemon\Daemon\Logger;
 
-class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+class Executor extends TaskExecutor\ExecutorAbstract implements TaskExecutor\ExecutorInterface {
 
     public function run() {
         $job = $this->getJob();
@@ -27,7 +27,7 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         // Output (status)
         $job->getOutput()->set(array(
-            'returnStatus' => Statistics\DefaultClass::STATUS_DONE,
+            'returnStatus' => Statistics\StatisticsDefault::STATUS_DONE,
         ));
 
         return $job;
