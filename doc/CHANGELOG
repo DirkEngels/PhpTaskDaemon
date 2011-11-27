@@ -14,10 +14,10 @@ Version 0.8.4 (planned)
 + Refactor manager
     + Move queue class to the process class
     + Add process pid ID to the logger log method
-- Implement manager process
++ Implement manager process
     + Same
     + Child
-    - Parallel
+    + Parallel
 + Refactor AbstractClasses -> ObjectAbstract
 
 
