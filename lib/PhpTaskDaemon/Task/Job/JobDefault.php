@@ -9,6 +9,6 @@
 
 namespace PhpTaskDaemon\Task\Job;
 
-class DefaultClass extends AbstractClass implements InterfaceClass {
+class JobDefault extends JobAbstract implements JobInterface {
 
 }

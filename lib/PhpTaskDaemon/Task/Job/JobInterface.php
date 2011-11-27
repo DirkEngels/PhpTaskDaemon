@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Job;
 
-interface InterfaceClass {
+interface JobInterface {
 
     public function getJobId();
     public function setJobId($jobId);
