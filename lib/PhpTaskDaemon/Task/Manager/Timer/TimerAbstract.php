@@ -9,8 +9,13 @@
 
 namespace PhpTaskDaemon\Task\Manager\Timer;
 
-interface InterfaceClass {
+abstract class TimerAbstract {
 
-    public function timeToWait();
+    /**
+     * Returns the time to wait before to run again.
+     */
+    public function timeToWait() {
+        return 1;
+    }
 
 }

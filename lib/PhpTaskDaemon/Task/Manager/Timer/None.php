@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Timer;
 
-class None extends AbstractClass implements InterfaceClass {
+class None extends TimerAbstract implements TimerInterface {
 
     /**
      * Returns the time to wait.
