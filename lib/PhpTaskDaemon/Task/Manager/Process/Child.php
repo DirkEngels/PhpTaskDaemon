@@ -12,6 +12,8 @@ use PhpTaskDaemon\Daemon\Logger;
 
 class Child extends ProcessAbstract implements ProcessInterface {
 
+    protected $_childCount = 0;
+
     /**
      * Forks the task to a seperate process
      */
@@ -20,6 +22,7 @@ class Child extends ProcessAbstract implements ProcessInterface {
         $jobs = $this->getJobs();
         foreach($jobs as $job) {
             $pid = pcntl_fork();
+            $this->_childCount++;
 
             if ($pid == -1) {
                 die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
@@ -28,7 +31,7 @@ class Child extends ProcessAbstract implements ProcessInterface {
                 $this->runParent($pid);
             } else {
                 // Run child process
-                $this->runChild();
+                $this->runChild($job);
             }
         }
 
@@ -41,13 +44,14 @@ class Child extends ProcessAbstract implements ProcessInterface {
 
         try {
             $res = pcntl_waitpid($pid, $status);
+            $this->_childCount--;
         } catch (Exception $e) {
             echo $e->getMessage();
         }
     }
 
 
-    public function runChild() {
+    public function runChild($job) {
         $this->getExecutor()->getStatus()->resetPid();
         $this->getExecutor()->getStatus()->resetIpc();
         $this->getQueue()->getStatistics()->resetIpc();
