@@ -10,11 +10,9 @@
 namespace PhpTaskDaemon\Task\Manager;
 
 /**
- * 
  * This is the interface for a Daemon_Manager. What more can I say?
- * 
  */
-interface InterfaceClass {
+interface ManagerInterface {
 
     public function execute();
 

@@ -14,7 +14,7 @@ use PhpTaskDaemon\Task\Job;
  * The manager base class does notting, but is defined for unit testing
  * purposes.
  */
-class DefaultClass extends AbstractClass implements InterfaceClass {
+class ManagerDefault extends ManagerAbstract implements ManagerInterface {
 
     public function execute() {
         while (true) {

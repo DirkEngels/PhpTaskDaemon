@@ -9,11 +9,10 @@
 
 namespace PhpTaskDaemon\Task\Manager;
 
-class Gearman extends AbstractClass implements InterfaceClass {
+class Gearman extends ManagerAbstract implements ManagerInterface {
 
     /**
-     * (non-PHPdoc)
-     * @see lib/PhpTaskDaemon/Task/Manager/PhpTaskDaemon\Task\Manager.InterfaceClass::execute()
+     * Starts a gearman worker
      */
     public function execute() {
         $gearmanWorker= new \GearmanWorker();
@@ -39,9 +38,9 @@ class Gearman extends AbstractClass implements InterfaceClass {
      */
     public function processGearmanTask($gearmanJob) {
         $data = $gearmanJob->workload();
-        $job = new \PhpTaskDaemon\Task\Job\DefaultClass();
-        $job->setInput(
-            new \PhpTaskDaemon\Task\Job\Data\DefaultClass(
+        $job = new \PhpTaskDaemon\Task\Job\JobDefault(
+            'gearman-' . getmypid(),
+            new \PhpTaskDaemon\Task\Job\Data\JobDefault(
                 array('gearmanData' => $data)
             )
         );
