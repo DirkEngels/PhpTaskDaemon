@@ -19,7 +19,7 @@ use PhpTaskDaemon\Daemon\Logger;
  * the status count of executed jobs and the number of loaded and processed
  * items in the queue.
  */
-abstract class AbstractClass {
+abstract class StatisticsAbstract {
 
     const STATUS_LOADED = 'loaded';
     const STATUS_QUEUED = 'queued';
@@ -34,9 +34,9 @@ abstract class AbstractClass {
      *
      * The constructor sets the shared memory object. A default shared memory
      * object instance will be created when none provided.
-     * @param \PhpTaskDaemon\Ipc $ipc
+     * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
      */
-    public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
+    public function __construct(\PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc = NULL) {
         $this->_pid = getmypid();
         if (!is_null($ipc)) {
             $this->setIpc($ipc);
@@ -48,7 +48,7 @@ abstract class AbstractClass {
     /**
      *
      * Returns the shared memory object
-     * @return PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     * @return PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      */
     public function getIpc() {
         if (getmypid() != $this->_pid) {
@@ -68,12 +68,12 @@ abstract class AbstractClass {
     /**
      *
      * Sets a shared memory object
-     * @param \PhpTaskDaemon\Daemon\Ipc\None $ipc
+     * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
      * @return $this
      */
     public function setIpc($ipc) {
-    $this->_ipc = $ipc;
-    return TRUE;
+        $this->_ipc = $ipc;
+        return TRUE;
     }
 
 

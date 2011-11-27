@@ -14,6 +14,6 @@ namespace PhpTaskDaemon\Task\Queue\Statistics;
  * The base class does notting!
  *
  */
-class DefaultClass extends AbstractClass implements InterfaceClass {
+class StatisticsDefault extends StatisticsAbstract implements StatisticsInterface {
 
 }
