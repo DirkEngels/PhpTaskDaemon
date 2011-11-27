@@ -15,6 +15,9 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  */
 class None extends AbstractClass implements InterfaceClass {
 
+    public function __construct($id = 'none') {
+        parent::__construct($id);
+    }
 
     /**
      * 
