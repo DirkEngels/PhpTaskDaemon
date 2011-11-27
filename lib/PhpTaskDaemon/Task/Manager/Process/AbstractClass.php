@@ -9,12 +9,42 @@
 
 namespace PhpTaskDaemon\Task\Manager\Process;
 
+use PhpTaskDaemon\Daemon\Logger;
+
 abstract class AbstractClass {
 
     const SLEEPTIME = 100;
-    protected $_queue = null;
-    protected $_executor = null;
+    protected $_name = NULL;
+    protected $_queue = NULL;
+    protected $_executor = NULL;
     protected $_jobs = array();
+
+
+    public function __construct($name = NULL) {
+        $this->_name = $name;
+    }
+
+
+    /**
+     *
+     * Returns the task name 
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
+    }
+
+
+    /**
+     *
+     * Sets the task name 
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name) {
+        $this->_name = $name;
+        return $this;
+    }
 
 
     /**
@@ -76,7 +106,7 @@ abstract class AbstractClass {
 
     /**
      * Gets the job
-     * @return array
+     * @return array[\PhpTaskDaemon\Task\Job\AbstractClass]
      */
     public function getJobs() {
         return $this->_jobs;
@@ -86,9 +116,11 @@ abstract class AbstractClass {
     /**
      * Sets the jobs
      * @param array $jobs
+     * @return $this
      */
     public function setJobs($jobs) {
         $this->_jobs = $jobs;
+        return $this;
     }
 
 
@@ -100,10 +132,14 @@ abstract class AbstractClass {
      */
     protected function _processTask(\PhpTaskDaemon\Task\Job\AbstractClass $job) {
         // Set manager input
-         \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Started: " . $job->getJobId(), \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::log(getmypid() . ": Started: " . $job->getJobId(), \Zend_Log::DEBUG);
         $executor = $this->getExecutor();
         $executor->setJob($job);
         $queue = $this->getQueue();
+
+        $executor->getStatus()->resetIpc();
+        $executor->getStatus()->resetPid();
+        $queue->getStatistics()->resetIpc();
 
         // Update Status before and after running the task
         $executor->updateStatus(0);
@@ -112,10 +148,9 @@ abstract class AbstractClass {
 
         // Log and sleep for a while
         usleep(self::SLEEPTIME);
-        \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ': ' . $job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
+        \PhpTaskDaemon\Daemon\Logger::log(getmypid() . ': ' . $job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
 
         // Reset status and decrement queue
-        $executor->updateStatus(0);
         $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
         $queue->updateQueue();
 
@@ -135,19 +170,49 @@ abstract class AbstractClass {
             die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
         } elseif ($pid) {
             // The manager waits later
+            return $pid;
+
         } else {
-            // Initiate resources
             // @todo: Initiate resources
+            $this->getExecutor()->getStatus()->getIpc()->initResource();
 
             // Set manager input and start the manager
             $this->_processTask($job);
 
             // Cleanup resources
-            // @todo: Cleanup resources
+            $this->getExecutor()->getStatus()->getIpc()->cleanupResource();
 
             // Exit after finishing the forked
             exit;
         }
     } 
+
+
+    /**
+     * 
+     * POSIX Signal handler callback
+     * @param $sig
+     */
+    public function sigHandler($sig) {
+        switch ($sig) {
+            case SIGTERM:
+                // Shutdown
+                \PhpTaskDaemon\Daemon\Logger::log('Application (PROCESS) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
+                break;
+            case SIGCHLD:
+                // Halt
+                \PhpTaskDaemon\Daemon\Logger::log('Application (PROCESS) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);
+                while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
+                break;
+            case SIGINT:
+                // Shutdown
+                \PhpTaskDaemon\Daemon\Logger::log('Application (PROCESS) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
+                break;
+            default:
+                \PhpTaskDaemon\Daemon\Logger::log('Application (PROCESS) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
+                break;
+        }
+        exit;
+    }
 
 }
