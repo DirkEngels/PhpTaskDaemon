@@ -37,11 +37,10 @@ class Child extends ProcessAbstract implements ProcessInterface {
 
     public function runParent($pid) {
         // The manager waits later
-        \PhpTaskDaemon\Daemon\Logger::log('Processing manager starting!', \Zend_Log::NOTICE);
+        \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
 
         try {
             $res = pcntl_waitpid($pid, $status);
-            \PhpTaskDaemon\Daemon\Logger::log('Processing manager done!', \Zend_Log::NOTICE);
         } catch (Exception $e) {
             echo $e->getMessage();
         }
