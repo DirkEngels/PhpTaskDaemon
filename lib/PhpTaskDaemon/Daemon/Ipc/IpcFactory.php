@@ -8,16 +8,22 @@
  */
 
 namespace PhpTaskDaemon\Daemon\Ipc;
+use PhpTaskDaemon\Daemon\Config;
+use PhpTaskDaemon\Daemon\Logger;
 
 /**
  * The factory object creates an IPC instance by reading the configuration file.
  *
  */
-class Factory {
+class IpcFactory {
     const TYPE_NONE = 'None';
     const TYPE_SHAREDMEMORY = 'SharedMemory';
     const TYPE_FILESYSTEM = 'FileSystem';
     const TYPE_DATABASE = 'DataBase';
+
+    const NAME_DAEMON = 'daemon';
+    const NAME_QUEUE = 'queue';
+    const NAME_EXECUTOR = 'executor';
 
 
     /**
@@ -25,23 +31,30 @@ class Factory {
      * @param $ipcType
      * @return \PhpTaskDaemon\Task\Manager\AbstractClass
      */
-    public static function get($ipcType, $id) {
-        $ipcObject = NULL;
+    public static function get($type = self::NAME_DAEMON, $id = NULL, $taskName = NULL) {
+        if (is_null($id)) {
+            $id = getmypid();
+        }
+        $ipcId = $type . '-' . $id;
+
+        $ipcType = Config::get()->getOptionValue('global.ipc', $taskName);
         switch($ipcType) {
-            case self::TYPE_FILESYSTEM:
-                $ipcObject = new FileSystem($id);
-                break;
-        	case self::TYPE_SHAREDMEMORY:
-                $ipcObject = new SharedMemory($id);
-                break;
             case self::TYPE_DATABASE:
-                $ipcObject = new DataBase($id);
+                $ipcObject = new DataBase($ipcId);
+                break;
+            case self::TYPE_FILESYSTEM:
+                $ipcObject = new FileSystem($ipcId);
+                break;
+            case self::TYPE_SHAREDMEMORY:
+                $ipcObject = new SharedMemory($ipcId);
                 break;
             case self::TYPE_NONE:
             default:
-                $ipcObject = new None($id);
+                $ipcType = 'None';
+                $ipcObject = new None($ipcId);
                 break;
         }
+        Logger::log('Create new IPC object: ' . $ipcId, \Zend_Log::DEBUG);
         return $ipcObject;
     }
 
