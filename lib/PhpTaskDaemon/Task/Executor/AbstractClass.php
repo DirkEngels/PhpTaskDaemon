@@ -52,7 +52,7 @@ abstract class AbstractClass {
     /**
      * 
      * Returns the current status object, if set.
-     * @return \PhpTaskDaemon\Task\Executor\Status $status
+     * @return \PhpTaskDaemon\Task\Executor\Status\AbstractClass $status
      */
     public function getStatus() {
         return $this->_status;
