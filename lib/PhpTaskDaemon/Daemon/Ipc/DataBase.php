@@ -213,7 +213,7 @@ class DataBase extends AbstractClass implements InterfaceClass {
                     $this->_pdo = new \PDO("sqlite::memory");
                     break;
             }
-            Logger::log('Succesfully initialized the DB PDO driver (type: ' . Config::get()->getOptionValue('db.adapter') . ')', \Zend_Log::INFO);
+            Logger::log('Succesfully initialized the DB PDO driver (type: ' . Config::get()->getOptionValue('db.adapter') . ')', \Zend_Log::DEBUG);
         } catch (\Exception $e) {
             echo $e->getMessage();
             Logger::log('Could not initialize the DB PDO driver:' . $e->getMessage(), \Zend_Log::ERR);
