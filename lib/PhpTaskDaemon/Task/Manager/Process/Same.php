@@ -18,7 +18,11 @@ class Same extends AbstractClass implements InterfaceClass {
             $this->_processTask($job);
         }
 
-        \PhpTaskDaemon\Daemon\Logger::get()->log('Finished current set of tasks!', \Zend_Log::INFO);
+        // Remove executor
+        $this->getQueue()->getStatistics()->getIpc()->setVar('executors', array());
+        $this->getExecutor()->getStatus()->getIpc()->remove();
+
+        \PhpTaskDaemon\Daemon\Logger::log('Finished current set of tasks!', \Zend_Log::INFO);
     }
 
 }
