@@ -13,8 +13,11 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * 
  * The Daemon\Ipc\None class is responsible for storing and retrieving nothing.
  */
-class None extends AbstractClass implements InterfaceClass {
+class None extends IpcAbstract implements IpcInterface {
 
+    public function __construct($id = 'none') {
+        parent::__construct($id);
+    }
 
     /**
      * 

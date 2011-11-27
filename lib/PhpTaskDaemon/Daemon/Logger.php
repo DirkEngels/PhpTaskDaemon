@@ -28,7 +28,7 @@ class Logger {
      * Singleton getter
      * @return \PhpTaskDaemon\Daemon\Log
      */
-    public function get() {
+    public static function get() {
         if (!self::$_instance) {
             self::$_instance = new \Zend_Log();
             self::$_instance->addWriter(
@@ -40,4 +40,11 @@ class Logger {
         return self::$_instance;
     }
 
+    public static function log($message, $level = null) {
+        if (is_null($level)) {
+            $level = Config::get()->getOptionValue('daemon.log.level');
+        }
+
+        return self::get()->log('[' . getmypid() . '] ' . $message, $level);
+    }
 }

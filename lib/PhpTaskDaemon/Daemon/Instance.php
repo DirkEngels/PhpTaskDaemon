@@ -30,7 +30,7 @@ class Instance {
 
     /**
      * Shared memory object
-     * @var Ipc\AbstractClass $_ipc
+     * @var Ipc\IpcAbstract $_ipc
      */
     protected $_ipc = NULL;
 
@@ -116,7 +116,7 @@ class Instance {
 
     /**
      * Gets the inter process communication object
-     * @return \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     * @return \PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      */
     public function getIpc() {
         if (is_null($this->_ipc)) {
@@ -133,10 +133,10 @@ class Instance {
 
     /**
      * Sets the inter process communication object
-     * @param $ipc \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     * @param $ipc \PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      * @return $this
      */
-    public function setIpc(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc) {
+    public function setIpc(\PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc) {
         $this->_ipc = $ipc;
         return $this;
     }
@@ -195,7 +195,7 @@ class Instance {
         try {
             $pid = $this->getPidFile()->read();
 
-            \PhpTaskDaemon\Daemon\Logger::get()->log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
+            Logger::log("Killing THIS PID: " . $pid, \Zend_Log::WARN);
             posix_kill($pid, SIGTERM);
         } catch (\Exception $e) {
             echo $e->getMessage();
@@ -213,20 +213,20 @@ class Instance {
         switch ($sig) {
             case SIGTERM:
                 // Shutdown
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
+                Logger::log('Application (DAEMON) received SIGTERM signal (shutting down)', \Zend_Log::DEBUG);
                 $this->_exit();
                 break;
             case SIGCHLD:
                 // Halt
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);
+                Logger::log('Application (DAEMON) received SIGCHLD signal (halting)', \Zend_Log::DEBUG);
                 while (pcntl_waitpid(-1, $status, WNOHANG) > 0);
                 break;
             case SIGINT:
                 // Shutdown
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
+                Logger::log('Application (DAEMON) received SIGINT signal (shutting down)', \Zend_Log::DEBUG);
                 break;
             default:
-                \PhpTaskDaemon\Daemon\Logger::get()->log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
+                Logger::log('Application (DAEMON) received ' . $sig . ' signal (unknown action)', \Zend_Log::DEBUG);
                 break;
         }
     }
@@ -241,25 +241,26 @@ class Instance {
         declare(ticks = 1);
 
         if (count($this->_tasks->getManagers())==0) {
-            \PhpTaskDaemon\Daemon\Logger::get()->log("No daemon tasks found", \Zend_Log::INFO);
+            Logger::log("No daemon tasks found", \Zend_Log::INFO);
             $this->_exit();
         }
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::INFO);
+        Logger::log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::NOTICE);
 
         $this->getIpc()->setVar('childs', array());
         $managers = $this->_tasks->getManagers();
         foreach ($managers as $manager) {
-            \PhpTaskDaemon\Daemon\Logger::get()->log("Forking manager: "  . get_class($manager), \Zend_Log::INFO);
+            Logger::log("Starting manager: "  . $manager->getName(), \Zend_Log::NOTICE);
             try {
                 $this->_forkManager($manager);
             } catch (Exception $e) {
-                \PhpTaskDaemon\Daemon\Logger::get()->log($e->getMessage(), \Zend_Log::CRIT);
+                echo $e->getMessage();
+                Logger::log($e->getMessage(), \Zend_Log::CRIT);
                 $this->_exit();
             }
         }
 
         // Default sigHandler
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Setting default signal interrupt handler", \Zend_Log::DEBUG);
+        Logger::log("Setting default signal interrupt handler", \Zend_Log::DEBUG);
         $this->_sigHandler = new Interrupt\Signal(
             'Main Daemon',
             array(&$this, 'sigHandler')
@@ -269,14 +270,13 @@ class Instance {
         $this->getIpc()->setVar('childs', $this->getPidManager()->getChilds());
 
         // Wait till all childs are done
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Waiting for childs to complete", \Zend_Log::NOTICE);
+        Logger::log("Waiting for childs to complete", \Zend_Log::NOTICE);
         while (pcntl_waitpid(0, $status) != -1) {
             $status = pcntl_wexitstatus($status);
         }
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Running done.", \Zend_Log::NOTICE);
+        Logger::log("Running done.", \Zend_Log::NOTICE);
 
         $this->getPidFile()->unlink();
-        $this->getIpc()->remove();
 
         $this->_exit();
     }
@@ -293,7 +293,7 @@ class Instance {
         $pid = pcntl_fork();
         if ($pid === -1) {
             // Error: Throw exception: Fork Failed
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Managers could not be forked!!!', \Zend_Log::CRIT);
+            Logger::log('Managers could not be forked!!!', \Zend_Log::CRIT);
             throw new \PhpTaskDaemon\Daemon\Exception\ForkFailed();
 
         } elseif ($pid) {
@@ -307,13 +307,13 @@ class Instance {
             $this->getPidManager()->forkChild($newPid);
             $manager->init($this->getPidManager()->getParent());
 
-            $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
-            $manager->getTimer()->getQueue()->setStatistics($statistics);
+            $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault();
+            $manager->getProcess()->getQueue()->setStatistics($statistics);
 
-            $status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
+            $status = new \PhpTaskDaemon\Task\Executor\Status\StatusDefault();
             $manager->getProcess()->getExecutor()->setStatus($status);
 
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
+            Logger::log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
             $manager->runManager();
             $this->_exit();
         }

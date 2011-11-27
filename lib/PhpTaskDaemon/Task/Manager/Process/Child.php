@@ -8,33 +8,63 @@
  */
 
 namespace PhpTaskDaemon\Task\Manager\Process;
+use PhpTaskDaemon\Daemon\Logger;
 
-class Child extends AbstractClass implements InterfaceClass {
+class Child extends ProcessAbstract implements ProcessInterface {
+
+    protected $_childCount = 0;
 
     /**
      * Forks the task to a seperate process
-     * @param \PhpTaskDaemon\Task\Job $job
      */
     public function run() {
-        // Fork the manager
-        $pid = pcntl_fork();
 
-        if ($pid == -1) {
-            $err = 'Could not fork.. dunno why not... shutting down... bleep bleep.. blap...';
-            \PhpTaskDaemon\Daemon\Logger::get()->log($err, \Zend_Log::CRIT);
-            die ($err);
-        } elseif ($pid) {
-            // The manager waits later
-            $childs++;
+        $jobs = $this->getJobs();
+        foreach($jobs as $job) {
+            $pid = pcntl_fork();
+            $this->_childCount++;
 
-        } else {
-            foreach($this->getJobs() as $job) {                
-                // Set manager input and start the manager
-                $this->_forkTask($this->getJob());
+            if ($pid == -1) {
+                die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
+            } elseif ($pid) {
+                // Continue parent process
+                $this->runParent($pid);
+            } else {
+                // Run child process
+                $this->runChild($job);
             }
-            \PhpTaskDaemon\Daemon\Logger::get()->log('Finished current set of tasks! Child exits!', \Zend_Log::INFO);
-            exit;
         }
-    } 
+
+        \PhpTaskDaemon\Daemon\Logger::log('Finished current set of tasks!', \Zend_Log::NOTICE);
+    }
+
+    public function runParent($pid) {
+        // The manager waits later
+        \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
+
+        try {
+            $res = pcntl_waitpid($pid, $status);
+            $this->_childCount--;
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+
+    public function runChild($job) {
+        $this->getExecutor()->getStatus()->resetPid();
+        $this->getExecutor()->getStatus()->resetIpc();
+        $this->getQueue()->getStatistics()->resetIpc();
+
+        \PhpTaskDaemon\Daemon\Logger::log('Processing task started!', \Zend_Log::NOTICE);
+        try {
+            $this->_processTask($job);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+
+        \PhpTaskDaemon\Daemon\Logger::log('Processing task done!', \Zend_Log::NOTICE);
+        exit(1);
+    }
 
 }

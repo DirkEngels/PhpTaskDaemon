@@ -10,11 +10,11 @@ Command Line
 A command line tool is provided to start, stop and monitor the daemon. Below a 
 
 Command line:
-* Start:        ./daemon --help
-* Start:        ./daemon --action start
-* Stop:         ./daemon --action stop
-* Status:       ./daemon --action status
-* Monitor:      ./daemon --action monitor
+* Help:         ./phptaskdaemon --help
+* Start:        ./phptaskdaemon --action start
+* Stop:         ./phptaskdaemon --action stop
+* Status:       ./phptaskdaemon --action status
+* Monitor:      ./phptaskdaemon --action monitor
 
 
 State Api

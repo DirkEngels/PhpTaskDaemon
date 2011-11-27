@@ -9,30 +9,26 @@
 
 namespace PhpTaskDaemon\Task\Manager\Process;
 
-class Parallel extends AbstractClass implements InterfaceClass {
+class Parallel extends Child {
 
     protected $_maxProcess = 3;
 
+    public function runParent($pid) {
+        // The manager waits later
+        \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
 
-    /**
-     * (non-PHPdoc)
-     * @see lib/PhpTaskDaemon/Task/Manager/Process/PhpTaskDaemon\Task\Manager\Process.InterfaceClass::run()
-     */
-    public function run() {
-        $currentChilds = 0;
-
-        while(count($this->_jobs)>0) {
-            if ($currentChilds<$this->_maxProcess) {
-                $job = array_shift($this->_jobs);
-                $this->_forkTask($job);
+        try {
+            echo "Checking child count: " . $this->_childCount . "/" . $this->_maxProcess . "\n";
+            if ($this->_childCount >= $this->_maxProcess) {
+                while (pcntl_waitpid(0, $status) != -1) {
+                    $status = pcntl_wexitstatus($status);
+                    echo "Child $status completed\n";
+                    $this->_childCount--;
+                }
             }
+        } catch (Exception $e) {
+            echo $e->getMessage();
         }
-        for ($i = $currentChilds; $i<$this->_maxProcess; $i++) {
-            $this->_forkTask($job);
-            $currentChilds++;
-        }
-
-        $this->_executeTask($this->getJob());
     }
 
 }

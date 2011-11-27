@@ -1,5 +1,8 @@
 <?php
 
+// Set error_reporting
+error_reporting(E_ALL);
+
 // Set include paths
 define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
 define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/app'));
