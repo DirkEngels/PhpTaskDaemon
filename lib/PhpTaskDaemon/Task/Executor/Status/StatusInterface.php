@@ -8,10 +8,9 @@
  */
 namespace PhpTaskDaemon\Task\Executor\Status;
 
-/**
- * 
- * The base class can be used as a default status class.
- */
-class DefaultClass extends AbstractClass implements InterfaceClass {
+interface StatusInterface {
+
+    public function get();
+    public function set($status);
 
 }

@@ -17,9 +17,9 @@ use PhpTaskDaemon\Daemon\Logger;
  * The abstract class encapsulate a set of methods of the Ipc class. 
  *
  */
-abstract class AbstractClass {
+abstract class StatusAbstract {
     /**
-     * @var \PhpTaskDaemon\Ipc\AbstractClass
+     * @var \PhpTaskDaemon\Ipc\IpcAbstract
      */
     protected $_ipc;
 
@@ -34,9 +34,9 @@ abstract class AbstractClass {
      * 
      * The constructor sets the shared memory object. A default shared memory
      * object instance will be created when none provided.
-     * @param \PhpTaskDaemon\Ipc $ipc
+     * @param \PhpTaskDaemon\Ipc\IpcAbstract $ipc
      */
-    public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
+    public function __construct(\PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc = NULL) {
         $this->_pid = getmypid();
         if (!is_null($ipc)) {
             $this->setIpc($ipc);
@@ -44,19 +44,10 @@ abstract class AbstractClass {
     }
 
 
-//    /**
-//     * 
-//     * Unset the shared memory at destruction time.
-//     */
-//    public function __destruct() {
-//        unset($this->_ipc); 
-//    }
-
-
     /**
      *
      * Returns the shared memory object
-     * @return PhpTaskDaemon\Ipc\AbstractClass
+     * @return PhpTaskDaemon\Ipc\IpcAbstract
      */
     public function getIpc() {
         if (getmypid() != $this->_pid) {
@@ -77,7 +68,7 @@ abstract class AbstractClass {
     /**
      *
      * Sets a shared memory object
-     * @param \PhpTaskDaemon\Daemon\Ipc\Ipc $ipc
+     * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
      * @return $this
      */
     public function setIpc($ipc) {
