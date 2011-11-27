@@ -313,7 +313,7 @@ class Factory {
             case 'queue':
                 return new \PhpTaskDaemon\Task\Queue\QueueDefault();
             case 'statistics':
-                return new \PhpTaskDaemon\Task\Queue\Statistics\QueueDefault();
+                return new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault();
             case 'process':
                 return new \PhpTaskDaemon\Task\Manager\Process\Same();
             case 'executor':
