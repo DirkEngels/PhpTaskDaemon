@@ -8,10 +8,13 @@
  */
 
 namespace PhpTaskDaemon\Task\Queue\Statistics;
+use PhpTaskDaemon\Daemon\Ipc\IpcFactory;
 use PhpTaskDaemon\Daemon\Config;
+use PhpTaskDaemon\Daemon\Logger;
+
 
 /**
- * 
+ *
  * The abstract queue statistics class implements methods for setting/change
  * the status count of executed jobs and the number of loaded and processed
  * items in the queue.
@@ -23,18 +26,21 @@ abstract class AbstractClass {
     const STATUS_DONE = 'done';
     const STATUS_FAILED = 'failed';
 
+    private $_pid;
     protected $_ipc;
 
 
     /**
-     * 
+     *
      * The constructor sets the shared memory object. A default shared memory
      * object instance will be created when none provided.
      * @param \PhpTaskDaemon\Ipc $ipc
      */
     public function __construct(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc = NULL) {
+        $this->_pid = getmypid();
         if (!is_null($ipc)) {
             $this->setIpc($ipc);
+            $this->_initializeIpc();
         }
     }
 
@@ -42,16 +48,18 @@ abstract class AbstractClass {
     /**
      *
      * Returns the shared memory object
-     * @return PhpTaskDaemon\Ipc
+     * @return PhpTaskDaemon\Daemon\Ipc\AbstractClass
      */
     public function getIpc() {
-        if (is_null($this->_ipc)) {
-            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-            if (!class_exists($ipcClass)) {
-                $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+        if (getmypid() != $this->_pid) {
+            if (!(is_null($this->_ipc))) {
+                $this->_ipc = NULL;
+                $this->_ipc->initResource();
             }
-            $this->_ipc = new $ipcClass('phptaskdaemond-queue-' . getmypid());
+        }
 
+        if (is_null($this->_ipc)) {
+            $this->_ipc = IpcFactory::get(IpcFactory::NAME_QUEUE, $this->_pid);
             $this->_initializeIpc();
         }
 
@@ -66,23 +74,51 @@ abstract class AbstractClass {
      * @return $this
      */
     public function setIpc($ipc) {
-        $this->_ipc = $ipc;
-        $this->_initializeIpc();
-        return TRUE;
+    $this->_ipc = $ipc;
+    return TRUE;
+    }
+
+
+    /**
+     * Resets the current IPC object, so it can be (lazy) loaded again, which
+     * is usefull when forking processes.
+     * @return $this
+     */
+    public function resetIpc() {
+        Logger::log('Resetting Statistics IPC', \Zend_Log::DEBUG);
+        $this->_ipc = NULL;
+        return $this;
+    }
+
+
+    /**
+     * Resets the current pid, needed for the IPC object.
+     * @param integer $pid
+     * @return $this
+     */
+    public function resetPid($pid) {
+        if (is_null($pid)) {
+            $pid = getmypid();
+        }
+
+        Logger::log('Resetting Statistics PID (' . $pid . ')', \Zend_Log::DEBUG);
+        $this->_pid = $pid;
+        return $this;
     }
 
 
     /**
      * Returns an array with the number of executed tasks grouped per status.
-     * 
+     *
      * @param string $status
      * @return array
      */
-    public function get($status = NULL) {
+    public function get($status = self::STATUS_QUEUED) {
         $ipc = $this->getIpc();
         if (is_NULL($status)) {
             return $ipc->get();
         }
+
         if (!in_array($status, $ipc->getKeys())) {
             $ipc->setVar($status, 0);
         }
@@ -91,7 +127,7 @@ abstract class AbstractClass {
 
 
     /**
-     * 
+     *
      * (Re)Sets a status count
      * @param string $status
      * @param integer $count
@@ -108,12 +144,12 @@ abstract class AbstractClass {
 
     /**
      * Increments the statistics for a certain status
-     * 
+     *
      * @param string $status
      * @return integer
      */
     public function incrementStatus($status = self::STATUS_DONE, $count = 1) {
-        return $this->_ipc->incrementVar($status, $count);
+        return $this->getIpc()->incrementVar($status, $count);
     }
 
 
@@ -124,29 +160,30 @@ abstract class AbstractClass {
      */
     public function setQueueCount($count = 0) {
         $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->_ipc->setVar(self::STATUS_LOADED, $count);
+        $this->getIpc()->setVar(self::STATUS_LOADED, $count);
         return $count;
     }
 
 
     /**
-     * 
+     *
      * Decrements the queue count (after finishing a single job).
      */
     public function decrementQueue($count = 1) {
-        return $this->_ipc->decrementVar(self::STATUS_QUEUED, $count);
+        return $this->getIpc()->decrementVar(self::STATUS_QUEUED, $count);
     }
 
 
     /**
-     * 
+     *
      * Initializes the statistics array with default values.
      */
-    public function _initializeIpc() {
+    protected function _initializeIpc() {
         $this->getIpc()->setVar(self::STATUS_LOADED, 0);
         $this->getIpc()->setVar(self::STATUS_QUEUED, 0);
         $this->getIpc()->setVar(self::STATUS_DONE, 0);
         $this->getIpc()->setVar(self::STATUS_FAILED, 0);
         $this->getIpc()->setVar('executors', array());
     }
+
 }
