@@ -30,7 +30,7 @@ class Instance {
 
     /**
      * Shared memory object
-     * @var Ipc\AbstractClass $_ipc
+     * @var Ipc\IpcAbstract $_ipc
      */
     protected $_ipc = NULL;
 
@@ -116,7 +116,7 @@ class Instance {
 
     /**
      * Gets the inter process communication object
-     * @return \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     * @return \PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      */
     public function getIpc() {
         if (is_null($this->_ipc)) {
@@ -133,10 +133,10 @@ class Instance {
 
     /**
      * Sets the inter process communication object
-     * @param $ipc \PhpTaskDaemon\Daemon\Ipc\AbstractClass
+     * @param $ipc \PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      * @return $this
      */
-    public function setIpc(\PhpTaskDaemon\Daemon\Ipc\AbstractClass $ipc) {
+    public function setIpc(\PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc) {
         $this->_ipc = $ipc;
         return $this;
     }
@@ -307,10 +307,10 @@ class Instance {
             $this->getPidManager()->forkChild($newPid);
             $manager->init($this->getPidManager()->getParent());
 
-            $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
+            $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault();
             $manager->getProcess()->getQueue()->setStatistics($statistics);
 
-            $status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
+            $status = new \PhpTaskDaemon\Task\Executor\Status\StatusDefault();
             $manager->getProcess()->getExecutor()->setStatus($status);
 
             Logger::log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
