@@ -54,7 +54,7 @@ class State {
             if (!class_exists($ipcQueueClass)) {
                 $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
             }
-            $ipcQueue = new $ipcQueueClass('phptaskdaemond-queue-' . $process);
+            $ipcQueue = new $ipcQueueClass('queue-' . $process);
             $state[$ipcQueue->getId()] = $ipcQueue->get();
 
             // Executor Status
@@ -63,7 +63,7 @@ class State {
                 if (!class_exists($ipcExecutorClass)) {
                     $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
                 }
-                $ipcExecutor = new $ipcExecutorClass('phptaskdaemond-executor-' . $executorPid);
+                $ipcExecutor = new $ipcExecutorClass('executor-' . $executorPid);
                 $state[$ipcExecutor->getId()] = $ipcExecutor->get();
             }
         }
