@@ -24,34 +24,44 @@ class Child extends ProcessAbstract implements ProcessInterface {
             if ($pid == -1) {
                 die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
             } elseif ($pid) {
-                // The manager waits later
-                \PhpTaskDaemon\Daemon\Logger::log('Processing manager starting!', \Zend_Log::NOTICE);
-
-                try {
-                    $res = pcntl_waitpid($pid, $status);
-                    \PhpTaskDaemon\Daemon\Logger::log('Processing manager done!', \Zend_Log::NOTICE);
-                } catch (Exception $e) {
-                    echo $e->getMessage();
-                }
-
+                // Continue parent process
+                $this->runParent($pid);
             } else {
-                $this->getExecutor()->getStatus()->resetPid();
-                $this->getExecutor()->getStatus()->resetIpc();
-                $this->getQueue()->getStatistics()->resetIpc();
-
-                \PhpTaskDaemon\Daemon\Logger::log('Processing task started!', \Zend_Log::NOTICE);
-                try {
-                    $this->_processTask($job);
-                } catch (\Exception $e) {
-                    echo $e->getMessage();
-                }
-
-                \PhpTaskDaemon\Daemon\Logger::log('Processing task done!', \Zend_Log::NOTICE);
-                exit(1);
+                // Run child process
+                $this->runChild();
             }
         }
 
         \PhpTaskDaemon\Daemon\Logger::log('Finished current set of tasks!', \Zend_Log::NOTICE);
+    }
+
+    public function runParent($pid) {
+        // The manager waits later
+        \PhpTaskDaemon\Daemon\Logger::log('Processing manager starting!', \Zend_Log::NOTICE);
+
+        try {
+            $res = pcntl_waitpid($pid, $status);
+            \PhpTaskDaemon\Daemon\Logger::log('Processing manager done!', \Zend_Log::NOTICE);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+
+    public function runChild() {
+        $this->getExecutor()->getStatus()->resetPid();
+        $this->getExecutor()->getStatus()->resetIpc();
+        $this->getQueue()->getStatistics()->resetIpc();
+
+        \PhpTaskDaemon\Daemon\Logger::log('Processing task started!', \Zend_Log::NOTICE);
+        try {
+            $this->_processTask($job);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+
+        \PhpTaskDaemon\Daemon\Logger::log('Processing task done!', \Zend_Log::NOTICE);
+        exit(1);
     }
 
 }
