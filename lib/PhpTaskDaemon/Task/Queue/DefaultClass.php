@@ -23,7 +23,7 @@ class DefaultClass extends AbstractClass implements InterfaceClass {
             new Job\DefaultClass(
                 'base-1',
                 new Job\Data\DefaultClass(
-                    array('sleepTime' => 100000)
+                    array('sleepTime' => 1000000)
                 )
             ),
             new Job\DefaultClass(
