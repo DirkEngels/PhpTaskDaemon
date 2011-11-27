@@ -18,7 +18,7 @@ Version 0.8.4 (planned)
     + Same
     + Child
     - Parallel
-- Refactor AbstractClasses -> ObjectAbstract
++ Refactor AbstractClasses -> ObjectAbstract
 
 
 Version 0.8.3 (30-10-2011)
