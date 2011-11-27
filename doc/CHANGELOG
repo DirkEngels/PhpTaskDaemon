@@ -6,6 +6,7 @@ Version 1.0 (roadmap)
 - Add tools (init.d script)
 - Add example tasks
 - Create user documentation (doc dir + website/wiki)
+- Refactor AbstractClasses -> ObjectAbstract
 
 
 Version 0.8.4 (planned)
