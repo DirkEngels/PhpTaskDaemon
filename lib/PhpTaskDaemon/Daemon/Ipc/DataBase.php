@@ -227,7 +227,8 @@ class DataBase extends IpcAbstract implements IpcInterface {
      * @return integer
      */
     protected function _dbStatement($sql, $params = array()) {
-        Logger::log('Executing SQL Statement: ' . $sql . ' with params: ' . var_export($params, true), \Zend_Log::DEBUG);
+        Logger::log('Executing SQL Statement: ' . $sql, \Zend_Log::DEBUG);
+        Logger::log('Executing SQL Params: ' . implode(", ", $params), \Zend_Log::DEBUG);
         $this->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         try {
             $this->_stmt = $this->getPdo()->prepare($sql);
