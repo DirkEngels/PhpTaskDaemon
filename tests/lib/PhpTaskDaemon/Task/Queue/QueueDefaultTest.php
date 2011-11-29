@@ -14,7 +14,7 @@
 
 namespace PhpTaskDaemon\Task\Queue;
 
-class DefaultClassTest extends \PHPUnit_Framework_Testcase {
+class QueueDefaultTest extends \PHPUnit_Framework_Testcase {
     protected $_queue;
     protected $_statistics;
 
@@ -25,13 +25,13 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 //        );
 
         $semaphore = __DIR__ . '/_data/constructor.shm';
-        $this->_queue = new \PhpTaskDaemon\Task\Queue\DefaultClass($semaphore);
+        $this->_queue = new \PhpTaskDaemon\Task\Queue\QueueDefault($semaphore);
         $ipc = new \PhpTaskDaemon\Daemon\Ipc\None(\TMP_PATH . '/test-queue');
-        $this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($ipc);
+        $this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault($ipc);
     }
     protected function tearDown() {
 //        $ipc = $this->_statistics->getIpc();
-//        if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//        if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\IpcAbstract')) {
 //            $ipc->remove();
 //        }
 //        unset($this->_statistics);
@@ -54,7 +54,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
     public function testUpdateStatisticsCountIsPositive() {
         $statistics = $this->getMock(
-            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\DefaultClass', 
+            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\StatisticsDefault', 
             array('setStatusCount')
         );
         $statistics->expects($this->once())
@@ -64,7 +64,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
         $this->assertTrue(
             $this->_queue->updateStatistics(
-                \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass::STATUS_DONE,
+                \PhpTaskDaemon\Task\Queue\Statistics\StatisticsAbstract::STATUS_DONE,
                 100,
                 true
             )
@@ -73,7 +73,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
     public function testUpdateStatisticsCountIsZero() {
         $statistics = $this->getMock(
-            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\DefaultClass', 
+            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\StatisticsDefault', 
             array('incrementStatus')
         );
         $statistics->expects($this->once())
@@ -83,7 +83,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
         $this->assertTrue(
             $this->_queue->updateStatistics(
-                \PhpTaskDaemon\Task\Queue\Statistics\AbstractClass::STATUS_DONE
+                \PhpTaskDaemon\Task\Queue\Statistics\StatisticsAbstract::STATUS_DONE
             )
         );
     }
@@ -95,7 +95,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
     public function testUpdateQueueCountIsPositive() {
         $statistics = $this->getMock(
-            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\\DefaultClass', 
+            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\\StatisticsDefault', 
             array('setQueueCount')
         );
         $statistics->expects($this->once())
@@ -112,7 +112,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
     public function testUpdateQueueCountIsZero() {
         $statistics = $this->getMock(
-            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\\DefaultClass', 
+            '\\PhpTaskDaemon\\Task\\Queue\\Statistics\\StatisticsDefault', 
             array('decrementQueue')
         );
         $statistics->expects($this->once())
@@ -158,7 +158,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
         $this->assertInternalType('array', $result);
         $this->assertEquals(3, count($result));
         foreach($result as $item) {
-            $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Job\\AbstractClass', $item);
+            $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Job\\JobAbstract', $item);
         }
     }
 }

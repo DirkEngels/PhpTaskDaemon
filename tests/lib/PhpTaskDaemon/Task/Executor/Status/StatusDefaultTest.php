@@ -14,7 +14,7 @@
 
 namespace PhpTaskDaemon\Task\Executor\Status;
 
-class DefaultClassTest extends \PHPUnit_Framework_Testcase {
+class StatusDefaultTest extends \PHPUnit_Framework_Testcase {
     protected $_status;
     protected $_ipc;
 
@@ -25,7 +25,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 //        );
 
         $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None(\TMP_PATH . '/test-status');
-        $this->_status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass();
+        $this->_status = new \PhpTaskDaemon\Task\Executor\Status\StatusDefault();
         
     }
 
@@ -33,7 +33,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 //        $this->_ipc->remove();
 //        unset($this->_ipc);
 //        $ipc = $this->_status->getIpc();
-//        if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//        if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\IpcAbstract')) {
 //            $ipc->remove();
 //        }
 //        unset($this->_status);
@@ -41,18 +41,18 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 
     public function testConstructorNoArguments() {
         $ipcCreated = $this->_status->getIpc();
-        $this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+        $this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\IpcAbstract', $ipcCreated);
     }
 
     public function testConstructorSingleArguments() {
-        $this->_status = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($this->_ipc);
+        $this->_status = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault($this->_ipc);
         $ipcCreated = $this->_status->getIpc();
-        $this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+        $this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\IpcAbstract', $ipcCreated);
     }
 
     public function testSetIpc() {
         $ipcCreated = $this->_status->getIpc();
-        $this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+        $this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\IpcAbstract', $ipcCreated);
         $this->_status->setIpc($this->_ipc);
         $this->assertEquals($this->_ipc, $this->_status->getIpc());
     }

@@ -38,8 +38,8 @@ class SameTest extends \PHPUnit_Framework_TestCase {
 
         $process->setJobs(
 	    $jobs = array(
-                new \PhpTaskDaemon\Task\Job\DefaultClass(),
-                new \PhpTaskDaemon\Task\Job\DefaultClass(),
+                new \PhpTaskDaemon\Task\Job\JobDefault(),
+                new \PhpTaskDaemon\Task\Job\JobDefault(),
             )
         );
 

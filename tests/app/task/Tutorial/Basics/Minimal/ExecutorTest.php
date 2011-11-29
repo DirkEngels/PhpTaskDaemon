@@ -22,9 +22,9 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase {
     protected $_executor = NULL;
 
     protected function setUp() {
-        $this->_job = new \PhpTaskDaemon\Task\Job\DefaultClass(
+        $this->_job = new \PhpTaskDaemon\Task\Job\JobDefault(
             'test-job-1',
-            new \PhpTaskDaemon\Task\Job\Data\DefaultClass(array(
+            new \PhpTaskDaemon\Task\Job\Data\DataDefault(array(
                 'sleepTime' => 20,
                 'test' => 'data'
             ))
@@ -38,15 +38,15 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase {
 
     public function testConstructor() {
         $this->assertInstanceOf(
-            '\\PhpTaskDaemon\\Task\\Job\\AbstractClass', 
+            '\\PhpTaskDaemon\\Task\\Job\\JobAbstract', 
             $this->_executor->getJob()
         );
         $this->assertInstanceOf(
-            '\\PhpTaskDaemon\\Task\\Job\\Data\\AbstractClass', 
+            '\\PhpTaskDaemon\\Task\\Job\\Data\\DataAbstract', 
             $this->_executor->getJob()->getInput()
         );
         $this->assertInstanceOf(
-            '\\PhpTaskDaemon\\Task\\Job\\Data\\AbstractClass', 
+            '\\PhpTaskDaemon\\Task\\Job\\Data\\DataAbstract', 
             $this->_executor->getJob()->getOutput()
         );
 

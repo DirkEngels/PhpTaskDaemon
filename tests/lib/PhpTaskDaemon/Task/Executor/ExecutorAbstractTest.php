@@ -15,12 +15,12 @@
 
 namespace PhpTaskDaemon\Task\Executor;
 
-class AbstractTest extends \PHPUnit_Framework_TestCase {
+class ExecutorAbstractTest extends \PHPUnit_Framework_TestCase {
     protected $_executor;
 
     protected function setUp() {
         $this->_executor = $this->getMockForAbstractClass(
-            '\\PhpTaskDaemon\\Task\\Executor\\AbstractClass'
+            '\\PhpTaskDaemon\\Task\\Executor\\ExecutorAbstract'
         );
     }
 
@@ -32,7 +32,7 @@ class AbstractTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testUpdateStatusStatusSet() {
-        $status = $this->getMock('\\PhpTaskDaemon\\Task\\Executor\\Statistics\\DefaultClass', array('set'));
+        $status = $this->getMock('\\PhpTaskDaemon\\Task\\Executor\\Statistics\\StatisticsDefault', array('set'));
         $status->expects($this->once())
              ->method('set')
              ->will($this->returnValue(TRUE));
