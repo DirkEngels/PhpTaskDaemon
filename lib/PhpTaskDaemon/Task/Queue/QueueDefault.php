@@ -23,19 +23,19 @@ class QueueDefault extends QueueAbstract implements QueueInterface {
             new Job\JobDefault(
                 'base-1',
                 new Job\Data\DataDefault(
-                    array('sleepTime' => 1000000)
+                    array('sleepTime' => rand(500000, 2000000))
                 )
             ),
             new Job\JobDefault(
                 'base-2',
                 new Job\Data\DataDefault(
-                    array('sleepTime' => 500000)
+                    array('sleepTime' => rand(500000, 2000000))
                 )
             ),
             new Job\JobDefault(
                 'base-3',
                 new Job\Data\DataDefault(
-                    array('sleepTime' => 1000000)
+                    array('sleepTime' => rand(500000, 2000000))
                 )
             )
         );
