@@ -323,6 +323,7 @@ class Console {
 
                 // Statistics
                 echo "[" . $queuePid . "]: ";
+                echo $queue['name'] . "\t";
                 echo "\t(Progress: " . ($queue['loaded']-$queue['queued']) . '/' . $queue['loaded'];
                 echo "\tDone: " . $queue['done'];
                 echo "\tFailed: " . $queue['failed'];
