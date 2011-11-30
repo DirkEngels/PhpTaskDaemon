@@ -43,10 +43,23 @@ abstract class IpcAbstract {
         return TRUE;
     }
 
+
+    /**
+     * 
+     * Initializes the resource, which is needed when forking processes.
+     * @return bool
+     */
     public function initResource() {
+        return TRUE;
     }
 
+
+    /**
+     * Cleans up any open resources.
+     * @return bool
+     */
     public function cleanupResource() {
+        return TRUE;
     }
 
 
@@ -85,9 +98,25 @@ abstract class IpcAbstract {
 
     /**
      * Removes the ipc data
+     * @param string $key
+     * @return bool
+     */
+    public function removeVar($key) {
+        if (in_array($key, $this->_keys)) {
+            unset($this->_keys[$key]);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
+     * Removes the ipc data
+     * @return bool
      */
     public function remove() {
         $this->_keys = array();
+        return TRUE;
     }
 
 }
