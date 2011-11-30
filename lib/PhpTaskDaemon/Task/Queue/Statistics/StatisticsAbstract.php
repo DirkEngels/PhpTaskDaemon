@@ -40,7 +40,6 @@ abstract class StatisticsAbstract {
         $this->_pid = getmypid();
         if (!is_null($ipc)) {
             $this->setIpc($ipc);
-            $this->_initializeIpc();
         }
     }
 
@@ -58,7 +57,9 @@ abstract class StatisticsAbstract {
         }
 
         if (is_null($this->_ipc)) {
-            $this->_ipc = IpcFactory::get(IpcFactory::NAME_QUEUE, $this->_pid);
+            $this->setIpc(
+                IpcFactory::get(IpcFactory::NAME_QUEUE, $this->_pid)
+            );
         }
 
         return $this->_ipc;
@@ -73,6 +74,7 @@ abstract class StatisticsAbstract {
      */
     public function setIpc($ipc) {
         $this->_ipc = $ipc;
+        $this->_initializeIpc();
         return TRUE;
     }
 
@@ -177,11 +179,10 @@ abstract class StatisticsAbstract {
      * Initializes the statistics array with default values.
      */
     protected function _initializeIpc() {
-        $this->getIpc()->setVar(self::STATUS_LOADED, 0);
-        $this->getIpc()->setVar(self::STATUS_QUEUED, 0);
-        $this->getIpc()->setVar(self::STATUS_DONE, 0);
-        $this->getIpc()->setVar(self::STATUS_FAILED, 0);
-        $this->getIpc()->setVar('executors', array());
+        $this->_ipc->setVar(self::STATUS_LOADED, 0);
+        $this->_ipc->setVar(self::STATUS_QUEUED, 0);
+        $this->_ipc->setVar(self::STATUS_DONE, 0);
+        $this->_ipc->setVar(self::STATUS_FAILED, 0);
     }
 
 }
