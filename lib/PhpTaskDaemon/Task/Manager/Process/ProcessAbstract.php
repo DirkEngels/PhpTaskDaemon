@@ -142,9 +142,9 @@ abstract class ProcessAbstract {
         $queue->getStatistics()->resetIpc();
 
         // Update Status before and after running the task
-        $executor->updateStatus(0);
+        $executor->updateStatus(0, 'Initializing task');
         $job = $executor->run();
-        $executor->updateStatus(100);
+        $executor->updateStatus(100, 'Finished task');
 
         // Log and sleep for a while
         usleep(self::SLEEPTIME);
