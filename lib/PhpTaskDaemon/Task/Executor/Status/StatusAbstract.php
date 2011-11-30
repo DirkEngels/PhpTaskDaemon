@@ -127,6 +127,10 @@ abstract class StatusAbstract {
      * @return bool
      */
     public function set($percentage, $message = NULL) {
+        if (($percentage == 0) && ($message == NULL)) {
+            $message = 'Initializing task';
+        }
+
         $this->getIpc()->setVar('percentage', $percentage);
         if ($message != NULL) {
             $this->getIpc()->setVar('message', $message);
