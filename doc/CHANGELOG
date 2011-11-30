@@ -5,7 +5,8 @@ Version 1.0 (roadmap)
 ---------------------
 - Add tools (init.d script)
 - Create user documentation (doc dir + website/wiki)
-
+- Add queue implementation: database
+- Add database logger
 
 Version 0.8.5 (planned)
 -----------------------
