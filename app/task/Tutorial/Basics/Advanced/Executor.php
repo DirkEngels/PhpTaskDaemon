@@ -20,8 +20,8 @@ class Executor extends TaskExecutor\ExecutorAbstract implements TaskExecutor\Exe
 
         // Return Status
         $returnStatus = (rand(0,1)==1) 
-            ? Statistics\DefaultClass::STATUS_DONE 
-            : Statistics\DefaultClass::STATUS_FAILED;
+            ? Statistics\StatisticsDefault::STATUS_DONE 
+            : Statistics\StatisticsDefault::STATUS_FAILED;
 
         // Output
         $job->getOutput()->set(
