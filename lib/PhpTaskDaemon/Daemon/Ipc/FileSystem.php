@@ -14,7 +14,7 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * The Daemon\Ipc\FileSystem class is responsible for storing and retrieving
  * inter process communication data from the database.
  */
-class FileSystem extends AbstractClass implements InterfaceClass {
+class FileSystem extends IpcAbstract implements IpcInterface {
 
     /**
      * 

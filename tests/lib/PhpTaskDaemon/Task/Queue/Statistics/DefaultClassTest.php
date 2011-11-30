@@ -14,7 +14,7 @@
 
 namespace PhpTaskDaemon\Task\Queue\Statistics;
 
-class DefaultClassTest extends \PHPUnit_Framework_Testcase {
+class StatisticsDefaultTest extends \PHPUnit_Framework_Testcase {
 	protected $_statistics;
 	protected $_ipc;
 	
@@ -25,7 +25,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 //        );
 
 		$this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None(\TMP_PATH . '/test-statistics');
-		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass();
+		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault();
 		
 	}
 	protected function tearDown() {
@@ -34,7 +34,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 //		$this->_ipc->remove();
 //		unset($this->_ipc);
 //		$ipc = $this->_statistics->getIpc();
-//		if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//		if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\IpcAbstract')) {
 //			$ipc->remove();
 //		}
 //		unset($this->_statistics);
@@ -42,21 +42,18 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
 	
 	public function testConstructorNoArguments() {
 		$ipcCreated = $this->_statistics->getIpc();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\IpcAbstract', $ipcCreated);
 	}
 	public function testConstructorSingleArguments() {
-		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\DefaultClass($this->_ipc);
+		$this->_statistics = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault($this->_ipc);
 		$ipcCreated = $this->_statistics->getIpc();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\IpcAbstract', $ipcCreated);
 	}
 	public function testSetIpc() {
 		$ipcCreated = $this->_statistics->getIpc();
-		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\AbstractClass', $ipcCreated);
+		$this->assertInstanceOf('\PhpTaskDaemon\Daemon\Ipc\IpcAbstract', $ipcCreated);
 		$this->_statistics->setIpc($this->_ipc);
 		$this->assertEquals($this->_ipc, $this->_statistics->getIpc());
-	}
-	public function testGetAll() {
-		$this->assertInternalType('array', $this->_statistics->get());
 	}
 	public function testGetStatus() {
 		$this->assertEquals(null, $this->_statistics->get('otherstatus'));

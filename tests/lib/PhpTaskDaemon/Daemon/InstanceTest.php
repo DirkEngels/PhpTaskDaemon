@@ -68,7 +68,7 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
 
         $tasks = new \PhpTaskDaemon\Daemon\Tasks();
         $tasks->addManager(
-            new \PhpTaskDaemon\Task\Manager\DefaultClass()
+            new \PhpTaskDaemon\Task\Manager\ManagerDefault()
         );
         $this->_instance->setTasks($tasks);
         $this->assertEquals($tasks, $this->_instance->getTasks());

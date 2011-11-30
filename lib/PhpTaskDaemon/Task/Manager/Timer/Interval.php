@@ -9,7 +9,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Timer;
 
-class Interval extends AbstractClass implements InterfaceClass {
+class Interval extends TimerAbstract implements TimerInterface {
 
     protected $_timeToWait = null;
 

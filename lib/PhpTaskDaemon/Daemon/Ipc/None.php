@@ -13,8 +13,7 @@ namespace PhpTaskDaemon\Daemon\Ipc;
  * 
  * The Daemon\Ipc\None class is responsible for storing and retrieving nothing.
  */
-class None extends AbstractClass implements InterfaceClass {
-
+class None extends IpcAbstract implements IpcInterface {
 
     /**
      * 
@@ -57,27 +56,6 @@ class None extends AbstractClass implements InterfaceClass {
      * @return bool
      */
     public function decrementVar($key, $count = 1) {
-        return TRUE;
-    }
-
-
-    /**
-     * 
-     * Removes nothing 
-     * @param string $key
-     * @return bool
-     */
-    public function removeVar($key) {
-        return TRUE;
-    }
-
-
-    /**
-     * 
-     * Removes nothing
-     * @return bool
-     */
-    public function remove() {
         return TRUE;
     }
 

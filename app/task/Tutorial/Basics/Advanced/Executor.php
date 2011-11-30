@@ -7,7 +7,7 @@ use \PhpTaskDaemon\Task\Queue\Statistics;
 
 require_once(__DIR__ . '/Queue.php');
 
-class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\InterfaceClass {
+class Executor extends TaskExecutor\ExecutorAbstract implements TaskExecutor\ExecutorInterface {
     public function run() {
         $job = $this->getJob();
 
@@ -20,8 +20,8 @@ class Executor extends TaskExecutor\AbstractClass implements TaskExecutor\Interf
 
         // Return Status
         $returnStatus = (rand(0,1)==1) 
-            ? Statistics\DefaultClass::STATUS_DONE 
-            : Statistics\DefaultClass::STATUS_FAILED;
+            ? Statistics\StatisticsDefault::STATUS_DONE 
+            : Statistics\StatisticsDefault::STATUS_FAILED;
 
         // Output
         $job->getOutput()->set(

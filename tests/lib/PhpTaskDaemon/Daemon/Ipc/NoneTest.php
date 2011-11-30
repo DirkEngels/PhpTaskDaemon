@@ -23,17 +23,6 @@ class NoneTest extends \PHPUnit_Framework_TestCase {
         $this->_ipc = new \PhpTaskDaemon\Daemon\Ipc\None('test');
     }
 
-    public function testConstructor() {
-        $this->assertEquals(0, sizeof($this->_ipc->get()));
-        $this->assertEquals('a:0:{}', serialize($this->_ipc->get()));
-        $this->assertEquals('test', $this->_ipc->getId());
-    }
-
-    public function testGetKeys() {
-        $this->assertEquals(0, sizeof($this->_ipc->getKeys()));
-        $this->assertInternalType('array', $this->_ipc->getKeys());
-    }
-
     public function testSetVarNew() {
         $this->_ipc->setVar('testvar1', '123456');
         $this->assertEquals(0, sizeof($this->_ipc->get()));

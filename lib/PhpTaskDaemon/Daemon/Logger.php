@@ -28,7 +28,7 @@ class Logger {
      * Singleton getter
      * @return \PhpTaskDaemon\Daemon\Log
      */
-    public function get() {
+    public static function get() {
         if (!self::$_instance) {
             self::$_instance = new \Zend_Log();
             self::$_instance->addWriter(
