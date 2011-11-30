@@ -27,6 +27,9 @@ class Child extends ProcessAbstract implements ProcessInterface {
             if ($pid == -1) {
                 die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
             } elseif ($pid) {
+                $this->getQueue()->getStatistics()->resetIpc();
+                $this->getQueue()->getStatistics()->getIpc()->addArrayVar('executors', $pid);
+
                 // Continue parent process
                 $this->runParent($pid);
             } else {
@@ -43,7 +46,10 @@ class Child extends ProcessAbstract implements ProcessInterface {
         \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
 
         try {
-            $res = pcntl_waitpid($pid, $status);
+            $this->getQueue()->getStatistics()->resetIpc();
+            $this->getQueue()->getStatistics()->getIpc()->addArrayVar('executors', $pid);
+            $pid = pcntl_wait($status);
+
             $this->_childCount--;
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -64,6 +70,12 @@ class Child extends ProcessAbstract implements ProcessInterface {
         }
 
         \PhpTaskDaemon\Daemon\Logger::log('Processing task done!', \Zend_Log::NOTICE);
+
+        // Clean up IPC
+        $this->getQueue()->getStatistics()->getIpc()->removeArrayVar('executors', getmypid());
+        $this->getExecutor()->getStatus()->resetIpc();
+        $this->getExecutor()->getStatus()->getIpc()->remove();
+
         exit(1);
     }
 
