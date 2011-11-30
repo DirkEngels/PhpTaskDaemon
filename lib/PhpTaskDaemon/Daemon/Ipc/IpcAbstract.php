@@ -97,6 +97,48 @@ abstract class IpcAbstract {
 
 
     /**
+     * Adds a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function addArrayVar($key, $value) {
+        $array = $this->getVar($key);
+        echo $key;
+        echo var_dump($array);
+        if (!is_array($array)) {
+            return FALSE;
+        }
+
+        if (!in_array($value, $array)) {
+            array_push($array, $value);
+            $this->setVar($key, $array);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
+     * Removes a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function removeArrayVar($key, $value) {
+        $array = $this->getVar($key);
+        if (!is_array($array)) {
+            return FALSE;
+        }
+
+        if (in_array($value, $array)) {
+            $array = array_diff($array, array($value));
+            $this->setVar($key, $array);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
      * Removes the ipc data
      * @param string $key
      * @return bool

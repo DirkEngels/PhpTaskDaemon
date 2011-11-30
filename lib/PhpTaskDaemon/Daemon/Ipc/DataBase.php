@@ -161,6 +161,43 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Adds a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function addArrayVar($key, $value) {
+        $result = FALSE;
+        $this->getPdo()->beginTransaction();
+        $array = $this->getVar($key);
+        if (!is_array($array)) {
+            $array = array();
+        }
+
+        if (!in_array($value, $array)) {
+            array_push($array, $value);
+            $this->setVar($key, $array);
+            $result = TRUE;
+        }
+
+        $this->getPdo()->commit();
+        return $result;
+    }
+
+
+    /**
+     * Removes a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function removeArrayVar($key, $value) {
+        $this->getPdo()->beginTransaction();
+        $result = parent::removeArrayVar($key, $value);
+        $this->getPdo()->commit();
+        return $result;
+    }
+
+
+    /**
      * 
      * Removes nothing 
      * @param string $name
