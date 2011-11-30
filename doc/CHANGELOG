@@ -10,9 +10,10 @@ Version 1.0 (roadmap)
 
 Version 0.8.5 (planned)
 -----------------------
-- Clean up pid & ipc resources
++ Fix setting IPC status & statistics
 - Add example tasks
 - Add tutorial
+- Clean up pid & ipc resources
 - Refactor status into executor
 - Refactor statistics into queue
 + Fix unit tests
