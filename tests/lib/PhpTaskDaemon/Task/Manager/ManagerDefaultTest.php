@@ -99,6 +99,10 @@ class ManagerDefaultTest extends \PHPUnit_Framework_Testcase {
 	}
 
     public function testRunManager() {
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
+        );
+
         $manager = $this->getMock('\\PhpTaskDaemon\\Task\\Manager\\ManagerDefault', array('execute'));
         $manager->expects($this->once())
              ->method('execute')
