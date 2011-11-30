@@ -20,7 +20,9 @@ class Parallel extends Child {
         try {
             echo "Checking child count: " . $this->_childCount . "/" . $this->_maxProcess . "\n";
             if ($this->_childCount >= $this->_maxProcess) {
-                while (pcntl_waitpid(0, $status) != -1) {
+                $pid = getmypid();
+                while ($pid != -1) {
+                    $pid = pcntl_wait($status);
                     $status = pcntl_wexitstatus($status);
                     echo "Child $status completed\n";
                     $this->_childCount--;
