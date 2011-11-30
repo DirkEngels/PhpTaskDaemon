@@ -13,7 +13,7 @@
 
 namespace PhpTaskDaemon\Task\Executor;
 
-class DefaultClassTest extends \PHPUnit_Framework_TestCase {
+class ExecutorDefaultTest extends \PHPUnit_Framework_TestCase {
     protected $_executor;
     protected $_status;
     protected $_job;
@@ -24,10 +24,10 @@ class DefaultClassTest extends \PHPUnit_Framework_TestCase {
 //          'This test has not been implemented yet.'
 //        );
 
-        $this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass();
+        $this->_executor = new \PhpTaskDaemon\Task\Executor\ExecutorDefault();
         $ipc = new \PhpTaskDaemon\Daemon\Ipc\None(\TMP_PATH . '/test-executor');
-        $this->_status = new \PhpTaskDaemon\Task\Executor\Status\DefaultClass($ipc);
-        $this->_job = new \PhpTaskDaemon\Task\Job\DefaultClass();
+        $this->_status = new \PhpTaskDaemon\Task\Executor\Status\StatusDefault($ipc);
+        $this->_job = new \PhpTaskDaemon\Task\Job\JobDefault();
 
         // Mark empty run function of the base class as executed in the coverage
         $this->_executor->run();
@@ -35,7 +35,7 @@ class DefaultClassTest extends \PHPUnit_Framework_TestCase {
 
     protected function tearDown() {
 //        $ipc = $this->_status->getIpc();
-//        if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\AbstractClass')) {
+//        if (is_a($ipc, '\PhpTaskDaemon\Daemon\Ipc\IpcAbstract')) {
 //            $ipc->remove();
 //        }
 //        unset($this->_status);
@@ -46,8 +46,8 @@ class DefaultClassTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testConstructorSingleArgument() {
-        $this->_executor = new \PhpTaskDaemon\Task\Executor\DefaultClass($this->_status);
-        $this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\Status\AbstractClass', $this->_executor->getStatus());
+        $this->_executor = new \PhpTaskDaemon\Task\Executor\ExecutorDefault($this->_status);
+        $this->assertInstanceOf('\PhpTaskDaemon\Task\Executor\Status\StatusAbstract', $this->_executor->getStatus());
         $this->assertNull($this->_executor->getJob());
     }
 

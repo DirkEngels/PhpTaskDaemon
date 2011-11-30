@@ -16,18 +16,21 @@
 
 namespace PhpTaskDaemon\Task\Manager\Timer;
 
-class AbstractTest extends \PHPUnit_Framework_TestCase {
+class TimerAbstractTest extends \PHPUnit_Framework_TestCase {
     protected $_timer;
 
     protected function setUp() {
         $this->_timer = $this->getMockForAbstractClass(
-            '\\PhpTaskDaemon\\Task\\Manager\\Timer\\AbstractClass'
+            '\\PhpTaskDaemon\\Task\\Manager\\Timer\\TimerAbstract'
         );
     }
 
     protected function tearDown() {
     }
 
+    /**
+     * @todo
+     */
     public function testNothing() {
         $this->assertTrue(TRUE);
     }
