@@ -179,10 +179,18 @@ abstract class StatisticsAbstract {
      * Initializes the statistics array with default values.
      */
     protected function _initializeIpc() {
-        $this->_ipc->setVar(self::STATUS_LOADED, 0);
-        $this->_ipc->setVar(self::STATUS_QUEUED, 0);
-        $this->_ipc->setVar(self::STATUS_DONE, 0);
-        $this->_ipc->setVar(self::STATUS_FAILED, 0);
+        $statuses = array(
+            self::STATUS_LOADED,
+            self::STATUS_QUEUED,
+            self::STATUS_DONE,
+            self::STATUS_FAILED
+        );
+        $ipcKeys = $this->_ipc->getKeys();
+        foreach($statuses as $status) {
+            if (!in_array($status, $ipcKeys)) {
+                $this->_ipc->setVar($status, 0);
+            }
+        }
     }
 
 }
