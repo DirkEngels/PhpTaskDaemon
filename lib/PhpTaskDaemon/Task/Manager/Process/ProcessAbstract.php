@@ -151,7 +151,9 @@ abstract class ProcessAbstract {
         \PhpTaskDaemon\Daemon\Logger::log(getmypid() . ': ' . $job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
 
         // Reset status and decrement queue
-        $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
+        $queue->updateStatistics(
+            $job->getOutput()->getVar('returnStatus')
+        );
         $queue->updateQueue();
 
         return $job->getOutput()->getVar('returnStatus');
