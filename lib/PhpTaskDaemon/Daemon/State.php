@@ -41,14 +41,14 @@ class State {
         }
 
         // Childs
-        if (!in_array('childs', $daemonKeys)) {
-            $state['childs'] = array();
+        if (!in_array('processes', $daemonKeys)) {
+            $state['processes'] = array();
         } else {
-            $state['childs'] = $ipc->getVar('childs');
+            $state['processes'] = $ipc->getVar('processes');
         }
 
         // Loop Childs
-        foreach($state['childs'] as $process) {
+        foreach($state['processes'] as $process) {
             // Queue Statistics
             $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
             if (!class_exists($ipcQueueClass)) {

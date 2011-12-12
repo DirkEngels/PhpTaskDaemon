@@ -246,7 +246,7 @@ class Instance {
         }
         Logger::log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::NOTICE);
 
-        $this->getIpc()->setVar('childs', array());
+        $this->getIpc()->setVar('processes', array());
         $managers = $this->_tasks->getManagers();
         foreach ($managers as $manager) {
             Logger::log("Starting manager: "  . $manager->getName(), \Zend_Log::NOTICE);
@@ -267,7 +267,7 @@ class Instance {
         );
 
         // Write pids to shared memory
-        $this->getIpc()->setVar('childs', $this->getPidManager()->getChilds());
+        $this->getIpc()->setVar('processes', $this->getPidManager()->getChilds());
 
         // Wait till all childs are done
         Logger::log("Waiting for childs to complete", \Zend_Log::NOTICE);

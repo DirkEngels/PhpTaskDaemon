@@ -300,7 +300,7 @@ class Console {
             $this->_exit();
         }
 
-        echo "PhpTaskDaemon - Status (" . count($state['childs']) . ")\n";
+        echo "PhpTaskDaemon - Status (" . count($state['processes']) . ")\n";
         echo "==========================\n";
         echo "\n";
 
@@ -314,11 +314,11 @@ class Console {
             $state = State::getState();
         }
 
-        if (count($state['childs']) == 0) {
+        if (count($state['processes']) == 0) {
             echo "No processes!\n";
 
         } else {
-            foreach ($state['childs'] as $queuePid) {
+            foreach ($state['processes'] as $queuePid) {
                 $queue = $state['queue-' . $queuePid];
 
                 // Statistics
@@ -358,7 +358,7 @@ class Console {
             ob_start();
 
             $state = State::getState();
-            echo "PhpTaskDaemon - Monitoring (" . count($state['childs']) . ")\n";
+            echo "PhpTaskDaemon - Monitoring (" . count($state['processes']) . ")\n";
             echo "==============================\n";
             echo "\n";
             $this->_status($state);
