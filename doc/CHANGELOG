@@ -11,6 +11,7 @@ Version 1.0 (roadmap)
 Version 0.8.5 (planned)
 -----------------------
 + Fix setting IPC status & statistics
++ Move namespace example tasks to App
 - Add example tasks
 - Add tutorial
 - Clean up pid & ipc resources
