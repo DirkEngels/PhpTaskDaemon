@@ -198,9 +198,14 @@ abstract class ManagerAbstract {
      * The sleep function for an interval manager
      */
     protected function _sleep() {
+        $sleepTime = \PhpTaskDaemon\Daemon\Config::get()->getOptionValue('timer.interval.time');
+        if ($sleepTime <= 0) {
+            $sleepTime = 15 * 1000 * 1000;
+        }
+
         // Sleep
-        \PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::DEBUG);
-        usleep($this->_sleepTimeQueue);
+        \PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::INFO);
+        usleep($sleepTime);
     }
 
 
