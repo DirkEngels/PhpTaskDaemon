@@ -17,7 +17,7 @@ Version 0.8.5 (planned)
 - Clean up pid & ipc resources
 - Refactor status into executor
 - Refactor statistics into queue
-+ Fix unit tests
++ Fix incomplete unit tests
 
 
 Version 0.8.4 (27-11-2011)
