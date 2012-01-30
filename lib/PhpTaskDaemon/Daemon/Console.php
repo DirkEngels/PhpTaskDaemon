@@ -332,9 +332,11 @@ class Console {
                 // Status
                 foreach ($queue['executors'] as $executorPid) {
                     $status = $state['executor-' . $executorPid];
+                    $percentage = (isset($status['percentage'])) ? $status['percentage'] : 0;
+                    $mesage = (isset($status['message'])) ? $status['message'] : '';
                     echo "- [" . $executorPid . "]: ";
-                    echo "\t" . $status['percentage'] . "%:";
-                    echo "\t" . $status['message'];
+                    echo "\t" . $percentage . "%:";
+                    echo "\t" . $message;
                     echo "\n";
                 }
 
