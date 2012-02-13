@@ -13,7 +13,7 @@
  */
 
 
-namespace PhpTaskDaemon\Daemon\Pid;
+namespace PhpTaskDaemon\Daemon;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase {
     protected $_config;
@@ -43,7 +43,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \PhpTaskDaemon\Exception\FileNotFound
      */
     public function testConstructInstanceSingleFileNonExisting() {
         $this->_config = \PhpTaskDaemon\Daemon\Config::get(array(
