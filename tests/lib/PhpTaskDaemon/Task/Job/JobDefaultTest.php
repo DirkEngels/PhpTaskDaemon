@@ -82,7 +82,7 @@ class JobDefaultTest extends \PHPUnit_Framework_Testcase {
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \InvalidArgumentException
      */
     public function testSetInputInvalidFormat() {
         $this->_job = new \PhpTaskDaemon\Task\Job\JobDefault();

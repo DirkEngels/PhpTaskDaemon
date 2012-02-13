@@ -93,11 +93,12 @@ abstract class JobAbstract {
      * 
      * (Re)Sets the input array 
      * @param \PhpTaskDaemon\Task\Job\Data\DataAbstract $input
+     * @exception \InvalidArgumentException
      * @return bool
      */
     public function setInput($input) {
         if (!is_a($input, '\PhpTaskDaemon\Task\Job\Data\DataAbstract')) {
-            throw new \Exception('Wrong data format for job input!');
+            throw new \InvalidArgumentException('Wrong data format for job input!');
         }
         $this->_input = $input;
         return TRUE; 
