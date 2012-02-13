@@ -119,11 +119,12 @@ abstract class JobAbstract {
      * 
      * (Re)Sets the output array 
      * @param \PhpTaskDaemon\Task\Job\Data\DataAbstract $output
+     * @exception \InvalidArgumentException
      * @return bool
      */
     public function setOutput($output) {
         if (!is_a($output, '\PhpTaskDaemon\Task\Job\Data\DataAbstract')) {
-            throw new \Exception('Wrong data format for job output!');
+            throw new \InvalidArgumentException('Wrong data format for job output!');
         }
         $this->_output = $output;
         return TRUE; 
