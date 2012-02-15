@@ -7,17 +7,17 @@ Version 1.0 (roadmap)
 - Create user documentation (doc dir + website/wiki)
 - Add queue implementation: database
 - Add database logger
+- Add tutorial
+- Clean up pid & ipc resources
 
 Version 0.8.5 (planned)
 -----------------------
 + Fix setting IPC status & statistics
 + Move namespace example tasks to App
-- Add example tasks
-- Add tutorial
-- Clean up pid & ipc resources
++ Fix incomplete unit tests
 - Refactor status into executor
 - Refactor statistics into queue
-+ Fix incomplete unit tests
+- Add example tasks
 
 
 Version 0.8.4 (27-11-2011)
