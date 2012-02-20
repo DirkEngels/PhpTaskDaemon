@@ -40,11 +40,6 @@ CREATE TRIGGER ipc_insert BEFORE INSERT ON `ipc` FOR EACH ROW SET
 NEW.ipcCreated = IFNULL(NEW.ipcCreated, NOW()),
 NEW.ipcUpdated = IFNULL(NEW.ipcUpdated, '0000-00-00 00:00:00');
 
-CREATE TRIGGER blog_entries_update BEFORE UPDATE ON `blog_entries` FOR EACH ROW SET
-NEW.updated = IF(NEW.updated = OLD.updated OR NEW.updated IS NULL, NOW(), NEW.updated),
-NEW.published = IFNULL(NEW.published, OLD.published);
-
-
 CREATE TRIGGER ipc_update BEFORE UPDATE ON `ipc` FOR EACH ROW SET
 NEW.ipcUpdated = CASE
                   WHEN NEW.ipcUpdated IS NULL THEN OLD.ipcUpdated
