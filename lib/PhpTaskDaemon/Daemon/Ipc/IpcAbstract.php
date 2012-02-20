@@ -153,8 +153,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * Removes the ipc data
-     * @return bool
+     * Removes all registered keys
+     * @return boolean
      */
     public function remove() {
         $this->_keys = array();
