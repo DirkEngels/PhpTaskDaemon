@@ -15,15 +15,15 @@ class Same extends ProcessAbstract implements ProcessInterface {
      * Executes a job within the same process.
      */
     public function run() {
-        $this->getQueue()->getStatistics()->getIpc()->setVar('executors', array(getmypid()));
+        $this->getQueue()->getIpc()->setVar('executors', array(getmypid()));
 
         foreach($this->getJobs() as $job) {
             $this->_processTask($job);
         }
 
         // Remove executor
-        $this->getQueue()->getStatistics()->getIpc()->setVar('executors', array());
-        $this->getExecutor()->getStatus()->getIpc()->remove();
+        $this->getQueue()->getIpc()->setVar('executors', array());
+        $this->getExecutor()->getIpc()->remove();
 
         \PhpTaskDaemon\Daemon\Logger::log('Finished current set of tasks!', \Zend_Log::INFO);
     }
