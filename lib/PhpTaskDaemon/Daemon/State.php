@@ -24,6 +24,7 @@ class State {
      * This static method returns an array with the state (statistics + 
      * statuses of active tasks) of all current running tasks.
      * 
+     * @static
      * @return array
      */
     public static function getState() {
@@ -43,6 +44,13 @@ class State {
     }
 
 
+    /**
+     * This static method returns an array with daemon specific information, 
+     * such as the process ID and its children ID's.
+     * 
+     * @static
+     * @return array
+     */
     public static function getDaemonState() {
         $state = array();
         $ipc = Ipc\IpcFactory::get(Ipc\IpcFactory::NAME_DAEMON);
@@ -65,9 +73,17 @@ class State {
     }
     
     
-    
+    /**
+     * This static methods returns an array with all information regarding a
+     * queue. A specific queue is identified by its process ID, which can be 
+     * retrieved from the daemon state.
+     *  
+     * @static
+     * @param integer $queuePid
+     * @return array
+     */
     public static function getQueueState($queuePid) {
-    	$ipcQueue = self::_getIpc(
+    	$ipcQueue = Ipc\IpcFactory::get(
     		Ipc\IpcFactory::NAME_QUEUE,
     		$queuePid
     	);
@@ -75,66 +91,21 @@ class State {
     }
 
     
+    /**
+     * This static methods returns an array with all information regarding an
+     * executor. A specific executor is identified by its process ID, which can
+     * be retrieved from the daemon state.
+     * 
+     * @static
+     * @param $executorPid
+     * @return array
+     */
     public static function getExecutorState($executorPid) {
-    	$ipcExecutor = self::_getIpc(
+    	$ipcExecutor = Ipc\IpcFactory::get(
     		Ipc\IpcFactory::NAME_EXECUTOR,
     		$executorPid
     	);
         return $ipcExecutor->get();
-    }
-    
-    
-    private static function _getIpc($type, $pid = NULL) {
-        $ipc = Ipc\IpcFactory::get(
-            $type,
-            $pid
-        );
-        echo get_class($ipc);
-        return $ipc->get();
-    }
-    
-
-    /**
-     * This statis method is mainly used by the getState method and returns an
-     * array with all statuses of currently running tasks of a particular
-     * manager.
-     *
-     * @param int $childPid
-     * @return array
-     */
-    protected static function _getChildStatus($childPid) {
-        $state = array('childPid' => $childPid);
-        if (file_exists(TMP_PATH . '/status-' . $childPid . '.shm')) {
-            $shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . $childPid);
-            $shmKeys = $shm->getKeys();
-            foreach($shm->getKeys() as $key => $value) {
-                $state[$key] = $shm->getVar($key);
-            }
-        }
-
-        return $state;
-    }
-
-
-    /**
-     * This statis method is mainly used by the getState method and returns an
-     * array with statistics of all currently running tasks of a particular
-     * manager.
-     *
-     * @param int $childPid
-     * @return array
-     */
-    protected static function _getChildStatistics($childPid) {
-        $state = array('childPid' => $childPid);
-        if (file_exists(TMP_PATH . '/statistics-' . $childPid . '.shm')) {
-            $shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . $childPid);
-            $shmKeys = $shm->getKeys();
-            foreach($shm->getKeys() as $key => $value) {
-                $state[$key] = $shm->getVar($key);
-            }
-        }
-
-        return $state;
     }
 
 }
