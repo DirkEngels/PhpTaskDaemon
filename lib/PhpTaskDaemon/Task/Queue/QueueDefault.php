@@ -18,24 +18,29 @@ use \PhpTaskDaemon\Task\Job;
  */
 class QueueDefault extends QueueAbstract implements QueueInterface {
 
+	/**
+	 * (non-PHPdoc)
+	 * 
+	 * @see Queue/PhpTaskDaemon\Task\Queue.QueueInterface::load()
+	 */
     public function load() {
         $queue = array(
             new Job\JobDefault(
                 'base-1',
                 new Job\Data\DataDefault(
-                    array('sleepTime' => 1000000)
+                    array('sleepTime' => rand(500000, 2000000))
                 )
             ),
             new Job\JobDefault(
                 'base-2',
                 new Job\Data\DataDefault(
-                    array('sleepTime' => 500000)
+                    array('sleepTime' => rand(500000, 2000000))
                 )
             ),
             new Job\JobDefault(
                 'base-3',
                 new Job\Data\DataDefault(
-                    array('sleepTime' => 1000000)
+                    array('sleepTime' => rand(500000, 2000000))
                 )
             )
         );

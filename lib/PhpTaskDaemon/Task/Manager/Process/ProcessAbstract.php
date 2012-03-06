@@ -127,7 +127,8 @@ abstract class ProcessAbstract {
     /**
      * 
      * Process a single task: set job input, reset status, run and update
-     * statistics
+     * statistics.
+     * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
      */
     protected function _processTask(\PhpTaskDaemon\Task\Job\JobAbstract $job) {
@@ -137,21 +138,23 @@ abstract class ProcessAbstract {
         $executor->setJob($job);
         $queue = $this->getQueue();
 
-        $executor->getStatus()->resetIpc();
-        $executor->getStatus()->resetPid();
-        $queue->getStatistics()->resetIpc();
+        $executor->resetIpc();
+        $executor->resetPid();
+        $queue->resetIpc();
 
         // Update Status before and after running the task
-        $executor->updateStatus(0);
+        $executor->setStatus(0, 'Initializing task');
         $job = $executor->run();
-        $executor->updateStatus(100);
+        $executor->setStatus(100, 'Finished task');
 
         // Log and sleep for a while
         usleep(self::SLEEPTIME);
         \PhpTaskDaemon\Daemon\Logger::log(getmypid() . ': ' . $job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
 
         // Reset status and decrement queue
-        $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
+        $queue->updateStatus(
+            $job->getOutput()->getVar('returnStatus')
+        );
         $queue->updateQueue();
 
         return $job->getOutput()->getVar('returnStatus');
@@ -174,13 +177,13 @@ abstract class ProcessAbstract {
 
         } else {
             // @todo: Initiate resources
-            $this->getExecutor()->getStatus()->getIpc()->initResource();
+            $this->getExecutor()->getIpc()->initResource();
 
             // Set manager input and start the manager
             $this->_processTask($job);
 
             // Cleanup resources
-            $this->getExecutor()->getStatus()->getIpc()->cleanupResource();
+            $this->getExecutor()->getIpc()->cleanupResource();
 
             // Exit after finishing the forked
             exit;

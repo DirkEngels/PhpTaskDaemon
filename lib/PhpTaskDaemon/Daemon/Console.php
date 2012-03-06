@@ -300,7 +300,7 @@ class Console {
             $this->_exit();
         }
 
-        echo "PhpTaskDaemon - Status (" . count($state['childs']) . ")\n";
+        echo "PhpTaskDaemon - Status (" . count($state['processes']) . ")\n";
         echo "==========================\n";
         echo "\n";
 
@@ -314,15 +314,16 @@ class Console {
             $state = State::getState();
         }
 
-        if (count($state['childs']) == 0) {
+        if (count($state['processes']) == 0) {
             echo "No processes!\n";
 
         } else {
-            foreach ($state['childs'] as $queuePid) {
+            foreach ($state['processes'] as $queuePid) {
                 $queue = $state['queue-' . $queuePid];
 
                 // Statistics
                 echo "[" . $queuePid . "]: ";
+                echo $queue['name'] . "\t";
                 echo "\t(Progress: " . ($queue['loaded']-$queue['queued']) . '/' . $queue['loaded'];
                 echo "\tDone: " . $queue['done'];
                 echo "\tFailed: " . $queue['failed'];
@@ -331,9 +332,11 @@ class Console {
                 // Status
                 foreach ($queue['executors'] as $executorPid) {
                     $status = $state['executor-' . $executorPid];
+                    $percentage = (isset($status['percentage'])) ? $status['percentage'] : 0;
+                    $mesage = (isset($status['message'])) ? $status['message'] : '';
                     echo "- [" . $executorPid . "]: ";
-                    echo "\t" . $status['percentage'] . "%:";
-                    echo "\t" . $status['message'];
+                    echo "\t" . $percentage . "%:";
+                    echo "\t" . $message;
                     echo "\n";
                 }
 
@@ -357,7 +360,7 @@ class Console {
             ob_start();
 
             $state = State::getState();
-            echo "PhpTaskDaemon - Monitoring (" . count($state['childs']) . ")\n";
+            echo "PhpTaskDaemon - Monitoring (" . count($state['processes']) . ")\n";
             echo "==============================\n";
             echo "\n";
             $this->_status($state);

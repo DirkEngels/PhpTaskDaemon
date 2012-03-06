@@ -179,6 +179,7 @@ class Config {
      * Initializes the configuration by loading one or more (default)
      * configuration files
      * @param array $configFiles
+     * @exception \PhpTaskDaemon\Exception\FileNotFound
      */
     protected function _initConfig($configFiles) {
         foreach($configFiles as $configFile) {
@@ -211,7 +212,7 @@ class Config {
 
         // At least one configuration file must be loaded.
         if (count($this->_files) == 0) {
-            throw new \Exception('No configuration files found!');
+            throw new \PhpTaskDaemon\Exception\FileNotFound('No configuration files found!');
         }
 
         $this->_config->setReadonly();

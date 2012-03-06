@@ -37,15 +37,19 @@ class Gearman extends ManagerAbstract implements ManagerInterface {
      * @param unknown_type $gearmanJob
      */
     public function processGearmanTask($gearmanJob) {
-        $data = $gearmanJob->workload();
+        $data = unserialize($gearmanJob->workload());
+        if (!is_array($data)) {
+            $data = array('data' => $data);
+        }
         $job = new \PhpTaskDaemon\Task\Job\JobDefault(
             'gearman-' . getmypid(),
-            new \PhpTaskDaemon\Task\Job\Data\JobDefault(
-                array('gearmanData' => $data)
+            new \PhpTaskDaemon\Task\Job\Data\DataDefault(
+                $data
             )
         );
-
-        return $this->_processTask($job);
+        return $this->getProcess()
+            ->setJobs(array($job))
+            ->run();
     }
 
 }

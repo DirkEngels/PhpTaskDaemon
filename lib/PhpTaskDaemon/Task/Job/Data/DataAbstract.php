@@ -50,7 +50,7 @@ abstract class DataAbstract {
      */
     public function set($data, $reset = FALSE) {
         if (!is_array($data)) {
-            throw new \Exception('Job data must be an array!');
+            throw new \InvalidArgumentException('Job data must be an array!');
         }
 
         if ($reset) {

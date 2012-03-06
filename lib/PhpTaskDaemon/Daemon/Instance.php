@@ -246,7 +246,7 @@ class Instance {
         }
         Logger::log("Found " . count($this->_tasks->getManagers()) . " daemon task managers", \Zend_Log::NOTICE);
 
-        $this->getIpc()->setVar('childs', array());
+        $this->getIpc()->setVar('processes', array());
         $managers = $this->_tasks->getManagers();
         foreach ($managers as $manager) {
             Logger::log("Starting manager: "  . $manager->getName(), \Zend_Log::NOTICE);
@@ -267,7 +267,7 @@ class Instance {
         );
 
         // Write pids to shared memory
-        $this->getIpc()->setVar('childs', $this->getPidManager()->getChilds());
+        $this->getIpc()->setVar('processes', $this->getPidManager()->getChilds());
 
         // Wait till all childs are done
         Logger::log("Waiting for childs to complete", \Zend_Log::NOTICE);
@@ -306,12 +306,6 @@ class Instance {
             $newPid = getmypid();
             $this->getPidManager()->forkChild($newPid);
             $manager->init($this->getPidManager()->getParent());
-
-            $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault();
-            $manager->getProcess()->getQueue()->setStatistics($statistics);
-
-            $status = new \PhpTaskDaemon\Task\Executor\Status\StatusDefault();
-            $manager->getProcess()->getExecutor()->setStatus($status);
 
             Logger::log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
             $manager->runManager();

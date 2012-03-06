@@ -96,9 +96,8 @@ class FileSystem extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
-     * Removes nothing
-     * @return bool
+     * (non-PHPdoc)
+     * @see PhpTaskDaemon\Daemon\Ipc.IpcAbstract::remove()
      */
     public function remove() {
     }

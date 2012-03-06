@@ -36,11 +36,12 @@ class Tasks {
     /**
      * Adds a manager
      * @param \PhpTaskDaemn\Task\Manager\ManagerAbstract $manager
+     * @exception \InvalidArgumentException
      * @return boolean
      */
     public function addManager($manager) {
         if (!($manager instanceof \PhpTaskDaemon\Task\Manager\ManagerAbstract)) {
-            throw new \Exception('Invalid Manager instance');
+            throw new \InvalidArgumentException('Invalid Manager instance');
         }
         return array_push($this->managers, $manager);
     }

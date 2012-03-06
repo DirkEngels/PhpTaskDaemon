@@ -161,6 +161,43 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Adds a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function addArrayVar($key, $value) {
+        $result = FALSE;
+        $this->getPdo()->beginTransaction();
+        $array = $this->getVar($key);
+        if (!is_array($array)) {
+            $array = array();
+        }
+
+        if (!in_array($value, $array)) {
+            array_push($array, $value);
+            $this->setVar($key, $array);
+            $result = TRUE;
+        }
+
+        $this->getPdo()->commit();
+        return $result;
+    }
+
+
+    /**
+     * Removes a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function removeArrayVar($key, $value) {
+        $this->getPdo()->beginTransaction();
+        $result = parent::removeArrayVar($key, $value);
+        $this->getPdo()->commit();
+        return $result;
+    }
+
+
+    /**
      * 
      * Removes nothing 
      * @param string $name
@@ -176,11 +213,10 @@ class DataBase extends IpcAbstract implements IpcInterface {
     }
 
 
-    /**
-     * 
-     * Removes nothing
-     * @return bool
-     */
+	/**
+	 * s(non-PHPdoc)
+	 * @see PhpTaskDaemon\Daemon\Ipc.IpcAbstract::remove()
+	 */
     public function remove() {
         $sql = "DELETE FROM ipc WHERE ipcId=:ipcId";
         $params = array(
@@ -227,7 +263,8 @@ class DataBase extends IpcAbstract implements IpcInterface {
      * @return integer
      */
     protected function _dbStatement($sql, $params = array()) {
-        Logger::log('Executing SQL Statement: ' . $sql . ' with params: ' . var_export($params, true), \Zend_Log::DEBUG);
+        Logger::log('Executing SQL Statement: ' . $sql, \Zend_Log::DEBUG);
+        Logger::log('Executing SQL Params: ' . implode(", ", $params), \Zend_Log::DEBUG);
         $this->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         try {
             $this->_stmt = $this->getPdo()->prepare($sql);

@@ -38,7 +38,7 @@ class TasksTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \InvalidArgumentException
      */
     public function testAddManagersInvalidManager() {
         $this->_tasks->addManager('blaat');

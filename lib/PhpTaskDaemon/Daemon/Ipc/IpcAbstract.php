@@ -43,10 +43,23 @@ abstract class IpcAbstract {
         return TRUE;
     }
 
+
+    /**
+     * 
+     * Initializes the resource, which is needed when forking processes.
+     * @return bool
+     */
     public function initResource() {
+        return TRUE;
     }
 
+
+    /**
+     * Cleans up any open resources.
+     * @return bool
+     */
     public function cleanupResource() {
+        return TRUE;
     }
 
 
@@ -84,10 +97,68 @@ abstract class IpcAbstract {
 
 
     /**
+     * Adds a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function addArrayVar($key, $value) {
+        $array = $this->getVar($key);
+        echo $key;
+        echo var_dump($array);
+        if (!is_array($array)) {
+            return FALSE;
+        }
+
+        if (!in_array($value, $array)) {
+            array_push($array, $value);
+            $this->setVar($key, $array);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
+     * Removes a value to an array key
+     * @param string $key
+     * @param mixed $value
+     */
+    public function removeArrayVar($key, $value) {
+        $array = $this->getVar($key);
+        if (!is_array($array)) {
+            return FALSE;
+        }
+
+        if (in_array($value, $array)) {
+            $array = array_diff($array, array($value));
+            $this->setVar($key, $array);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
      * Removes the ipc data
+     * @param string $key
+     * @return bool
+     */
+    public function removeVar($key) {
+        if (in_array($key, $this->_keys)) {
+            unset($this->_keys[$key]);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
+     * Removes all registered keys
+     * @return boolean
      */
     public function remove() {
         $this->_keys = array();
+        return TRUE;
     }
 
 }
