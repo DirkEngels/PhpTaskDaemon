@@ -27,18 +27,10 @@ class ExecutorAbstractTest extends \PHPUnit_Framework_TestCase {
     protected function tearDown() {
     }
 
-    public function testUpdateStatusNoStatusSet() {
-        $this->assertFalse($this->_executor->updateStatus(100));
+    public function testNothing() {
+        // Stop here and mark this test as incomplete.
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
+        );
     }
-
-    public function testUpdateStatusStatusSet() {
-        $status = $this->getMock('\\PhpTaskDaemon\\Task\\Executor\\Statistics\\StatisticsDefault', array('set'));
-        $status->expects($this->once())
-             ->method('set')
-             ->will($this->returnValue(TRUE));
-        
-        $this->_executor->setStatus($status);
-        $this->assertTrue($this->_executor->updateStatus(100));
-    }
-
 }

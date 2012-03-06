@@ -46,18 +46,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Executor\\ExecutorAbstract', $executor);
     }
 
-    public function testFactoryGetExecutorStatusWithTaskName() {
-        $status = \PhpTaskDaemon\Task\Factory::getExecutorStatus('Tutorial\\Basics\\Minimal');
-        $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Executor\\Status\\StatusAbstract', $status);
-    }
-
     public function testFactoryGetQueueWithTaskName() {
         $queue = \PhpTaskDaemon\Task\Factory::getQueue('Tutorial\\Basics\\Minimal');
         $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Queue\\QueueAbstract', $queue);
     }
 
-    public function testFactoryGetQueueStatisticsWithTaskName() {
-        $statistics = \PhpTaskDaemon\Task\Factory::getQueueStatistics('Tutorial\\Basics\\Minimal');
-        $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Queue\\Statistics\\StatisticsAbstract', $statistics);
-    }
 }
