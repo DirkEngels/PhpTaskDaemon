@@ -176,7 +176,9 @@ abstract class ManagerAbstract {
 
     /**
      * 
-     * Starts the manager
+     * Starts the manager.
+     * 
+     * @todo
      */
     public function runManager() {
         // Override signal handler
@@ -186,7 +188,7 @@ abstract class ManagerAbstract {
 //        );
 
         // Set taskname to queue ipc
-        $queueIpc = $this->getProcess()->getQueue()->getStatistics()->getIpc();
+        $queueIpc = $this->getProcess()->getQueue()->getIpc();
         $queueIpc->setVar('name', $this->getName());
 
         $this->execute();

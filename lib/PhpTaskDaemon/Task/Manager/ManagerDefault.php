@@ -20,8 +20,8 @@ class ManagerDefault extends ManagerAbstract implements ManagerInterface {
         while (true) {
             // Re-initialize the IPC components
             $process = $this->getProcess();
-            $process->getExecutor()->getStatus()->resetIpc();
-            $process->getQueue()->getStatistics()->resetIpc();
+            $process->getExecutor()->resetIpc();
+            $process->getQueue()->resetIpc();
 
             // Load Tasks in Queue
             $jobs = $this->getProcess()->getQueue()->load();

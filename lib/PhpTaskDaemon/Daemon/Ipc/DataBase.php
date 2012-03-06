@@ -213,11 +213,10 @@ class DataBase extends IpcAbstract implements IpcInterface {
     }
 
 
-    /**
-     * 
-     * Removes nothing
-     * @return bool
-     */
+	/**
+	 * s(non-PHPdoc)
+	 * @see PhpTaskDaemon\Daemon\Ipc.IpcAbstract::remove()
+	 */
     public function remove() {
         $sql = "DELETE FROM ipc WHERE ipcId=:ipcId";
         $params = array(
