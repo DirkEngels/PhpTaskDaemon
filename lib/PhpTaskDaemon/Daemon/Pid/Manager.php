@@ -19,27 +19,29 @@ class Manager {
 
     /**
      * This variables stores the current process ID.
+     * 
      * @var int|NULL
      */
     protected $_current = NULL;
 
     /**
+     * The parent process ID.
      * 
-     * The parent process ID
      * @var int|NULL
      */
     protected $_parent = NULL;
 
     /**
      * An array with the child pids, if any.
+     * 
      * @var array
      */
     protected $_childs = array();
 
 
     /**
+     * Constructor with optional process (and parent) id.
      * 
-     * Constructor
      * @param int $pid
      * @param int $parent
      */
@@ -55,8 +57,8 @@ class Manager {
 
 
     /**
+     * Returns the PID of the current process.
      * 
-     * Returns the PID of the current process
      * @return int
      */
     public function getCurrent() {
@@ -65,8 +67,8 @@ class Manager {
 
 
     /**
+     * Returns the PID of the parent process.
      * 
-     * Returns the PID of the parent process
      * @return int|NULL
      */
     public function getParent() {
@@ -75,8 +77,8 @@ class Manager {
 
 
     /**
-     * 
      * Returns an array with pids of child processes, if any.
+     * 
      * @return array
      */
     public function getChilds() {
@@ -85,8 +87,8 @@ class Manager {
 
 
     /**
-     * 
      * Checks if the current process has any child processes.
+     * 
      * @return bool
      */
     public function hasChilds() {
@@ -98,8 +100,8 @@ class Manager {
 
 
     /**
+     * Adds a PID of a child process.
      * 
-     * Adds a PID of a child process
      * @param int $pid
      * @return int
      */
@@ -109,8 +111,8 @@ class Manager {
 
 
     /**
+     * Removes a PID of a child process.
      * 
-     * Removes a PID of a child process
      * @param int $pid
      * @return bool
      */
@@ -128,6 +130,7 @@ class Manager {
      * This method should be called by the child when a process has forked. It
      * shifts the current process ID to the parent and sets the new child 
      * process ID. It also cleans all existing childs.
+     * 
      * @param integer $newPid
      */
     public function forkChild($newPid) {
