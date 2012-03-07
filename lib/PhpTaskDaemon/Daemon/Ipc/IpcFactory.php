@@ -16,6 +16,7 @@ use PhpTaskDaemon\Daemon\Logger;
  *
  */
 class IpcFactory {
+
     const TYPE_NONE = 'None';
     const TYPE_SHAREDMEMORY = 'SharedMemory';
     const TYPE_FILESYSTEM = 'FileSystem';
@@ -28,6 +29,7 @@ class IpcFactory {
 
     /**
      * Instantiates a new Ipc object.
+     * 
      * @param $ipcType
      * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */
@@ -60,6 +62,7 @@ class IpcFactory {
                 $ipcObject = new None($ipcId);
                 break;
         }
+
         Logger::log('Create new IPC object (' . $ipcType . '): ' . $ipcId, \Zend_Log::DEBUG);
         return $ipcObject;
     }
