@@ -33,8 +33,8 @@ abstract class IpcAbstract {
 
 
     /**
+     * Constructs a new unique (id) Ipc object.
      * 
-     * Constructs a new unique (id) Ipc object
      * @param string $id
      */
     public function __construct($id) {
@@ -45,8 +45,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * 
      * Initializes the resource, which is needed when forking processes.
+     * 
      * @return bool
      */
     public function initResource() {
@@ -119,7 +119,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * Removes a value to an array key
+     * Removes a value to an array key.
+     * 
      * @param string $key
      * @param mixed $value
      */
@@ -139,7 +140,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * Removes the ipc data
+     * Removes the ipc data.
+     * 
      * @param string $key
      * @return bool
      */
@@ -153,7 +155,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * Removes the ipc data
+     * Removes the ipc data.
+     * 
      * @return bool
      */
     public function remove() {
