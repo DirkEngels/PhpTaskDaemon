@@ -17,29 +17,33 @@ namespace PhpTaskDaemon\Daemon\Pid;
  */
 class Manager {
 
+    const MSG_PID_UNKNOWN = 'Process ID (%s) has not been registered.';
+
     /**
      * This variables stores the current process ID.
+     * 
      * @var int|NULL
      */
     protected $_current = NULL;
 
     /**
-     * 
      * The parent process ID
+     * 
      * @var int|NULL
      */
     protected $_parent = NULL;
 
     /**
      * An array with the child pids, if any.
+     * 
      * @var array
      */
     protected $_childs = array();
 
 
     /**
+     * Constructor with an optional PID and parent PID.
      * 
-     * Constructor
      * @param int $pid
      * @param int $parent
      */
@@ -55,9 +59,9 @@ class Manager {
 
 
     /**
+     * Returns the PID of the current process.
      * 
-     * Returns the PID of the current process
-     * @return int
+     * @return int The process ID of the this registered process.
      */
     public function getCurrent() {
         return $this->_current;
@@ -65,9 +69,9 @@ class Manager {
 
 
     /**
+     * Returns the PID of the parent process.
      * 
-     * Returns the PID of the parent process
-     * @return int|NULL
+     * @return NULL|int The process ID of the parent process or NULL.
      */
     public function getParent() {
         return $this->_parent;
@@ -75,9 +79,9 @@ class Manager {
 
 
     /**
+     * Returns an array with pids of child processes, or not.
      * 
-     * Returns an array with pids of child processes, if any.
-     * @return array
+     * @return array Contains the child process IDs of the current process.
      */
     public function getChilds() {
         return $this->_childs;
@@ -85,12 +89,12 @@ class Manager {
 
 
     /**
-     * 
      * Checks if the current process has any child processes.
-     * @return bool
+     * 
+     * @return bool Has one or more child processes registered.
      */
     public function hasChilds() {
-        if (count($this->_childs)>0) {
+        if ( count( $this->_childs ) > 0 ) {
             return TRUE;
         }
         return FALSE;
@@ -98,10 +102,10 @@ class Manager {
 
 
     /**
+     * Adds a child process ID.
      * 
-     * Adds a PID of a child process
-     * @param int $pid
-     * @return int
+     * @param int $pid The process ID to add.
+     * @return bool
      */
     public function addChild($pid) {
         return array_push($this->_childs, $pid);
@@ -109,18 +113,23 @@ class Manager {
 
 
     /**
+     * Removes a child process ID.
      * 
-     * Removes a PID of a child process
      * @param int $pid
-     * @return bool
+     * @throws InvalidArgumentException PID_UNKNOWN
+     * @return bool Process ID was registered.
      */
     public function removeChild($pid) {
         $key = array_search($pid, $this->_childs);
-        if ($key !== FALSE) {
+
+        // 
+        if ($key == FALSE) {
+            $msg = sprintf( self::MSG_PID_UNKNOWN, $pid );
+            throw new \InvalidArgumentException( $msg );
+        }
+
             unset($this->_childs[$key]);
             return TRUE;
-        }
-        return FALSE;
     }
 
 
@@ -128,7 +137,9 @@ class Manager {
      * This method should be called by the child when a process has forked. It
      * shifts the current process ID to the parent and sets the new child 
      * process ID. It also cleans all existing childs.
-     * @param integer $newPid
+     * 
+     * @param integer $newPid The new process ID of the forked process.
+     * @return NULL
      */
     public function forkChild($newPid) {
         $this->_parent = $this->_current;

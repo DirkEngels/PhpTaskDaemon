@@ -28,6 +28,7 @@ class IpcFactory {
 
     /**
      * Instantiates a new Ipc object.
+     * 
      * @param $ipcType
      * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */

@@ -19,7 +19,8 @@ use PhpTaskDaemon\Daemon\Logger;
 abstract class IpcAbstract {
 
     /**
-     * Unique identifier
+     * Unique identifier for the IPC ID.
+     * 
      * @var string
      */
     protected $_id = NULL;
@@ -27,6 +28,7 @@ abstract class IpcAbstract {
 
     /**
      * This array contains the keys of all registered variables.
+     * 
      * @var array
      */
     protected $_keys = array();
@@ -56,6 +58,7 @@ abstract class IpcAbstract {
 
     /**
      * Cleans up any open resources.
+     * 
      * @return bool
      */
     public function cleanupResource() {
@@ -64,7 +67,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * Returns the unique identifier
+     * Returns the unique identifier.
+     * 
      * @return string
      */
     public function getId() {
@@ -73,8 +77,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * 
      * Returns the registered keys.
+     * 
      * @return array
      */
     public function getKeys() {
@@ -84,6 +88,7 @@ abstract class IpcAbstract {
 
     /**
      * Returns all the registered keys with corresponding values.
+     * 
      * @return array
      */
     public function get() {
@@ -97,7 +102,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * Adds a value to an array key
+     * Adds a value to an array key.
+     * 
      * @param string $key
      * @param mixed $value
      */

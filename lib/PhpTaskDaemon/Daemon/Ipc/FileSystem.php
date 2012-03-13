@@ -17,8 +17,8 @@ namespace PhpTaskDaemon\Daemon\Ipc;
 class FileSystem extends IpcAbstract implements IpcInterface {
 
     /**
+     * Returns an array with registered keys.
      * 
-     * Returns an empty array
      * @return array
      */
     public function getKeys() {
@@ -27,8 +27,8 @@ class FileSystem extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
-     * Returns nothing (NULL) 
+     * Returns nothing (NULL).
+     *  
      * @param string $key
      * @return mixed
      */
@@ -37,8 +37,8 @@ class FileSystem extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Sets a key using the filesystem.
      * 
-     * Sets nothing
      * @param string $key
      * @param mixed $value
      * @return bool
@@ -50,8 +50,8 @@ class FileSystem extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Increment a key registered as a filename.
      * 
-     * Increments nothing
      * @param string $key
      * @return bool
      */
@@ -64,8 +64,8 @@ class FileSystem extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * Decrements the value of the key stored in a file.
+     * 
      * @param string $key
      * @return bool
      */
@@ -81,8 +81,8 @@ class FileSystem extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
-     * Removes the file from the filesystem 
+     * Removes the file from the filesystem.
+     *  
      * @param string $key
      * @return bool
      */
@@ -96,15 +96,16 @@ class FileSystem extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Removes nothing.
      * 
-     * Removes nothing
      * @return bool
      */
     public function remove() {
     }
 
     /**
-     * Returns the filename for a specific key
+     * Returns the filename for a specific key.
+     * 
      * @param string $key
      * @output string
      */

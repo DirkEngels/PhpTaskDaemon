@@ -25,8 +25,8 @@ class Signal {
     protected $_identifier = NULL;
 
     /**
+     * Register POSIX Signals.
      * 
-     * Register POSIX Signals
      * @param $identifier
      * @param $log
      * @param $callback
@@ -51,9 +51,9 @@ class Signal {
 
 
     /**
+     * POSIX Signal handler callback.
      * 
-     * POSIX Signal handler callback
-     * @param $sig
+     * @param $sig POSIX Signal to catch.
      */
     public function defaultHandler($sig) {
         switch ($sig) {

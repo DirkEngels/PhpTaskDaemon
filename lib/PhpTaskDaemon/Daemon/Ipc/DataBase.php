@@ -19,6 +19,9 @@ use PhpTaskDaemon\Daemon\Logger;
  */
 class DataBase extends IpcAbstract implements IpcInterface {
 
+    const MSG_INVALID_VALUE = 'Value for key (%s) does not exists (ipcId: %s)';
+    const MSG_NOT_NUMERIC = 'Value (%s) is not numeric: %d';
+
     /**
      * PDO Object
      * @var \PDO
@@ -32,12 +35,17 @@ class DataBase extends IpcAbstract implements IpcInterface {
     protected $_stmt;
 
 
-    public function __construct($id) {
-        parent::__construct($id);
+    public function __construct( $id ) {
+        parent::__construct( $id );
         $this->_dbSetup();
     }
 
 
+    /**
+     * (non-PHPdoc)
+     * 
+     * @see PhpTaskDaemon\Daemon\Ipc.IpcAbstract::initResource()
+     */
     public function initResource() {
         $this->_pdo = NULL;
         $this->_stmt = NULL;
@@ -45,11 +53,12 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Getter for the PDO object
+     * Getter for the PDO object.
+     * 
      * @return \PDO
      */
     public function getPdo() {
-        if (is_null($this->_pdo)) {
+        if ( is_null( $this->_pdo ) ) {
             $this->_dbSetup();
         }
 
@@ -58,23 +67,24 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Setter of the PDO object
+     * Setter of the PDO object.
+     * 
      * @param $pdo \PDO
      */
-    public function setJob($pdo) {
+    public function setJob( $pdo ) {
         $this->_pdo = $pdo;
     }
 
 
     /**
+     * Returns an empty array.
      * 
-     * Returns an empty array
      * @return array
      */
     public function getKeys() {
         $sql = "SELECT name FROM ipc WHERE ipcId=:ipcId";
         $params = array(
-            'ipcId' => $this->_id,
+            'ipcId' => $this->_id
         );
         $this->_dbStatement($sql, $params);
         return $this->_stmt->fetchAll(\PDO::FETCH_COLUMN);
@@ -82,33 +92,36 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
-     * Returns nothing (NULL) 
+     * Returns nothing (NULL).
+     *  
      * @param string $name
      * @return NULL
      */
-    public function getVar($name) {
+    public function getVar( $name ) {
         $sql = "SELECT value FROM ipc WHERE ipcId=:ipcId AND name=:name";
         $params = array(
             'ipcId' => $this->_id,
             'name' => $name,
         );
         $this->_dbStatement($sql, $params);
-//        if ($this->_stmt->rowCount() == 0) {
-//            throw new \Exception('Value for key (' . $name . ') does not exists (ipcId: ' . $this->_id . ')', \Zend_Log::ERR);
-//        }
+
+        if ($this->_stmt->rowCount() == 0) {
+            $msg = sprintf( self::MSG_INVALID_RECORD, $name, $id);
+            throw new \Exception( $msg, \Zend_Log::ERR);
+        }
+
         return unserialize($this->_stmt->fetchColumn());
     }
 
 
-    /**
+    /** 
+     * Sets nothing.
      * 
-     * Sets nothing
      * @param string $name
      * @param mixed $value
      * @return bool
      */
-    public function setVar($name, $value) {
+    public function setVar( $name, $value ) {
 
         $sql = "REPLACE INTO ipc (ipcUpdated, ipcId, name, value) VALUES (NOW(), :ipcId, :name, :value)";
         $params = array(
@@ -116,52 +129,61 @@ class DataBase extends IpcAbstract implements IpcInterface {
             'name' => $name,
             'value' => serialize($value),
         );
-        $this->_dbStatement($sql, $params);
+        return $this->_dbStatement($sql, $params);
     }
 
 
     /**
+     * Increments nothing.
      * 
-     * Increments nothing
      * @param string $name
      * @return bool
      */
-    public function incrementVar($name, $count = 1) {
+    public function incrementVar( $name, $count = 1 ) {
         $this->getPdo()->beginTransaction();
 
-        $value = $this->getVar($name);
-        if (!isset($value)) {
+        $value = $this->getVar( $name );
+        if ( ! isset( $value ) ) {
             $value = 0;
         }
         $value += $count;
-        $this->setVar($name, $value);
+        $this->setVar( $name, $value );
 
         return $this->getPdo()->commit();
     }
 
 
     /**
+     * Decrements nothing.
      * 
-     * Decrements nothing
      * @param string $name
      * @return bool
      */
-    public function decrementVar($name, $count = 1) {
+    public function decrementVar( $name, $count = 1 ) {
         $this->getPdo()->beginTransaction();
+        $value = $this->getVar( $name );
 
-        $value = $this->getVar($name);
-        if (!isset($value)) {
+        // Exception when value is not numeric
+        if ( ! is_numeric( $value ) ) {
+            $msg = sprintf( self::MSG_NOT_NUMERIC, $name, $value );
+            throw new \UnexpectedValueException( $msg );
+        }
+
+        // Reset value when not set
+        if ( ! isset( $value ) ) {
             $value = 0;
         }
+
         $value -= $count;
-        $this->setVar($name, $value);
+        $this->setVar( $name, $value );
 
         return $this->getPdo()->commit();
     }
 
 
     /**
-     * Adds a value to an array key
+     * Adds a value to an array key.
+     * 
      * @param string $key
      * @param mixed $value
      */
@@ -185,7 +207,8 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Removes a value to an array key
+     * Removes a value to an array key.
+     * 
      * @param string $key
      * @param mixed $value
      */
@@ -198,8 +221,8 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Removes nothing.
      * 
-     * Removes nothing 
      * @param string $name
      * @return bool
      */
@@ -214,8 +237,8 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Removes all registered keys.
      * 
-     * Removes nothing
      * @return bool
      */
     public function remove() {
@@ -227,6 +250,10 @@ class DataBase extends IpcAbstract implements IpcInterface {
     }
 
 
+    /**
+     * Sets up the database connection based on the configuration values.
+     * 
+     */
     protected function _dbSetup() {
         // Try loading PDO from config
         try {
@@ -255,6 +282,8 @@ class DataBase extends IpcAbstract implements IpcInterface {
             echo $e->getMessage();
             Logger::log('Could not initialize the DB PDO driver:' . $e->getMessage(), \Zend_Log::ERR);
         }
+
+        return TRUE;
     }
 
 

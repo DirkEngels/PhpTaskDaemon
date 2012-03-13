@@ -16,8 +16,8 @@ namespace PhpTaskDaemon\Daemon\Ipc;
 class None extends IpcAbstract implements IpcInterface {
 
     /**
-     * 
-     * Returns nothing (NULL) 
+     * Returns nothing (NULL).
+     *  
      * @param string $key
      * @return NULL
      */
@@ -27,8 +27,8 @@ class None extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Sets nothing.
      * 
-     * Sets nothing
      * @param string $key
      * @param mixed $value
      * @return bool
@@ -39,8 +39,8 @@ class None extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Increments nothing.
      * 
-     * Increments nothing
      * @param string $key
      * @return bool
      */
@@ -50,8 +50,8 @@ class None extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Decrements nothing.
      * 
-     * Decrements nothing
      * @param string $key
      * @return bool
      */

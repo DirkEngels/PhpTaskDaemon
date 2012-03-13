@@ -20,12 +20,14 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
     /**
      * This variable contains a unique identifier.
-     * @var unknown_type
+     * 
+     * @var string
      */
     protected $_id = NULL;
 
     /**
      * This variable contains the path string.
+     * 
      * @var string|NULL
      */
     protected $_path = NULL;
@@ -39,15 +41,16 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
     /**
      * The semaphore needed to lock/unlock access to the shared memory
      * segment.
+     * 
      * @var resource
      */
     protected $_semaphoreLock = NULL;
 
 
     /**
-     * 
      * The constructor requires an identifier which is used for attaching to a
      * shared memory segment.
+     * 
      * @param string $id
      */
     public function __construct($id) {
@@ -89,7 +92,6 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * The destructor detaches the shared memory segment.
      */
     public function __destruct() {
@@ -100,8 +102,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * Returns an array of registered variable keys.
+     * 
      * @return array
      */
     public function getKeys() {
@@ -119,9 +121,9 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * Returns the value of a registered shared variable or false if it does 
-     * not exists. 
+     * not exists.
+     * 
      * @param string $key
      * @return mixed|false
      */
@@ -141,9 +143,9 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * Sets the value of a shared variable. It registers the variable key when
      * it does not yet exists.
+     * 
      * @param string $key
      * @param mixed $value
      * @return bool
@@ -172,8 +174,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * Increments the value of a shared variable.
+     * 
      * @param string $key
      * @return bool|int
      */
@@ -206,8 +208,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * Decrements the value of a shared variable.
+     * 
      * @param string $key
      * @return bool|int
      */
@@ -241,8 +243,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
-     * Removes and unregisters a registered shared variable key. 
+     * Removes and unregisters a registered shared variable key.
+     *  
      * @param string $key
      * @return bool|int
      */
@@ -268,8 +270,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Removes a shared memory segment and semaphore.
      * 
-     * Removes a shared memory segment and semaphore
      * @return bool|int
      */
     public function remove() {
@@ -279,8 +281,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
+     * Removes a shared memory segment.
      * 
-     * Removes a shared memory segment
      * @return bool|int
      */
     private function _removeSegment() {
@@ -296,8 +298,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * 
      * Removes a semaphore required for the shared memory segment.
+     * 
      * @return bool|int
      */
     private function _removeSemaphore() {

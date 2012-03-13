@@ -31,6 +31,7 @@ class File {
      * 
      * The pid reader constructor has one optional argument containing a 
      * filename.
+     * 
      * @param string $filename
      */
     public function __construct($filename = NULL) {
@@ -42,19 +43,26 @@ class File {
      * 
      * The main daemon saves its pid into a pidfile. This methods returns the
      * filename of the pidfile.
-     * @return string
+     * 
+     * @return NULL|string The absolute filename or not.
      */
     public function getFilename() {
         if ($this->_filename == NULL) {
             $this->_filename = \TMP_PATH . '/daemon.pid';
         }
+
+        // Adjust relative paths.
+        if (substr( $this->_filename, 0, 1 ) == '/' ) {
+            $this->_filename = \APPLICATION_PATH . $this->_filename;
+        }
+
         return $this->_filename;
     }
 
 
     /**
+     * Sets the location of the pidfile for storing the pid of the main daemon.
      * 
-     * Sets the location of the pidfile for storing the pid of the main daemon
      * @param string $filename
      * @return bool
      */
@@ -68,9 +76,9 @@ class File {
 
 
     /**
-     * Checks if a process has written a pidfile
-     * @return bool
+     * Checks if a process has written a pidfile.
      * 
+     * @return bool
      */
     public function isRunning() {
         $pid = $this->read();
@@ -82,8 +90,8 @@ class File {
 
 
     /**
+     * Reads the pid file and returns the process ID.
      * 
-     * Reads the pid file and returns the process ID
      * @return int
      */
     public function read() {
@@ -99,9 +107,9 @@ class File {
 
 
     /**
-     * 
      * Removes the pidfile. Returns FALSE if the file does not exists or cannot
      * be removed.
+     * 
      * @return bool
      */
     public function unlink() {
@@ -115,8 +123,8 @@ class File {
 
 
     /**
-     * 
      * Writes a file to disk containing the process ID.
+     * 
      * @param int $pid
      * @return bool
      */
