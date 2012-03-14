@@ -18,6 +18,11 @@ use \PhpTaskDaemon\Task\Job;
  */
 class QueueDefault extends QueueAbstract implements QueueInterface {
 
+	/**
+	 * (non-PHPdoc)
+	 * 
+	 * @see Queue/PhpTaskDaemon\Task\Queue.QueueInterface::load()
+	 */
     public function load() {
         $queue = array(
             new Job\JobDefault(

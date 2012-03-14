@@ -7,6 +7,9 @@
  * @license https://github.com/DirkEngels/PhpTaskDaemon/blob/master/doc/LICENSE
  */
 namespace PhpTaskDaemon\Task\Executor;
+use PhpTaskDaemon\Daemon\Logger;
+use PhpTaskDaemon\Daemon\Ipc;
+use PhpTaskDaemon\Task\Job;
 
 /**
  * 
@@ -15,23 +18,41 @@ namespace PhpTaskDaemon\Task\Executor;
  */
 abstract class ExecutorAbstract {
 
+	/**
+     * @var \PhpTaskDaemon\Task\Job\JobAbstract
+	 */
 	protected $_job = NULL;
 
-    protected $_status = NULL;
+    /**
+     * Process ID
+     * @var integer
+     */
+    private $_pid;
+
+    /**
+     * @var \PhpTaskDaemon\Ipc\IpcAbstract
+     */
+    protected $_ipc;
 
     /**
      * 
-     * Optional a executor status object can be provided. 
-     * @param \PhpTaskDaemon\Task\Executor\StatusAbstract $status
+     * The constructor sets the IPC object. A default IPC object instance will
+     * be created when none provided.
+     * 
+     * @param \PhpTaskDaemon\Ipc\IpcAbstract $ipc
      */
-    public function __construct($status = NULL) {
-        $this->setStatus($status);
+    public function __construct(Ipc\IpcAbstract $ipc = NULL) {
+        $this->_pid = getmypid();
+        if (!is_null($ipc)) {
+            $this->setIpc($ipc);
+        }
     }
 
 
     /**
      * 
      * Returns the current job.
+     * 
      * @return \PhpTaskDaemon\Task\Job\JobAbstract
      */
     public function getJob() {
@@ -42,45 +63,112 @@ abstract class ExecutorAbstract {
     /**
      * 
      * Sets the current job
+     * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
      */
-    public function setJob($job) {
+    public function setJob(Job\JobAbstract $job) {
         $this->_job = $job;
     }
 
 
     /**
+     *
+     * Returns the shared memory object
      * 
-     * Returns the current status object, if set.
-     * @return \PhpTaskDaemon\Task\Executor\Status\StatusAbstract $status
+     * @return PhpTaskDaemon\Ipc\IpcAbstract
      */
-    public function getStatus() {
-        return $this->_status;
+    public function getIpc() {
+        if ( getmypid() != $this->_pid ) {
+            if ( ! is_null($this->_ipc) ) {
+                $this->_ipc = NULL;
+                $this->_pid = getmypid();
+            }
+        }
+
+        if ( is_null($this->_ipc) ) {
+            $this->_ipc = Ipc\IpcFactory::get(Ipc\IpcFactory::NAME_EXECUTOR, $this->_pid);
+        }
+
+        return $this->_ipc;
+    }
+
+
+    /**
+     *
+     * Sets a shared memory object
+     * 
+     * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
+     * @return $this
+     */
+    public function setIpc(Ipc\IpcAbstract $ipc) {
+        $this->_ipc = $ipc;
+        return TRUE;
+    }
+
+
+    /**
+     * Resets the current IPC object, so it can be (lazy) loaded again, which
+     * is usefull when forking processes.
+     * 
+     * @return $this 
+     */
+    public function resetIpc() {
+        Logger::log('Resetting Status IPC', \Zend_Log::DEBUG);
+        $this->_ipc = NULL;
+        return $this;
+    }
+
+
+    /**
+     * Resets the current pid, needed for the IPC object.
+     *  
+     * @param integer $pid
+     * @return $this
+     */
+    public function resetPid($pid = NULL) {
+        if ( is_null( $pid ) ) {
+            $pid = getmypid();
+        }
+        Logger::log('Resetting Status PID (' . $pid . ')', \Zend_Log::DEBUG);
+        $this->_pid = $pid;
+        return $this;
     }
 
 
     /**
      * 
-     * Sets the current status object
-     * @param \PhpTaskDaemon\Task\Executor\Status\StatusAbstract $status
+     * Get one or more status variables. When a key is provided and exists, the
+     * corresponding value will be returning. If no key is given, all
+     * registered keys and values will be returned. 
+     * 
+     * @param string|NULL $key
      */
-    public function setStatus($status) {
-        $this->_status = $status;
+    public function getStatus($key = NULL) {
+        if ( $key != NULL ) {
+            return $this->getIpc()->getVar($key);
+        }
+        return $this->getIpc()->get();
     }
 
 
     /**
      * 
-     * Updates the status of the current job in shared memory.
+     * Store the status of variable of using a IPC component
+     * 
      * @param integer $percentage
-     * @param string|NULL $message
+     * @param string $message
      * @return bool
      */
-    public function updateStatus($percentage, $message = NULL) {
-        if ($this->_status != NULL) {
-            return $this->_status->set($percentage, $message);
+    public function setStatus($percentage, $message = NULL) {
+        if ( ( $percentage == 0 ) && ( $message == NULL ) ) {
+            $message = 'Initializing task';
         }
-        return FALSE;
+
+        $this->getIpc()->setVar('percentage', $percentage);
+        if ($message != NULL) {
+            $this->getIpc()->setVar('message', $message);
+        }
+        return TRUE;
     }
 
 }
