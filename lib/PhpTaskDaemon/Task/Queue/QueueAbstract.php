@@ -43,7 +43,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * Returns the shared memory object.
      * 
      * @return PhpTaskDaemon\Daemon\Ipc\IpcAbstract
@@ -121,7 +120,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * Decrements the queue count (after finishing a single job).
      * 
      * @param integer $count
@@ -132,7 +130,6 @@ abstract class QueueAbstract {
     }    
 
     /**
-     *
      * (Re)Sets a status count.
      * 
      * @param string $status
@@ -149,7 +146,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * (Re)Sets the queue count.
      * 
      * @param integer $count
@@ -181,7 +177,6 @@ abstract class QueueAbstract {
 
 
     /**
-     * 
      * Updates the current queue information with the current count. If no
      * count is given, the current count will be decreased by one.
      * 
@@ -198,7 +193,6 @@ abstract class QueueAbstract {
 
     
     /**
-     *
      * Initializes the statistics array with default values.
      * 
      * @return bool
