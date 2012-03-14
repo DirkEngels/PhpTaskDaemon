@@ -10,7 +10,6 @@
 namespace PhpTaskDaemon\Daemon;
 
 /**
- * 
  * The Tasks class is responsible for scanning and loading the tasks. It is
  * used by the Console class for scanning the tasks. The Tasks instance will be
  * passed to the Instance class when starting the daemon.
@@ -18,14 +17,14 @@ namespace PhpTaskDaemon\Daemon;
 class Tasks {
 
     /**
-     * Array with Task Managers
+     * Array with Task Managers.
      * @var array
      */
     public $managers = array();
 
 
     /**
-     * Returns an array with all the managers
+     * Returns an array with all the managers.
      * @return array
      */
     public function getManagers() {
@@ -34,7 +33,8 @@ class Tasks {
 
 
     /**
-     * Adds a manager
+     * Adds a manager.
+     * 
      * @param \PhpTaskDaemn\Task\Manager\ManagerAbstract $manager
      * @exception \InvalidArgumentException
      * @return boolean
@@ -48,7 +48,8 @@ class Tasks {
 
 
     /**
-     * Load a single manager
+     * Load a single manager.
+     * 
      * @param $taskName
      * @return boolean
      */
@@ -70,6 +71,7 @@ class Tasks {
     /**
      * Main function to scan all tasks by scanning directories and 
      * configuration files for executors.
+     * 
      * @return array
      */
     public function scan() {
@@ -96,8 +98,8 @@ class Tasks {
         return $tasks;
     }
 
+
     /**
-     * 
      * Scans a directory for task managers and returns the number of loaded
      * tasks.
      * 

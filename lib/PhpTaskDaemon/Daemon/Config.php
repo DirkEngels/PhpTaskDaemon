@@ -22,13 +22,15 @@ class Config {
     protected static $_instance = NULL;
 
     /**
-     * Zend_Config object instance
+     * Zend_Config object instance.
+     * 
      * @var \Zend_Config
      */
     protected $_config = NULL;
 
     /**
-     * Loaded configurations files
+     * Loaded configurations files.
+     * 
      * @var array
      */
     protected $_files = array();
@@ -177,25 +179,27 @@ class Config {
 
     /**
      * Initializes the configuration by loading one or more (default)
-     * configuration files
-     * @param array $configFiles
-     * @exception \PhpTaskDaemon\Exception\FileNotFound
+     * configuration files.
+     * 
+     * @param array $configFiles Optional configuration files. 
+     * @exception \PhpTaskDaemon\Exception\FileNotFound No files found.
      */
-    protected function _initConfig($configFiles) {
-        foreach($configFiles as $configFile) {
-            Logger::log("Trying config file: " . $configFile, \Zend_Log::DEBUG);
+    protected function _initConfig( $configFiles = array() ) {
+        foreach( $configFiles as $configFile ) {
+            Logger::log( "Trying config file: " . $configFile, \Zend_Log::DEBUG );
             if (!file_exists($configFile)) {
-                Logger::log("Config file does not exists: " . $configFile, \Zend_Log::ERR);
+                Logger::log( "Config file does not exists: " . $configFile, \Zend_Log::ERR );
                 continue;
             }
 
-            if (!is_a($this->_config, '\Zend_Config')) {
+            if ( ! is_a( $this->_config, '\Zend_Config' ) ) {
                 // First config
                 $this->_config = new \Zend_Config_Ini(
                     $configFile,    
                     \APPLICATION_ENV,
-                    array('allowModifications' => TRUE)
+                    array( 'allowModifications' => TRUE )
                 );
+
             } else {
                 // Merge config file
                 $this->_config->merge(
@@ -205,6 +209,7 @@ class Config {
                     )
                 );
             }
+
             // Register configurations file
             array_push($this->_files, $configFile);
             Logger::log("Loaded config file: " . $configFile, \Zend_Log::INFO);
@@ -216,26 +221,28 @@ class Config {
         }
 
         $this->_config->setReadonly();
+        return TRUE;
     }
 
 
     /**
      * Recursively check if a config value exists untill the required nesting 
      * level has been reached.
-     * @param $keyString
+     * 
+     * @param $keyString Strips the config key in order to find a value.
      */
     protected function _getRecursiveKey($keyString) {
+        // Format config strings, because it is a framework.
         $keyString = $this->_prepareString($keyString);
         $keyPieces = explode('.', $keyString);
 
+        $value= $configArray;
         $configArray = Config::get()->getConfig()->toArray();
-        $value = $configArray;
         foreach($keyPieces as $keyPiece) {
-            if (isset($value[$keyPiece])) {
-                $value = $value[$keyPiece];
-            } else {
+            if ( ! isset( $value[$keyPiece] ) ) {
                 throw new \Exception('Config option does not exists: ' . $keyString);
             }
+            $value = $value[$keyPiece];
         }
         return $value;
     }
@@ -243,12 +250,15 @@ class Config {
 
     /**
      * Prepares the string by replacing slashes with dots and makes the string
-     * lowercase. 
+     * lowercase.
+     * 
      * @param string $string
-     * @return string
+     * @return string Formats a config key.s
      */
-    protected function _prepareString($string) {
-        return strtolower( str_replace('/', '.', $string) );
+    protected function _prepareString( $string ) {
+        $string = str_replace( '/', '.', $string );
+        $string = strtolower( $string );
+        return $string;
     }
 
 }

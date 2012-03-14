@@ -12,34 +12,35 @@ namespace PhpTaskDaemon\Daemon;
 /**
 * The main Console class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon daemon options.
-* The start method creates an Instance object 
+* The start method creates an Instance object.
 */
 class Console {
 
     /**
      * Console options object
+     * 
      * @var Zend_Console_Getopt
      */
     protected $_consoleOpts;
 
     /**
+     * Instance run object.
      * 
-     * Instance run object
      * @var Instance
      */
     protected $_instance;
 
     /**
+     * Tasks collection object.
      * 
-     * Tasks collection object
      * @var Tasks
      */
     protected $_tasks;
 
 
     /**
+     * Daemon constructor method.
      * 
-     * Daemon constructor method
      * @param \Zend_Console_Getopt $consoleOpts
      */
     public function __construct(Instance $instance = NULL) {
@@ -50,8 +51,8 @@ class Console {
 
 
     /**
+     * Returns an object containing the console arguments..
      * 
-     * Returns an object containing the console arguments.
      * @return Zend_Console_Getopt
      */
     public function getConsoleOpts() {
@@ -70,13 +71,14 @@ class Console {
                 )
             );
         }
+
         return $this->_consoleOpts;
     }
 
 
     /**
+     * Sets new console arguments.
      * 
-     * Sets new console arguments
      * @param \Zend_Console_Getopt $consoleOpts
      * @return $this
      */
@@ -99,8 +101,8 @@ class Console {
 
 
     /**
+     * Returns the daemon instance object.
      * 
-     * Returns the daemon instance object
      * @return Instance
      */
     public function getInstance() {
@@ -112,8 +114,8 @@ class Console {
 
 
     /**
+     * Sets a daemon instance object.
      * 
-     * Sets a daemon instance object
      * @param Instance $instance
      * @return $this
      */
@@ -124,8 +126,8 @@ class Console {
 
 
     /**
+     * Returns the daemon tasks collection object.
      * 
-     * Returns the daemon tasks collection object
      * @return Tasks
      */
     public function getTasks() {
@@ -137,8 +139,8 @@ class Console {
 
 
     /**
+     * Sets a daemon tasks collection object.
      * 
-     * Sets a daemon tasks collection object
      * @param Tasks $tasks
      * @return $this
      */
@@ -149,8 +151,9 @@ class Console {
 
 
     /**
-     * 
      * Reads the command line arguments and invokes the selected action.
+     * 
+     * @expected \RuntimeException
      */
     public function run() {
         try {
@@ -189,7 +192,7 @@ class Console {
             // Display Command Help
             $this->help();
 
-        } catch (\Exception $e) {
+        } catch (\RuntimeException $e) {
             Logger::log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
         }
 
@@ -197,7 +200,6 @@ class Console {
 
 
     /**
-     * 
      * Lists the current loaded tasks.
      */
     public function listTasks() {
@@ -243,8 +245,7 @@ class Console {
 
 
     /**
-     * 
-     * Action: Start Daemon
+     * Action: Start Daemon.
      */
     public function start() {
         $taskNames = $this->getTasks()->scan();
@@ -266,8 +267,7 @@ class Console {
 
 
     /**
-     * 
-     * Action: Stop daemon 
+     * Action: Stop daemon. 
      */
     public function stop() {
         if (!$this->getInstance()->isRunning()) {
@@ -290,8 +290,7 @@ class Console {
 
 
     /**
-     * 
-     * Action: Get daemon status
+     * Action: Get daemon status.
      */
     public function status() {
         $state = State::getState();
@@ -349,7 +348,6 @@ class Console {
 
 
     /**
-     * 
      * Displays the current tasks and activities of the daemon. The monitor 
      * action refreshes every x milliseconds.
      */
@@ -378,7 +376,6 @@ class Console {
 
 
     /**
-     * 
      * Displays a help message containing usage instructions.
      */
     public function help() {
@@ -412,7 +409,7 @@ class Console {
 
 
     /**
-     * Initializes the logging verbose mode
+     * Initializes the logging verbose mode.
      */
     protected function _initLogVerbose() {
         // Log Verbose Output
@@ -435,7 +432,8 @@ class Console {
 
     /**
      * Initalizes the Logger component to save log messages to a file based on
-     * the command line arguments and/or configuration files. 
+     * the command line arguments and/or configuration files.
+     * 
      * @throws \Exception
      */
     protected function _initLogFile() {
@@ -463,6 +461,30 @@ class Console {
     }
 
 
+    /**
+     * Output daemon settings.
+     * 
+     * Format:
+     * - Global
+     *   - Namespace
+     *   - Interrupt adapter
+     *   - IPC adapter
+     * - Paths
+     *   - App dir
+     *   - Task dir
+     *   - Tmp dir
+     *   - Log dir
+     * - Database
+     *   - Adapter
+     *   - Host
+     *   - Database
+     *   - Username
+     * - Log
+     *   - File
+     *   - Level
+     * 
+     * @return string
+     */
     protected function _settingsDaemon() {
         $out  = "Daemon Settings\n";
         $out .= "===============\n\n";
@@ -484,8 +506,8 @@ class Console {
         $out .= "Database\n";
         $out .= "--------\n";
         $out .= "- Adapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
-        $out .= "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
         $out .= "- Host:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
+        $out .= "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
         $out .= "- Username:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
         $out .= "\n";
 
@@ -556,7 +578,20 @@ class Console {
         return $out;
     }
 
-    protected function _exit() {
+
+    /**
+     * Stop the application immediately with an optioan message.
+     * 
+     * @param $string Log a last message before exiting.
+     */
+    protected function _exit( $msg = NULL ) {
+        // Log a last (default) message.
+        if ( is_null( $msg ) ) {
+            $msg = 'Exiting application with no specified reason!';
+        }
+        Logger::log( $msg );
+
+        // Goodbye!
         exit;
     }
 

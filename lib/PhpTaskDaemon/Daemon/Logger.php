@@ -18,14 +18,15 @@ class Logger {
 
 
     /** 
-     * Protected constructor for singleton pattern
+     * Protected constructor for singleton pattern.
      */
     protected function __construct() {
     }
 
 
     /**
-     * Singleton getter
+     * Singleton getter.
+     * 
      * @return \PhpTaskDaemon\Daemon\Log
      */
     public static function get() {
@@ -40,6 +41,13 @@ class Logger {
         return self::$_instance;
     }
 
+
+    /**
+     * Write a message to the logger.
+     * 
+     * @param string $message
+     * @param integer $level
+     */
     public static function log($message, $level = null) {
         if (is_null($level)) {
             $level = Config::get()->getOptionValue('daemon.log.level');

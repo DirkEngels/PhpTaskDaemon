@@ -20,12 +20,11 @@ use PhpTaskDaemon\Daemon\Ipc;
 class State {
 
     /**
-     * 
      * This static method returns an array with the state (statistics + 
      * statuses of active tasks) of all current running tasks.
      * 
      * @static
-     * @return array
+     * @return array Current state of all the daemon, queues and tasks.
      */
     public static function getState() {
     	$state = self::getDaemonState();
