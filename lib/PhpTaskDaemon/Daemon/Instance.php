@@ -298,12 +298,6 @@ class Instance {
             $this->getPidManager()->forkChild($newPid);
             $manager->init($this->getPidManager()->getParent());
 
-            $statistics = new \PhpTaskDaemon\Task\Queue\Statistics\StatisticsDefault();
-            $manager->getProcess()->getQueue()->setStatistics($statistics);
-
-            $status = new \PhpTaskDaemon\Task\Executor\Status\StatusDefault();
-            $manager->getProcess()->getExecutor()->setStatus($status);
-
             Logger::log('Manager forked (PID: ' . $newPid . ') !!!', \Zend_Log::DEBUG);
             $manager->runManager();
             $this->_exit();

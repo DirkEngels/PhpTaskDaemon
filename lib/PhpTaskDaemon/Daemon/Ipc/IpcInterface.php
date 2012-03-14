@@ -17,6 +17,12 @@ interface IpcInterface {
     public function incrementVar($key, $count = 1);
     public function decrementVar($key, $count = 1);
     public function removeVar($key);
+
+    /**
+     *
+     * Removes all registered keys
+     * @return bool
+     */
     public function remove();
 
 }

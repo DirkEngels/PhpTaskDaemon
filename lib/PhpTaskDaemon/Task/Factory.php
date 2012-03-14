@@ -28,15 +28,9 @@ class Factory {
 
     const TYPE_TRIGGER = 'timer';
     const TYPE_QUEUE = 'queue';
-    const TYPE_STATISTICS = 'statistics';
 
     const TYPE_PROCESS = 'process';
     const TYPE_EXECUTOR = 'executor';
-    const TYPE_STATUS = 'status';
-
-    const IPC_DAEMON = 'queue';
-    const IPC_QUEUE = 'queue';
-    const IPC_EXECUTOR = 'executor';
 
     const MSG_UNKNOWN_TYPE = 'Object type is not registered as a class constant of this class.';
 
@@ -73,21 +67,13 @@ class Factory {
             self::getComponentType( $taskName, self::TYPE_PROCESS )
         );
 
-        // Queue & Statistics
+        // Queue
         $manager->getProcess()->setQueue(
             self::getComponentType( $taskName, self::TYPE_QUEUE )
         );
-        $manager->getProcess()->getQueue()->setStatistics(
-            self::getComponentType( $taskName, self::TYPE_STATISTICS )
-        );
 
-        // Executor & Status
-        $manager->getProcess()->setExecutor(
-            $executor
-        );
-        $manager->getProcess()->getExecutor()->setStatus(
-            self::getComponentType( $taskName, self::TYPE_STATUS )
-        );
+        // Executor
+        $manager->getProcess()->setExecutor($executor);
 
         \PhpTaskDaemon\Daemon\Logger::get()->log( '----------', \Zend_Log::DEBUG );
         return $manager;
@@ -171,18 +157,6 @@ class Factory {
         return self::getComponentType($taskName, self::TYPE_EXECUTOR);
     }
 
-
-    /**
-     * Returns the executor status for the specified task.
-     * 
-     * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Executor\Status\StatusAbstract
-     */
-    public static function getExecutorStatus($taskName) {
-        return self::getComponentType($taskName, self::TYPE_STATUS);
-    }
-
-
     /**
      * Returns the queue for the specified task.
      * 
@@ -195,25 +169,18 @@ class Factory {
 
 
     /**
-     * Returns the queue statistics for the specified task.
-     * 
-     * @param string $taskName
-     * @return \PhpTaskDaemon\Task\Queue\QueueAbstract
-     */
-    public static function getQueueStatistics($taskName) {
-        return self::getComponentType($taskName, self::TYPE_STATISTICS);
-    }
-
-
-    /**
      * Returns the classname based on the taskName and objectType.
-     * 
+
      * @param string $taskName
      * @param string $objectType
      * @return string
      */
     public static function _getClassName($taskName, $objectType) {
-        return Daemon\Config::get()->getOptionValue('global.namespace') . '\\'. str_replace('/', '\\', $taskName) . '\\' . ucfirst($objectType);
+    	return implode('\\', array(
+    		Daemon\Config::get()->getOptionValue('global.namespace'),
+    		str_replace('/', '\\', $taskName),
+    		ucfirst($objectType)
+    	));
     }
 
 
@@ -311,14 +278,8 @@ class Factory {
             case 'queue':
                 $nameSpace .= 'Manager\\Queue';
                 break;
-            case 'statistics':
-                $nameSpace .= 'Manager\\Queue\\Statistics';
-                break;
             case 'executor':
                 $nameSpace .= 'Manager\\Executor';
-                break;
-            case 'status':
-                $nameSpace .= 'Manager\\Executor\\Status';
                 break;
             default:
                 throw new \InvalidArgumentException(self::MSG_UNKNOWN_TYPE);
@@ -349,6 +310,8 @@ class Factory {
                 );
             case 'timer':
                 return new \PhpTaskDaemon\Task\Manager\Timer\Interval();
+            case 'queue':
+                return new \PhpTaskDaemon\Task\Queue\QueueDefault();
             case 'process':
                 return new \PhpTaskDaemon\Task\Manager\Process\Same();
 
