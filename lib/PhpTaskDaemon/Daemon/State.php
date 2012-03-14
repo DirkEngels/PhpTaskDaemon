@@ -18,10 +18,10 @@ namespace PhpTaskDaemon\Daemon;
 class State {
 
     /**
-     * 
      * This static method returns an array with the state (statistics + 
      * statuses of active tasks) of all current running tasks.
-     * @return array
+     * 
+     * @return array Current state of all the daemon, queues and tasks.
      */
     public static function getState() {
         $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');

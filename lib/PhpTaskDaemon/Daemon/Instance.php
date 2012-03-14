@@ -17,13 +17,13 @@ namespace PhpTaskDaemon\Daemon;
  */
 class Instance {
     /**
-     * This variable contains pid manager object
+     * This variable contains pid manager object.
      * @var Pid\Manager $_pidManager
      */
     protected $_pidManager = NULL;
 
     /**
-     * Pid reader object
+     * Pid reader object.
      * @var Pid\File $_pidFile
      */
     protected $_pidFile = NULL;
@@ -42,17 +42,6 @@ class Instance {
 
 
     /**
-     * 
-     * Empty constructor 
-     * @param int $parent
-     */
-    public function __construct() {
-        
-    }
-
-
-    /**
-     * 
      * Unset variables at destruct to hopefully free some memory. 
      */
     public function __destruct() {
@@ -64,7 +53,8 @@ class Instance {
 
 
     /**
-     * Returns the pid manager object
+     * Returns the pid manager object.
+     * 
      * @return \PhpTaskDaemon\Daemon\Pid\Manager
      */
     public function getPidManager() {
@@ -79,7 +69,8 @@ class Instance {
 
 
     /**
-     * Sets the pid manager object
+     * Sets the pid manager object.
+     * 
      * @param $pidManager
      * @return $this
      */
@@ -90,7 +81,8 @@ class Instance {
 
 
     /**
-     * Returns the pid file object
+     * Returns the pid file object.
+     * 
      * @return \PhpTaskDaemon\Daemon\Pid\File
      */
     public function getPidFile() {
@@ -104,7 +96,8 @@ class Instance {
 
 
     /**
-     * Sets the pid file object
+     * Sets the pid file object.
+     * 
      * @param $pidFile
      * @return $this
      */
@@ -115,7 +108,8 @@ class Instance {
 
 
     /**
-     * Gets the inter process communication object
+     * Gets the inter process communication object.
+     * 
      * @return \PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      */
     public function getIpc() {
@@ -132,7 +126,8 @@ class Instance {
 
 
     /**
-     * Sets the inter process communication object
+     * Sets the inter process communication object.
+     * 
      * @param $ipc \PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      * @return $this
      */
@@ -143,8 +138,8 @@ class Instance {
 
 
     /**
-     * 
      * Return the tasks collection object.
+     * 
      * @return \PhpTaskDaemon\Daemon\Tasks
      */
     public function getTasks() {
@@ -157,8 +152,8 @@ class Instance {
 
 
     /**
+     * Sets the tasks collection object.
      * 
-     * Sets the tasks collection object
      * @param \PhpTaskDaemon\Daemon\Tasks $tasks
      * @return $this
      */
@@ -169,7 +164,6 @@ class Instance {
 
 
     /**
-     * 
      * This is the public start function of the daemon. It checks the input and
      * available managers before running the daemon.
      */
@@ -181,7 +175,7 @@ class Instance {
 
 
     /**
-     * Dispatches the isRunning method to the Pid\File object
+     * Dispatches the isRunning method to the Pid\File object.
      */
     public function isRunning() {
         return $this->getPidFile()->isRunning();
@@ -189,7 +183,7 @@ class Instance {
 
 
     /**
-     * Stops the running instance
+     * Stops the running instance.
      */
     public function stop() {
         try {
@@ -205,8 +199,8 @@ class Instance {
 
 
     /**
+     * POSIX Signal handler callback.
      * 
-     * POSIX Signal handler callback
      * @param $sig
      */
     public function sigHandler($sig) {
@@ -233,7 +227,6 @@ class Instance {
 
 
     /**
-     * 
      * This is the main function for running the daemon!
      */
     protected function _run() {
@@ -283,13 +276,11 @@ class Instance {
 
 
     /**
-     * 
      * Fork the managers to be processed in the background. The foreground task
      * is used to add gearman tasks to the queue for the background gearman 
-     * managers
+     * managers.
      */
-    private function _forkManager($manager)
-    {
+    private function _forkManager($manager) {
         $pid = pcntl_fork();
         if ($pid === -1) {
             // Error: Throw exception: Fork Failed
