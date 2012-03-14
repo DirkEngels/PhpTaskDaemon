@@ -409,7 +409,7 @@ class Console {
 
 
     /**
-     * Initializes the logging verbose mode
+     * Initializes the logging verbose mode.
      */
     protected function _initLogVerbose() {
         // Log Verbose Output
@@ -432,7 +432,8 @@ class Console {
 
     /**
      * Initalizes the Logger component to save log messages to a file based on
-     * the command line arguments and/or configuration files. 
+     * the command line arguments and/or configuration files.
+     * 
      * @throws \Exception
      */
     protected function _initLogFile() {
@@ -460,6 +461,30 @@ class Console {
     }
 
 
+    /**
+     * Output daemon settings.
+     * 
+     * Format:
+     * - Global
+     *   - Namespace
+     *   - Interrupt adapter
+     *   - IPC adapter
+     * - Paths
+     *   - App dir
+     *   - Task dir
+     *   - Tmp dir
+     *   - Log dir
+     * - Database
+     *   - Adapter
+     *   - Host
+     *   - Database
+     *   - Username
+     * - Log
+     *   - File
+     *   - Level
+     * 
+     * @return string
+     */
     protected function _settingsDaemon() {
         $out  = "Daemon Settings\n";
         $out .= "===============\n\n";
@@ -481,8 +506,8 @@ class Console {
         $out .= "Database\n";
         $out .= "--------\n";
         $out .= "- Adapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
-        $out .= "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
         $out .= "- Host:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
+        $out .= "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
         $out .= "- Username:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
         $out .= "\n";
 
@@ -553,7 +578,20 @@ class Console {
         return $out;
     }
 
-    protected function _exit() {
+
+    /**
+     * Stop the application immediately with an optioan message.
+     * 
+     * @param $string Log a last message before exiting.
+     */
+    protected function _exit( $msg = NULL ) {
+        // Log a last (default) message.
+        if ( is_null( $msg ) ) {
+            $msg = 'Exiting application with no specified reason!';
+        }
+        Logger::log( $msg );
+
+        // Goodbye!
         exit;
     }
 
