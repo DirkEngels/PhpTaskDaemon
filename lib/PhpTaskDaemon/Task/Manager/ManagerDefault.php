@@ -10,7 +10,6 @@ namespace PhpTaskDaemon\Task\Manager;
 use PhpTaskDaemon\Task\Job;
 
 /**
- * 
  * The manager base class does notting, but is defined for unit testing
  * purposes.
  */

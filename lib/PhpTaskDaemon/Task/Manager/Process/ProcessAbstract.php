@@ -1,3 +1,4 @@
+
 <?php
 /**
  * @package PhpTaskDaemon
@@ -20,14 +21,19 @@ abstract class ProcessAbstract {
     protected $_jobs = array();
 
 
+    /**
+     * The constructor expects a name.
+     *  
+     * @param unknown_type $name
+     */
     public function __construct($name = NULL) {
         $this->_name = $name;
     }
 
 
     /**
-     *
-     * Returns the task name 
+     * Returns the task name.
+     *  
      * @return string
      */
     public function getName() {
@@ -36,8 +42,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     *
-     * Sets the task name 
+     * Sets the task name.
+     *  
      * @param string $name
      * @return $this
      */
@@ -48,8 +54,8 @@ abstract class ProcessAbstract {
 
 
     /**
+     * Returns the current loaded queue array.
      * 
-     * Returns the current loaded queue array
      * @return \PhpTaskDaemon\Task\Queue\QueueAbstract
      */
     public function getQueue() {
@@ -61,8 +67,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * 
      * Sets the current queue to process.
+     * 
      * @param \PhpTaskDaemon\Task\Queue\QueueAbstract $queue
      * @return $this
      */
@@ -77,8 +83,8 @@ abstract class ProcessAbstract {
 
 
     /**
+     * Returns the executor object.
      * 
-     * Returns the executor object
      * @return \PhpTaskDaemon\Task\Executor\ExecutorAbstract
      */
     public function getExecutor() {
@@ -90,8 +96,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * 
      * Sets the current executor object.
+     * 
      * @param \PhpTaskDaemon\Task\Executor\ExecutorAbstract $executor
      * @return $this
      */
@@ -105,7 +111,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * Gets the job
+     * Gets the job.
+     * 
      * @return array[\PhpTaskDaemon\Task\Job\JobAbstract]
      */
     public function getJobs() {
@@ -114,7 +121,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * Sets the jobs
+     * Sets the jobs.
+     * 
      * @param array[\PhpTaskDaemon\Task\Job\JobAbstract] $jobs
      * @return $this
      */
@@ -125,11 +133,11 @@ abstract class ProcessAbstract {
 
 
     /**
-     * 
      * Process a single task: set job input, reset status, run and update
      * statistics.
      * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
+     * @return NULL|mixed
      */
     protected function _processTask(\PhpTaskDaemon\Task\Job\JobAbstract $job) {
         // Set manager input
@@ -163,7 +171,9 @@ abstract class ProcessAbstract {
 
     /**
      * Forks a single tasks.
+     * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
+     * @return EXIT|integer
      */
     protected function _forkTask($job) {
         // Fork the manager
@@ -192,9 +202,9 @@ abstract class ProcessAbstract {
 
 
     /**
+     * POSIX Signal handler callback.
      * 
-     * POSIX Signal handler callback
-     * @param $sig
+     * @param $sig The signal to catch.
      */
     public function sigHandler($sig) {
         switch ($sig) {

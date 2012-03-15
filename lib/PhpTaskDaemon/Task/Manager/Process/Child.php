@@ -1,3 +1,4 @@
+
 <?php
 /**
  * @package PhpTaskDaemon
@@ -8,6 +9,7 @@
  */
 
 namespace PhpTaskDaemon\Task\Manager\Process;
+
 use PhpTaskDaemon\Daemon\Logger;
 
 class Child extends ProcessAbstract implements ProcessInterface {
@@ -41,6 +43,12 @@ class Child extends ProcessAbstract implements ProcessInterface {
         \PhpTaskDaemon\Daemon\Logger::log('Finished current set of tasks!', \Zend_Log::NOTICE);
     }
 
+
+    /**
+     * Handles executing the parent process after forking.
+     * 
+     * @param unknown_type $pid
+     */
     public function runParent($pid) {
         // The manager waits later
         \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
@@ -57,12 +65,17 @@ class Child extends ProcessAbstract implements ProcessInterface {
     }
 
 
+    /**
+     * Handles executing the child process after forking.
+     * 
+     * @param \PhpTaskDaemon\Task\job\Data\DataInterface $job
+     */
     public function runChild($job) {
+        \PhpTaskDaemon\Daemon\Logger::log('Processing task started!', \Zend_Log::NOTICE);
         $this->getExecutor()->resetPid();
         $this->getExecutor()->resetIpc();
         $this->getQueue()->resetIpc();
 
-        \PhpTaskDaemon\Daemon\Logger::log('Processing task started!', \Zend_Log::NOTICE);
         try {
             $this->_processTask($job);
         } catch (\Exception $e) {

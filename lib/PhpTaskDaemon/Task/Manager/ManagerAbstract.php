@@ -12,7 +12,7 @@ namespace PhpTaskDaemon\Task\Manager;
 /**
  * 
  * This is the abstract class of a Daemon_Manager. It provides the basic 
- * methods needed for almost all managers. 
+ * methods needed for almost all managers.
  */
 abstract class ManagerAbstract {
 
@@ -23,7 +23,6 @@ abstract class ManagerAbstract {
     protected $_name = 'unknown';
 
     /**
-     * 
      * Pid manager object. This class is repsonsible for storing the current, 
      * parent and child process IDs.
      * @var \PhpTaskDaemon\Daemon\Pid\Manager
@@ -31,35 +30,33 @@ abstract class ManagerAbstract {
     protected $_pidManager = null;
 
     /**
-     * Queue object
+     * Queue object.
      * @var \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
     protected $_timer = null;
 
     /**
-     * Executor object
+     * Executor object.
      * @var \PhpTaskDaemon\Task\Manager\Process\TimerAbstract
      */
     protected $_process = null;
 
     /**
      * Time to wait in milliseconds before running the next task.
-     * 
      * @var integer
      */
     protected $_sleepTimeExecutor = 10;
 
     /**
      * Time to wait in milliseconds before loading the queue again.
-     * 
      * @var integer
      */
     protected $_sleepTimeQueue = 3000000;
 
 
     /**
+     * Initializes the pid manager.
      * 
-     * Initializes the pid manager
      * @param int $parentPid
      */
     public function init($parentPid = null) {
@@ -71,8 +68,7 @@ abstract class ManagerAbstract {
 
 
     /**
-     *
-     * Returns the task name 
+     * Returns the task name.
      * @return string
      */
     public function getName() {
@@ -81,8 +77,8 @@ abstract class ManagerAbstract {
 
 
     /**
-     *
-     * Sets the task name 
+     * Sets the task name.
+     * 
      * @param string $name
      * @return $this
      */
@@ -93,8 +89,8 @@ abstract class ManagerAbstract {
 
 
     /**
+     * Returns the pid manager of the task manager.
      * 
-     * Returns the pid manager of the task manager
      * @return \PhpTaskDaemon\Pid\Manager
      */
     public function getPidManager() {
@@ -103,8 +99,8 @@ abstract class ManagerAbstract {
 
 
     /**
+     * Sets the pid manager of the task manager.
      * 
-     * Sets the pid manager of the task manager
      * @param \PhpTaskDaemon\Pid\Manager $pidManager
      * @return $this
      */
@@ -115,8 +111,8 @@ abstract class ManagerAbstract {
 
 
     /**
+     * Returns the current loaded queue array.
      * 
-     * Returns the current loaded queue array
      * @return \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
     public function getTimer() {
@@ -128,8 +124,8 @@ abstract class ManagerAbstract {
 
 
     /**
-     * 
      * Sets the current queue to process.
+     * 
      * @param \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract $timer
      * @return $this
      */
@@ -144,8 +140,8 @@ abstract class ManagerAbstract {
 
 
     /**
+     * Returns the process object.
      * 
-     * Returns the process object
      * @return \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract
      */
     public function getProcess() {
@@ -158,8 +154,8 @@ abstract class ManagerAbstract {
 
 
     /**
-     * 
      * Sets the current executor object.
+     * 
      * @param \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract $process
      * @return $this
      */
@@ -175,7 +171,6 @@ abstract class ManagerAbstract {
 
 
     /**
-     * 
      * Starts the manager.
      * 
      * @todo
@@ -196,8 +191,9 @@ abstract class ManagerAbstract {
 
 
     /**
+     * The sleep function for an interval manager.
      * 
-     * The sleep function for an interval manager
+     * @return bool
      */
     protected function _sleep() {
         $sleepTime = \PhpTaskDaemon\Daemon\Config::get()->getOptionValue('timer.interval.time');
@@ -208,13 +204,13 @@ abstract class ManagerAbstract {
         // Sleep
         \PhpTaskDaemon\Daemon\Logger::get()->log("Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::INFO);
         usleep($sleepTime);
+        return TRUE;
     }
 
 
     /**
-     * 
-     * POSIX Signal handler callback
-     * @param $sig
+     * POSIX Signal handler callback.
+     * @param $sig The signal to catch.
      */
     public function sigHandler($sig) {
         switch ($sig) {

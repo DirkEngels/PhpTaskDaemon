@@ -1,3 +1,4 @@
+
 <?php
 /**
  * @package PhpTaskDaemon
@@ -60,7 +61,7 @@ abstract class ExecutorAbstract {
 
 
     /**
-     * Sets the current job
+     * Sets the current job.
      * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
      */
@@ -70,7 +71,7 @@ abstract class ExecutorAbstract {
 
 
     /**
-     * Returns the shared memory object
+     * Returns the shared memory object.
      * 
      * @return PhpTaskDaemon\Ipc\IpcAbstract
      */
@@ -94,7 +95,7 @@ abstract class ExecutorAbstract {
 
 
     /**
-     * Sets a shared memory object
+     * Sets a shared memory object.
      * 
      * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
      * @return $this
