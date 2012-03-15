@@ -16,6 +16,7 @@ class Interval extends TimerAbstract implements TimerInterface {
 
     /**
      * Returns the time to wait.
+     * 
      * @output integer
      */
     public function getTimeToWait() {
@@ -29,8 +30,9 @@ class Interval extends TimerAbstract implements TimerInterface {
 
     /**
      * Sets the time to wait
+     * 
      * @param $timeToWait
-     * @output $this
+     * @return $this
      */
     public function setTimeToWait($timeToWait) {
         $this->_timeToWait = $timeToWait;

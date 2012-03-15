@@ -12,7 +12,6 @@ use PhpTaskDaemon\Daemon\Logger;
 use PhpTaskDaemon\Daemon\Ipc;
 
 /**
- * 
  * The base class encapsulates two methods for updating the current queue count
  * and the statistic information about the executed tasks.
  */
@@ -28,7 +27,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * The constructor sets the shared memory object. A default shared memory
      * object instance will be created when none provided.
      * 
@@ -43,7 +41,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * Returns the shared memory object.
      * 
      * @return PhpTaskDaemon\Daemon\Ipc\IpcAbstract
@@ -66,7 +63,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * Sets a shared memory object.
      * 
      * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
@@ -121,7 +117,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * Decrements the queue count (after finishing a single job).
      * 
      * @param integer $count
@@ -132,7 +127,6 @@ abstract class QueueAbstract {
     }    
 
     /**
-     *
      * (Re)Sets a status count.
      * 
      * @param string $status
@@ -149,7 +143,6 @@ abstract class QueueAbstract {
 
 
     /**
-     *
      * (Re)Sets the queue count.
      * 
      * @param integer $count
@@ -162,7 +155,6 @@ abstract class QueueAbstract {
 
 
     /**
-     * 
      * Updates the statistic information of executed jobs in the shared memory
      * segment. If no count is given, the current count will be increased by
      * one.
@@ -181,7 +173,6 @@ abstract class QueueAbstract {
 
 
     /**
-     * 
      * Updates the current queue information with the current count. If no
      * count is given, the current count will be decreased by one.
      * 
@@ -198,7 +189,6 @@ abstract class QueueAbstract {
 
     
     /**
-     *
      * Initializes the statistics array with default values.
      * 
      * @return bool

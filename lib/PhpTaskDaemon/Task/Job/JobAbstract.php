@@ -27,6 +27,7 @@ abstract class JobAbstract {
      * The first argument contains the jobId, used for identifying the job. If
      * no jobId is provided, an random ID will be generated. The second 
      * argument is an array containing the input variables.
+     * 
      * @param string $jobId
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $input 
      */
@@ -45,8 +46,8 @@ abstract class JobAbstract {
 
 
     /**
+     * Generates a random job Id.
      * 
-     * Generates a random job Id
      * @return string
      */
     public static function generateJobId() {
@@ -55,8 +56,8 @@ abstract class JobAbstract {
 
 
     /**
+     * Returns the current job ID.
      * 
-     * Returns the current job ID
      * @return string
      */
     public function getJobId() {
@@ -65,8 +66,8 @@ abstract class JobAbstract {
 
 
     /** 
+     * Sets a new job ID.
      * 
-     * Sets a new job ID
      * @param string $jobId
      * @return $this;
      */
@@ -80,8 +81,8 @@ abstract class JobAbstract {
 
 
     /**
+     * Returns an data object with input variables.
      * 
-     * Returns an data object with input variables
      * @return \PhpTaskDaemon\Task\Job\Data\DataAbstract
      */
     public function getInput() {
@@ -90,8 +91,8 @@ abstract class JobAbstract {
 
 
     /**
-     * 
-     * (Re)Sets the input array 
+     * (Re)Sets the input array.
+     *  
      * @param \PhpTaskDaemon\Task\Job\Data\DataAbstract $input
      * @exception \InvalidArgumentException
      * @return bool
@@ -106,8 +107,8 @@ abstract class JobAbstract {
 
 
     /**
+     * Returns an data object with output variables.
      * 
-     * Returns an data object with output variables
      * @return \PhpTaskDaemon\Task\Job\Data\DataAbstract
      */
     public function getOutput() {
@@ -116,8 +117,8 @@ abstract class JobAbstract {
 
 
     /**
+     * (Re)Sets the output array.
      * 
-     * (Re)Sets the output array 
      * @param \PhpTaskDaemon\Task\Job\Data\DataAbstract $output
      * @exception \InvalidArgumentException
      * @return bool
