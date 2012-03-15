@@ -1,4 +1,4 @@
-w<?php
+<?php
 /**
  * @package PhpTaskDaemon
  * @subpackage Task\Manager\Timer
