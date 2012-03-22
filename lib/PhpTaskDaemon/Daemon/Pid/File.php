@@ -114,9 +114,9 @@ class File {
      */
     public function unlink() {
         if (!file_exists($this->getFilename())) {
-            throw new Exception\FileNotFound('Pidfile not found');
+            throw new Exception\FileNotFound( 'Pidfile not found' );
         } else {
-            return unlink($this->getFilename());
+            return unlink( $this->getFilename() );
         }
         return FALSE;
     }
@@ -128,13 +128,13 @@ class File {
      * @param int $pid
      * @return bool
      */
-    public function write($pid = NULL) {
-        if ($pid>0) {
-            if (!file_exists($this->getFilename())) {
-                touch($this->getFilename());
+    public function write( $pid = NULL ) {
+        if ( $pid > 0 ) {
+            if ( ! file_exists( $this->getFilename() ) ) {
+                touch( $this->getFilename() );
             }
 
-            file_put_contents($this->getFilename(), $pid);
+            file_put_contents( $this->getFilename(), $pid );
             return TRUE;
         }
         return FALSE;
