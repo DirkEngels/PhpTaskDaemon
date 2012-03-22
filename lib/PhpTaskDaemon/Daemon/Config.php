@@ -234,12 +234,12 @@ class Config {
     protected function _getRecursiveKey($keyString) {
         // Format config strings, because it is a framework.
         $keyString = $this->_prepareString($keyString);
-        $keyPieces = explode('.', $keyString);
+        $configArray = explode('.', $keyString);
 
         $value= $configArray;
         $configArray = Config::get()->getConfig()->toArray();
-        foreach($keyPieces as $keyPiece) {
-            if ( ! isset( $value[$keyPiece] ) ) {
+        foreach( $configArray as $keyPiece ) {
+            if ( ! in_array( $keyPiece, $value ) ) {
                 throw new \Exception('Config option does not exists: ' . $keyString);
             }
             $value = $value[$keyPiece];
