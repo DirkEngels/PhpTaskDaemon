@@ -48,9 +48,9 @@ class Logger {
      * @param string $message
      * @param integer $level
      */
-    public static function log($message, $level = null) {
-        if (is_null($level)) {
-            $level = Config::get()->getOptionValue('daemon.log.level');
+    public static function log( $message, $level = null ) {
+        if ( is_null( $level ) ) {
+            $level = Config::get()->getOptionValue( 'daemon.log.level' );
         }
 
         return self::get()->log('[' . getmypid() . '] ' . $message, $level);
