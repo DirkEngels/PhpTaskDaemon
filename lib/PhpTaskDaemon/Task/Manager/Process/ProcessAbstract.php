@@ -20,14 +20,19 @@ abstract class ProcessAbstract {
     protected $_jobs = array();
 
 
+    /**
+     * The constructor expects a name.
+     *  
+     * @param unknown_type $name
+     */
     public function __construct($name = NULL) {
         $this->_name = $name;
     }
 
 
     /**
-     *
-     * Returns the task name 
+     * Returns the task name.
+     *  
      * @return string
      */
     public function getName() {
@@ -36,8 +41,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     *
-     * Sets the task name 
+     * Sets the task name.
+     *  
      * @param string $name
      * @return $this
      */
@@ -48,8 +53,8 @@ abstract class ProcessAbstract {
 
 
     /**
+     * Returns the current loaded queue array.
      * 
-     * Returns the current loaded queue array
      * @return \PhpTaskDaemon\Task\Queue\QueueAbstract
      */
     public function getQueue() {
@@ -61,8 +66,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * 
      * Sets the current queue to process.
+     * 
      * @param \PhpTaskDaemon\Task\Queue\QueueAbstract $queue
      * @return $this
      */
@@ -77,8 +82,8 @@ abstract class ProcessAbstract {
 
 
     /**
+     * Returns the executor object.
      * 
-     * Returns the executor object
      * @return \PhpTaskDaemon\Task\Executor\ExecutorAbstract
      */
     public function getExecutor() {
@@ -90,8 +95,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * 
      * Sets the current executor object.
+     * 
      * @param \PhpTaskDaemon\Task\Executor\ExecutorAbstract $executor
      * @return $this
      */
@@ -105,7 +110,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * Gets the job
+     * Gets the job.
+     * 
      * @return array[\PhpTaskDaemon\Task\Job\JobAbstract]
      */
     public function getJobs() {
@@ -114,7 +120,8 @@ abstract class ProcessAbstract {
 
 
     /**
-     * Sets the jobs
+     * Sets the jobs.
+     * 
      * @param array[\PhpTaskDaemon\Task\Job\JobAbstract] $jobs
      * @return $this
      */
@@ -125,10 +132,11 @@ abstract class ProcessAbstract {
 
 
     /**
-     * 
      * Process a single task: set job input, reset status, run and update
-     * statistics
+     * statistics.
+     * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
+     * @return NULL|mixed
      */
     protected function _processTask(\PhpTaskDaemon\Task\Job\JobAbstract $job) {
         // Set manager input
@@ -137,21 +145,23 @@ abstract class ProcessAbstract {
         $executor->setJob($job);
         $queue = $this->getQueue();
 
-        $executor->getStatus()->resetIpc();
-        $executor->getStatus()->resetPid();
-        $queue->getStatistics()->resetIpc();
+        $executor->resetIpc();
+        $executor->resetPid();
+        $queue->resetIpc();
 
         // Update Status before and after running the task
-        $executor->updateStatus(0);
+        $executor->setStatus(0, 'Initializing task');
         $job = $executor->run();
-        $executor->updateStatus(100);
+        $executor->setStatus(100, 'Finished task');
 
         // Log and sleep for a while
         usleep(self::SLEEPTIME);
         \PhpTaskDaemon\Daemon\Logger::log(getmypid() . ': ' . $job->getOutput()->getVar('returnStatus') . ": " . $job->getJobId(), \Zend_Log::DEBUG);            
 
         // Reset status and decrement queue
-        $queue->updateStatistics($job->getOutput()->getVar('returnStatus'));
+        $queue->updateStatus(
+            $job->getOutput()->getVar('returnStatus')
+        );
         $queue->updateQueue();
 
         return $job->getOutput()->getVar('returnStatus');
@@ -160,7 +170,9 @@ abstract class ProcessAbstract {
 
     /**
      * Forks a single tasks.
+     * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $job
+     * @return EXIT|integer
      */
     protected function _forkTask($job) {
         // Fork the manager
@@ -174,13 +186,13 @@ abstract class ProcessAbstract {
 
         } else {
             // @todo: Initiate resources
-            $this->getExecutor()->getStatus()->getIpc()->initResource();
+            $this->getExecutor()->getIpc()->initResource();
 
             // Set manager input and start the manager
             $this->_processTask($job);
 
             // Cleanup resources
-            $this->getExecutor()->getStatus()->getIpc()->cleanupResource();
+            $this->getExecutor()->getIpc()->cleanupResource();
 
             // Exit after finishing the forked
             exit;
@@ -189,9 +201,9 @@ abstract class ProcessAbstract {
 
 
     /**
+     * POSIX Signal handler callback.
      * 
-     * POSIX Signal handler callback
-     * @param $sig
+     * @param $sig The signal to catch.
      */
     public function sigHandler($sig) {
         switch ($sig) {

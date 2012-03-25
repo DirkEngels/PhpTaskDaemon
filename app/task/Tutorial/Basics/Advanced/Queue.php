@@ -26,7 +26,7 @@ class Queue extends TaskQueue\QueueAbstract implements TaskQueue\QueueInterface 
                 new Job\JobDefault(
                     'advanced-' . $i,
                     new Job\Data\DataDefault(
-                        array('sleepTime' => rand(10000, 100000))
+                        array('sleepTime' => rand(100000, 10000000))
                     )
                 )
             );

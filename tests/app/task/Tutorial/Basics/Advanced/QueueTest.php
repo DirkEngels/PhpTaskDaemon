@@ -36,7 +36,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase {
         $this->assertGreaterThanOrEqual(50, count($result));
         $this->assertLessThanOrEqual(500, count($result));
         foreach($result as $item) {
-            $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Job\\AbstractClass', $item);
+            $this->assertInstanceOf('\\PhpTaskDaemon\\Task\\Job\\JobAbstract', $item);
         }
     }
 

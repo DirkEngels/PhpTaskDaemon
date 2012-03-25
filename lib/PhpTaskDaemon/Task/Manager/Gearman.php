@@ -12,7 +12,7 @@ namespace PhpTaskDaemon\Task\Manager;
 class Gearman extends ManagerAbstract implements ManagerInterface {
 
     /**
-     * Starts a gearman worker
+     * Starts a gearman worker.
      */
     public function execute() {
         $gearmanWorker= new \GearmanWorker();
@@ -32,20 +32,24 @@ class Gearman extends ManagerAbstract implements ManagerInterface {
 
 
     /**
-     * 
      * Accept the gearman input and process the job.
-     * @param unknown_type $gearmanJob
+     * 
+     * @param \PhpTaskDaemon\Task\Job\JobAbstract $gearmanJob
      */
     public function processGearmanTask($gearmanJob) {
-        $data = $gearmanJob->workload();
+        $data = unserialize($gearmanJob->workload());
+        if (!is_array($data)) {
+            $data = array('data' => $data);
+        }
         $job = new \PhpTaskDaemon\Task\Job\JobDefault(
             'gearman-' . getmypid(),
-            new \PhpTaskDaemon\Task\Job\Data\JobDefault(
-                array('gearmanData' => $data)
+            new \PhpTaskDaemon\Task\Job\Data\DataDefault(
+                $data
             )
         );
-
-        return $this->_processTask($job);
+        return $this->getProcess()
+            ->setJobs(array($job))
+            ->run();
     }
 
 }

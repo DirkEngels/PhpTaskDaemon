@@ -13,6 +13,8 @@ abstract class TimerAbstract {
 
     /**
      * Returns the time to wait before to run again.
+     * 
+     * @return integer The number of seconds to wait.
      */
     public function timeToWait() {
         return 1;

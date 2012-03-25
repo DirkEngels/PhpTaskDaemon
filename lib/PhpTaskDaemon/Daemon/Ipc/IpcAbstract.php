@@ -19,7 +19,8 @@ use PhpTaskDaemon\Daemon\Logger;
 abstract class IpcAbstract {
 
     /**
-     * Unique identifier
+     * Unique identifier for the IPC ID.
+     * 
      * @var string
      */
     protected $_id = NULL;
@@ -27,15 +28,17 @@ abstract class IpcAbstract {
 
     /**
      * This array contains the keys of all registered variables.
+     * 
      * @var array
      */
     protected $_keys = array();
 
 
     /**
+     * Constructs a new unique (id) Ipc object.
      * 
-     * Constructs a new unique (id) Ipc object
      * @param string $id
+     * @return boolean
      */
     public function __construct($id) {
         $this->_id = $id;
@@ -43,15 +46,30 @@ abstract class IpcAbstract {
         return TRUE;
     }
 
-    public function initResource() {
-    }
 
-    public function cleanupResource() {
+    /**
+     * Initializes the resource, which is needed when forking processes.
+     * 
+     * @return bool
+     */
+    public function initResource() {
+        return TRUE;
     }
 
 
     /**
-     * Returns the unique identifier
+     * Cleans up any open resources.
+     * 
+     * @return bool
+     */
+    public function cleanupResource() {
+        return TRUE;
+    }
+
+
+    /**
+     * Returns the unique identifier.
+     * 
      * @return string
      */
     public function getId() {
@@ -60,8 +78,8 @@ abstract class IpcAbstract {
 
 
     /**
-     * 
      * Returns the registered keys.
+     * 
      * @return array
      */
     public function getKeys() {
@@ -71,6 +89,7 @@ abstract class IpcAbstract {
 
     /**
      * Returns all the registered keys with corresponding values.
+     * 
      * @return array
      */
     public function get() {
@@ -84,10 +103,74 @@ abstract class IpcAbstract {
 
 
     /**
-     * Removes the ipc data
+     * Adds a value to an array key.
+     * 
+     * @param string $key
+     * @param mixed $value
+     * @return boolean
+     */
+    public function addArrayVar($key, $value) {
+        $array = $this->getVar($key);
+        echo $key;
+        echo var_dump($array);
+        if (!is_array($array)) {
+            return FALSE;
+        }
+
+        if (!in_array($value, $array)) {
+            array_push($array, $value);
+            $this->setVar($key, $array);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
+     * Removes a value to an array key.
+     * 
+     * @param string $key
+     * @param mixed $value
+     * @return boolean
+     */
+    public function removeArrayVar($key, $value) {
+        $array = $this->getVar($key);
+        if (!is_array($array)) {
+            return FALSE;
+        }
+
+        if (in_array($value, $array)) {
+            $array = array_diff($array, array($value));
+            $this->setVar($key, $array);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
+     * Removes the ipc data.
+     * 
+     * @param string $key
+     * @return bool
+     */
+    public function removeVar($key) {
+        if (in_array($key, $this->_keys)) {
+            unset($this->_keys[$key]);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
+    /**
+     * Removes all registered keys.
+     * 
+     * @return boolean
      */
     public function remove() {
         $this->_keys = array();
+        return TRUE;
     }
 
 }

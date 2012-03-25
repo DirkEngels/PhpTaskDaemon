@@ -13,18 +13,18 @@
  */
 
 
-namespace PhpTaskDaemon\Daemon\Pid;
+namespace PhpTaskDaemon\Daemon;
 
 use PhpTaskDaemon\Daemon\Tasks;
 
-class ConsoleTest extends \PHPUnit_Extensions_OutputTestCase {
+class ConsoleTest extends \PHPUnit_Framework_TestCase {
     protected $_console;
 
     protected function setUp() {
-//        // Stop here and mark this test as incomplete.
-//        $this->markTestIncomplete(
-//          'This test has not been implemented yet.'
-//        );
+        // Stop here and mark this test as incomplete.
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
+        );
 
         $this->_console = new \PhpTaskDaemon\Daemon\Console();
     }

@@ -3,12 +3,15 @@
 // Set error_reporting
 error_reporting(E_ALL);
 
+// Set timezone
+date_default_timezone_set("Europe/Amsterdam");
+
 // Set include paths
 define('PROJECT_ROOT', realpath(__DIR__ .'/../'));
 define('APPLICATION_PATH', realpath(\PROJECT_ROOT .'/app'));
 define('TASKDIR_PATH', realpath(\PROJECT_ROOT .'/app/tasks'));
 define('LIBRARY_PATH', realpath(\PROJECT_ROOT .'/lib'));
-define('TMP_PATH', realpath(\PROJECT_ROOT .'/tmp'));
+define('TMP_PATH', realpath(\PROJECT_ROOT .'/app/tmp'));
 
 // Define application environment
 defined('APPLICATION_ENV')

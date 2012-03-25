@@ -16,7 +16,7 @@
 
 namespace PhpTaskDaemon\Task\Manager\Process;
 
-class AbstractTest extends \PHPUnit_Framework_TestCase {
+class ProcessAbstractTest extends \PHPUnit_Framework_TestCase {
     protected $_process;
 
     protected function setUp() {
@@ -28,18 +28,11 @@ class AbstractTest extends \PHPUnit_Framework_TestCase {
     /**
      * @todo
      */
-    public function testNothing() {
-        $this->assertTrue(true);
-    }
-
-    /*
-    public function testSetQueueInvalidArgument() {
-        $this->_process->setQueue('invalid queue object');
-        $this->assertEquals(
-            new \PhpTaskDaemon\Task\Queue\DefaultClass(),
-            $this->_process->getQueue()
+    public function testConstructor() {
+        // Stop here and mark this test as incomplete.
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
         );
     }
-    */
 
 }

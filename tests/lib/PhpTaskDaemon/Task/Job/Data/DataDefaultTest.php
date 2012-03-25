@@ -15,10 +15,10 @@
 
 namespace PhpTaskDaemon\Task\Data\Job;
 
-class DefaultClassTest extends \PHPUnit_Framework_Testcase {
+class DataDefaultTest extends \PHPUnit_Framework_Testcase {
 
     /**
-     * @var \PhpTaskDaemon\Task\Job\Data\AbstractClass
+     * @var \PhpTaskDaemon\Task\Job\Data\DataAbstract
      */
     protected $_data;
 
@@ -28,7 +28,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     protected $_mockData;
 
     protected function setUp() {
-        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DefaultClass();
+        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DataDefault();
         $this->_mockData = array(
             'key1' => 'value1',
             'key2' => 'value2',
@@ -48,14 +48,14 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     }
 
     public function testConstructorNoArguments() {
-        $this->assertInstanceOf('\PhpTaskDaemon\Task\Job\Data\AbstractClass', $this->_data);
+        $this->assertInstanceOf('\PhpTaskDaemon\Task\Job\Data\DataAbstract', $this->_data);
         $this->assertInternalType('array', $this->_data->get());
         $this->assertEquals(0, sizeof($this->_data->get()));
         $this->assertEquals(0, sizeof($this->_data->getKeys()));
     }
     public function testInitWithDataArguments() {
-        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DefaultClass($this->_mockData);
-        $this->assertInstanceOf('\PhpTaskDaemon\Task\Job\Data\AbstractClass', $this->_data);
+        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DataDefault($this->_mockData);
+        $this->assertInstanceOf('\PhpTaskDaemon\Task\Job\Data\DataAbstract', $this->_data);
         $this->assertInternalType('array', $this->_data->get());
         $this->assertEquals(4, sizeof($this->_data->get()));
         $this->assertEquals(4, sizeof($this->_data->getKeys()));
@@ -73,7 +73,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     }
 
     public function testSetVarInitialized() {
-        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DefaultClass($this->_mockData);
+        $this->_data = new \PhpTaskDaemon\Task\Job\Data\DataDefault($this->_mockData);
 
         $this->assertEquals(4, sizeof($this->_data->get()));
         $this->assertEquals(4, sizeof($this->_data->getKeys()));
@@ -128,7 +128,7 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \InvalidArgumentException
      */
     public function testSetInvalidData () {
         $this->assertEquals(0, sizeof($this->_data->get()));
@@ -145,4 +145,3 @@ class DefaultClassTest extends \PHPUnit_Framework_Testcase {
     }
 
 }
-

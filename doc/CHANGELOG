@@ -1,24 +1,44 @@
 Change Log
 ==========
 
+Future features
+------------------
+- Add queue implementation: database
+- Add manager implementation: ZeroMq
+
+
 Version 1.0 (roadmap)
 ---------------------
 - Add tools (init.d script)
+- Add developer tutorial
 - Create user documentation (doc dir + website/wiki)
-
-
-Version 0.8.5 (planned)
------------------------
+- Increate unit test coverage
+- Double check coding style
+- Double check php doc info
 - Clean up pid & ipc resources
-- Add example tasks
-- Add tutorial
-- Refactor status into executor
-- Refactor statistics into queue
-- Add documentation (website)
+
+
+Version 0.8.6 (planned)
+-----------------------
+- Finish example tasks
+- Clean up pid & ipc resources
+- Add some more unit tests
+- Add some more documentation
+- Update website documentation
+
+
+Version 0.8.5 (25-03-2012)
+==========================
++ Fix setting IPC status & statistics
++ Move namespace example tasks to App
++ Fix incomplete unit tests
++ Refactor status into executor
++ Refactor statistics into queue
++ Refactor daemon state
 
 
 Version 0.8.4 (27-11-2011)
-==========================
+--------------------------
 + Refactor manager
     + Move queue class to the process class
     + Add process pid ID to the logger log method

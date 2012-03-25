@@ -13,7 +13,8 @@ class None extends TimerAbstract implements TimerInterface {
 
     /**
      * Returns the time to wait.
-     * @output integer
+     * 
+     * @return integer
      */
     public function getTimeToWait() {
         return 0;

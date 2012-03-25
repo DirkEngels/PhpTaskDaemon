@@ -9,6 +9,8 @@
 
 namespace PhpTaskDaemon\Daemon;
 
+use PhpTaskDaemon\Daemon\Ipc;
+
 /**
  * 
  * The State class can be used to read the current state of the daemon from the
@@ -17,55 +19,63 @@ namespace PhpTaskDaemon\Daemon;
  */
 class State {
 
+    const KEY_PID       = 'pid';
+    const KEY_PROCS     = 'processes';
+    const KEY_QUEUE     = 'queue';
+    const KEY_EXECUTOR  = 'executor';
+
+
     /**
-     * 
      * This static method returns an array with the state (statistics + 
      * statuses of active tasks) of all current running tasks.
-     * @return array
+     * 
+     * @static
+     * @return array Current state of all the daemon, queues and tasks.
      */
     public static function getState() {
-        $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-        if (!class_exists($ipcClass)) {
-            $ipcClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
+        $state = self::getDaemonState();
+
+        // Loop Childs
+        foreach( $state[ self::KEY_PROCS ] as $queuePid ) {
+            $key = self::KEY_QUEUE . '-' . $queuePid;
+            $state[ $key ] = self::getStateQueue( $queuePid );
+            $executorPids = $state[ $ipcQueue->getId() ][ 'executors' ];
+
+            // Executor Status
+            foreach ( $executorPids as $executorPid ) {
+                $key = self::KEY_EXECUTOR . '-' . $executorPid;
+                $state[ $key ] = self::getStateExecutor( $executorPid );
+            }
         }
-        $ipc = new $ipcClass('phptaskdaemond');
 
+        return $state;
+    }
+
+
+    /**
+     * This static method returns an array with daemon specific information, 
+     * such as the process ID and its children ID's.
+     * 
+     * @static
+     * @return array
+     */
+    public static function getDaemonState() {
+        // Get Daemon IPC Object
         $state = array();
-
+        $ipc = Ipc\IpcFactory::get( Ipc\IpcFactory::NAME_DAEMON );
         $daemonKeys = $ipc->getKeys();
 
         // Pid
-        $state['pid'] = null;
-        if (in_array('pid', $daemonKeys)) {
-            $state['pid'] = $ipc->getVar('pid');
+        $state[ self::KEY_PID ] = null;
+        if ( in_array( self::KEY_PID, $daemonKeys ) ) {
+            $state[ self::KEY_PID ] = $ipc->getVar( self::KEY_PID );
         }
 
         // Childs
-        if (!in_array('childs', $daemonKeys)) {
-            $state['childs'] = array();
+        if ( ! in_array( self::KEY_PROCS, $daemonKeys ) ) {
+            $state[ self::KEY_PROCS ] = array();
         } else {
-            $state['childs'] = $ipc->getVar('childs');
-        }
-
-        // Loop Childs
-        foreach($state['childs'] as $process) {
-            // Queue Statistics
-            $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-            if (!class_exists($ipcQueueClass)) {
-                $ipcQueueClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
-            }
-            $ipcQueue = new $ipcQueueClass('queue-' . $process);
-            $state[$ipcQueue->getId()] = $ipcQueue->get();
-
-            // Executor Status
-            foreach ($state[$ipcQueue->getId()]['executors'] as $executorPid) {
-                $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\' . Config::get()->getOptionValue('global.ipc');
-                if (!class_exists($ipcExecutorClass)) {
-                    $ipcExecutorClass = '\\PhpTaskDaemon\\Daemon\\Ipc\\None';
-                }
-                $ipcExecutor = new $ipcExecutorClass('executor-' . $executorPid);
-                $state[$ipcExecutor->getId()] = $ipcExecutor->get();
-            }
+            $state[ self::KEY_PROCS ] = $ipc->getVar( self::KEY_PROCS );
         }
 
         return $state;
@@ -73,46 +83,38 @@ class State {
 
 
     /**
-     * This statis method is mainly used by the getState method and returns an
-     * array with all statuses of currently running tasks of a particular
-     * manager.
-     *
-     * @param int $childPid
+     * This static methods returns an array with all information regarding a
+     * queue. A specific queue is identified by its process ID, which can be 
+     * retrieved from the daemon state.
+     *  
+     * @static
+     * @param integer $queuePid
      * @return array
      */
-    protected static function _getChildStatus($childPid) {
-        $state = array('childPid' => $childPid);
-        if (file_exists(TMP_PATH . '/status-' . $childPid . '.shm')) {
-            $shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('status-' . $childPid);
-            $shmKeys = $shm->getKeys();
-            foreach($shm->getKeys() as $key => $value) {
-                $state[$key] = $shm->getVar($key);
-            }
-        }
-
-        return $state;
+    public static function getStateQueue( $queuePid ) {
+        $ipcQueue = Ipc\IpcFactory::get(
+            Ipc\IpcFactory::NAME_QUEUE,
+            $queuePid
+        );
+        return $ipcQueue->get();
     }
 
 
     /**
-     * This statis method is mainly used by the getState method and returns an
-     * array with statistics of all currently running tasks of a particular
-     * manager.
-     *
-     * @param int $childPid
+     * This static methods returns an array with all information regarding an
+     * executor. A specific executor is identified by its process ID, which can
+     * be retrieved from the daemon state.
+     * 
+     * @static
+     * @param $executorPid
      * @return array
      */
-    protected static function _getChildStatistics($childPid) {
-        $state = array('childPid' => $childPid);
-        if (file_exists(TMP_PATH . '/statistics-' . $childPid . '.shm')) {
-            $shm = new \PhpTaskDaemon\Daemon\Ipc\SharedMemory('statistics-' . $childPid);
-            $shmKeys = $shm->getKeys();
-            foreach($shm->getKeys() as $key => $value) {
-                $state[$key] = $shm->getVar($key);
-            }
-        }
-
-        return $state;
+    public static function getStateExecutor( $executorPid ) {
+        $ipcExecutor = Ipc\IpcFactory::get(
+            Ipc\IpcFactory::NAME_EXECUTOR,
+            $executorPid
+        );
+        return $ipcExecutor->get();
     }
 
 }

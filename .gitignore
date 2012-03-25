@@ -1,0 +1,6 @@
+.buildpath
+.project
+.settings/
+build/
+lib/Zend
+logs
