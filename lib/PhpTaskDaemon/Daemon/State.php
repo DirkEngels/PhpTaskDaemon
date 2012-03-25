@@ -19,6 +19,12 @@ use PhpTaskDaemon\Daemon\Ipc;
  */
 class State {
 
+    const KEY_PID       = 'pid';
+    const KEY_PROCS     = 'processes';
+    const KEY_QUEUE     = 'queue';
+    const KEY_EXECUTOR  = 'executor';
+
+
     /**
      * This static method returns an array with the state (statistics + 
      * statuses of active tasks) of all current running tasks.
@@ -27,15 +33,18 @@ class State {
      * @return array Current state of all the daemon, queues and tasks.
      */
     public static function getState() {
-    	$state = self::getDaemonState();
+        $state = self::getDaemonState();
 
         // Loop Childs
-        foreach($state['processes'] as $queuePid) {
-            $state['queue-' . $queuePid] = self::getQueueState($queuePid);
+        foreach( $state[ self::KEY_PROCS ] as $queuePid ) {
+            $key = self::KEY_QUEUE . '-' . $queuePid;
+            $state[ $key ] = self::getStateQueue( $queuePid );
+            $executorPids = $state[ $ipcQueue->getId() ][ 'executors' ];
 
             // Executor Status
-            foreach ($state[$ipcQueue->getId()]['executors'] as $executorPid) {
-				$state['executor-' . $executorPid] = self::getExecutorState($executorPid);
+            foreach ( $executorPids as $executorPid ) {
+                $key = self::KEY_EXECUTOR . '-' . $executorPid;
+                $state[ $key ] = self::getStateExecutor( $executorPid );
             }
         }
 
@@ -51,27 +60,28 @@ class State {
      * @return array
      */
     public static function getDaemonState() {
+        // Get Daemon IPC Object
         $state = array();
-        $ipc = Ipc\IpcFactory::get(Ipc\IpcFactory::NAME_DAEMON);
+        $ipc = Ipc\IpcFactory::get( Ipc\IpcFactory::NAME_DAEMON );
         $daemonKeys = $ipc->getKeys();
 
         // Pid
-        $state['pid'] = null;
-        if (in_array('pid', $daemonKeys)) {
-            $state['pid'] = $ipc->getVar('pid');
+        $state[ self::KEY_PID ] = null;
+        if ( in_array( self::KEY_PID, $daemonKeys ) ) {
+            $state[ self::KEY_PID ] = $ipc->getVar( self::KEY_PID );
         }
 
         // Childs
-        if (!in_array('processes', $daemonKeys)) {
-            $state['processes'] = array();
+        if ( ! in_array( self::KEY_PROCS, $daemonKeys ) ) {
+            $state[ self::KEY_PROCS ] = array();
         } else {
-            $state['processes'] = $ipc->getVar('processes');
+            $state[ self::KEY_PROCS ] = $ipc->getVar( self::KEY_PROCS );
         }
 
         return $state;
     }
-    
-    
+
+
     /**
      * This static methods returns an array with all information regarding a
      * queue. A specific queue is identified by its process ID, which can be 
@@ -81,15 +91,15 @@ class State {
      * @param integer $queuePid
      * @return array
      */
-    public static function getQueueState($queuePid) {
-    	$ipcQueue = Ipc\IpcFactory::get(
-    		Ipc\IpcFactory::NAME_QUEUE,
-    		$queuePid
-    	);
+    public static function getStateQueue( $queuePid ) {
+        $ipcQueue = Ipc\IpcFactory::get(
+            Ipc\IpcFactory::NAME_QUEUE,
+            $queuePid
+        );
         return $ipcQueue->get();
     }
 
-    
+
     /**
      * This static methods returns an array with all information regarding an
      * executor. A specific executor is identified by its process ID, which can
@@ -99,11 +109,11 @@ class State {
      * @param $executorPid
      * @return array
      */
-    public static function getExecutorState($executorPid) {
-    	$ipcExecutor = Ipc\IpcFactory::get(
-    		Ipc\IpcFactory::NAME_EXECUTOR,
-    		$executorPid
-    	);
+    public static function getStateExecutor( $executorPid ) {
+        $ipcExecutor = Ipc\IpcFactory::get(
+            Ipc\IpcFactory::NAME_EXECUTOR,
+            $executorPid
+        );
         return $ipcExecutor->get();
     }
 

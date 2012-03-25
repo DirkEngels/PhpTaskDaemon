@@ -16,6 +16,29 @@ namespace PhpTaskDaemon\Daemon;
 */
 class Console {
 
+    // Messages
+    const MSG_NO_TASKS = "No tasks found!";
+
+    // Configuration options
+    const CONFIG_PROCESS_TYPE           = 'process.type';
+    const CONFIG_IPC                    = 'ipc';
+    const CONFIG_ACTION                 = 'action';
+
+    // Manager depndies.
+    const CONFIG_TIMER_TYPE             = 'timer.type';
+    const CONFIG_TIMER_INTERVAL_TIME    = 'timer.interval.time';
+    const CONFIG_TIMER_CRON_TIME        = 'timer.cron.time';
+
+    // Actions
+    const ACTION_START                  = 'start';
+    const ACTION_STOP                   = 'stop';
+    const ACTION_RESTART                = 'restart';
+    const ACTION_STATUS                 = 'status';
+    const ACTION_MONITOR                = 'monitor';
+    const ACTION_LIST_TASKS             = 'list-tasks';
+    const ACTION_SETTINGS               = 'settings';
+    const ACTION_HELP                   = 'action';
+
     /**
      * Console options object
      * 
@@ -43,31 +66,31 @@ class Console {
      * 
      * @param \Zend_Console_Getopt $consoleOpts
      */
-    public function __construct(Instance $instance = NULL) {
+    public function __construct( Instance $instance = NULL ) {
         // Initialize command line arguments
-        $this->setInstance($instance);
+        $this->setInstance( $instance );
         $this->setConsoleOpts();
     }
 
 
     /**
-     * Returns an object containing the console arguments..
+     * Returns an object containing the console arguments.
      * 
      * @return Zend_Console_Getopt
      */
     public function getConsoleOpts() {
         // Initialize default console options
-        if (is_NULL($this->_consoleOpts)) {
+        if ( is_null( $this->_consoleOpts ) ) {
             $this->_consoleOpts = new \Zend_Console_Getopt(
                 array(
-                    'config-file|c-s'    => 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
-                    'log-file|l-s'        => 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
+                    'config-file|c-s'   => 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
+                    'log-file|l-s'      => 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
                     'action|a=s'        => 'Action (default: start) (options: start, stop, restart, status, monitor)',
                     'list-tasks|lt'     => 'List tasks',
                     'settings|s'        => 'Display tasks settings',
-                    'task|t=s'             => 'Run single task',
-                    'verbose|v-i'            => 'Verbose',
-                    'help|h'              => 'Show help message (this message)',
+                    'task|t=s'          => 'Run single task',
+                    'verbose|v-i'       => 'Verbose',
+                    'help|h'            => 'Show help message (this message)',
                 )
             );
         }
@@ -82,15 +105,15 @@ class Console {
      * @param \Zend_Console_Getopt $consoleOpts
      * @return $this
      */
-    public function setConsoleOpts(\Zend_Console_Getopt $consoleOpts = NULL) {
-        if ($consoleOpts === NULL) {
+    public function setConsoleOpts( \Zend_Console_Getopt $consoleOpts = NULL ) {
+        if ( $consoleOpts === NULL ) {
             $consoleOpts = $this->getConsoleOpts();
         }
 
         // Parse Options
         try {
             $consoleOpts->parse();
-        } catch (\Zend_Console_Getopt_Exception $e) {
+        } catch ( \Zend_Console_Getopt_Exception $e ) {
             echo $e->getUsageMessage();
             $this->_exit();
         }
@@ -119,7 +142,7 @@ class Console {
      * @param Instance $instance
      * @return $this
      */
-    public function setInstance($instance) {
+    public function setInstance( $instance ) {
         $this->_instance = $instance;
         return $this;
     }
@@ -144,7 +167,7 @@ class Console {
      * @param Tasks $tasks
      * @return $this
      */
-    public function setTasks($tasks) {
+    public function setTasks( $tasks ) {
         $this->_tasks = $tasks;
         return $this;
     }
@@ -164,13 +187,13 @@ class Console {
             $this->_initConfig();
 
             // List Tasks (--list-tasks)
-            if ($this->_consoleOpts->getOption('list-tasks')) {
+            if ($this->_consoleOpts->getOption( self::ACTION_LIST_TASKS ) ) {
                 $this->listTasks();
                 $this->_exit();
             }
 
             // Display Settings (--settings)
-            if ($this->_consoleOpts->getOption('settings')) {
+            if ($this->_consoleOpts->getOption( self::ACTION_SETTINGS ) ) {
                 $this->settings();
                 $this->_exit();
             }
@@ -179,10 +202,19 @@ class Console {
             $this->_initLogFile();
 
             // Check action, otherwise display help
-            if ($this->_consoleOpts->getOption('action')) {
-                $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
-                $action = $this->_consoleOpts->getOption('action');
-                if (in_array($action, $allActions))  {
+            if ($this->_consoleOpts->getOption( self::ACTION_HELP ) ) {
+
+                // All available actions
+                $allActions = array(
+                    self::ACTION_START,
+                    self::ACTION_STOP,
+                    self::ACTION_RESTART,
+                    self::ACTION_STATUS,
+                    self::ACTION_MONITOR,
+                );
+
+                $action = $this->_consoleOpts->getOption( self::CONFIG_ACTION );
+                if ( in_array( $action, $allActions ) )  {
                     // Perform action
                     $this->$action();
                     $this->_exit();
@@ -193,7 +225,7 @@ class Console {
             $this->help();
 
         } catch (\RuntimeException $e) {
-            Logger::log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
+            Logger::log( 'FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT );
         }
 
     }
@@ -203,35 +235,42 @@ class Console {
      * Lists the current loaded tasks.
      */
     public function listTasks() {
+        $config = Config::get();
         $taskNames = $this->getTasks()->scan();
 
+        // Print header
         echo "List Tasks\n";
         echo "==========\n\n";
-        if (count($taskNames)==0) {
-            echo "No tasks found!\n";
-        } else {
-            foreach ($taskNames as $taskName) {
-                echo $taskName, "\n";
-                echo str_repeat('-', strlen($taskName)), "\n";
 
-                echo "Process:\t\t", Config::get()->getOptionValue('process.type', $taskName), "\n";
-                echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
+        // One or more tasks found
+        if ( ! count( $taskNames ) == 0 ) {
+            foreach ( $taskNames as $taskName ) {
+
+                // Print header
+                echo $taskName, "\n";
+                echo str_repeat( '-', strlen($taskName) ), "\n";
+
+                echo "Process:\t\t", $config->getOptionValue( self::CONFIG_PROCESS_TYPE, $taskName ), "\n";
+                echo "IPC:\t\t\t", $config->getOptionValue( self::CONFIG_IPC, $taskName ), "\n";
 
                 // Manager Timer
-                $timer = Config::get()->getOptionValue('manager.timer.type', $taskName);
+                $timer = $config->getOptionValue( self::CONFIG_TIMER_TYPE, $taskName );
                 echo "Timer:\t\t", $timer, "\n";
                 switch($timer) {
                     case 'interval':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.interval.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", $config->getOptionValue( self::CONFIG_TIMER_INTERVAL_TIME, $taskName ), "\n";
                         break;
                     case 'cron':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.cron.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", $config->getOptionValue( self::CONFIG_TIMER_CRON_TIME, $taskName ), "\n";
                         break;
                     default:
                         break;
                 }
                 echo "\n";
             }
+        // No Tasks
+        } else {
+            echo self::MSG_NO_TASKS . "\n";
         }
     }
 
@@ -423,8 +462,8 @@ class Console {
             }
             $writerVerbose->addFilter($logLevel);
 
-            \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
-            $msg = 'Adding log writer: verbose (level: ' . $logLevel . ')';
+            \PhpTaskDaemon\Daemon\Logger::get()->addWriter( $writerVerbose );
+            $msg = 'Added Log Writer: Verbose';
             \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
         }
     }
@@ -453,7 +492,7 @@ class Console {
                 // Adding logfile
                 $writerFile = new \Zend_Log_Writer_Stream($logFile);
                 \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-                \PhpTaskDaemon\Daemon\Logger::log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::log('Added Log Writer: ' . $logFile, \Zend_Log::DEBUG);
             } catch (\Exception $e) {
                 \PhpTaskDaemon\Daemon\Logger::log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
             }

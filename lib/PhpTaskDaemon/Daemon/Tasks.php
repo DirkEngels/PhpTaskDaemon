@@ -16,8 +16,11 @@ namespace PhpTaskDaemon\Daemon;
  */
 class Tasks {
 
+    const MSG_INVALID_MANAGER = 'Invalid manager instance';
+
     /**
      * Array with Task Managers.
+     * 
      * @var array
      */
     public $managers = array();
@@ -25,6 +28,7 @@ class Tasks {
 
     /**
      * Returns an array with all the managers.
+     * 
      * @return array
      */
     public function getManagers() {
@@ -40,10 +44,10 @@ class Tasks {
      * @return boolean
      */
     public function addManager($manager) {
-        if (!($manager instanceof \PhpTaskDaemon\Task\Manager\ManagerAbstract)) {
-            throw new \InvalidArgumentException('Invalid Manager instance');
+        if ( ! ( $manager instanceof \PhpTaskDaemon\Task\Manager\ManagerAbstract ) ) {
+            throw new \InvalidArgumentException( self::MSG_INVALID_MANAGER );
         }
-        return array_push($this->managers, $manager);
+        return array_push( $this->managers, $manager );
     }
 
 
@@ -75,10 +79,6 @@ class Tasks {
      * @return array
      */
     public function scan() {
-        // Configuration
-//        $tasksFoundInConfig = $this->_scanTasksInConfig(
-//            \PhpTaskDaemon\Daemon\Config::get()
-//        );
         $tasksFoundInConfig = array();
         Logger::log('Scanned config and found ' . count($tasksFoundInConfig) . ' tasks', \Zend_Log::DEBUG);
 
@@ -107,38 +107,47 @@ class Tasks {
      * @return integer
      */
     protected function _scanTasksInDirs($dir, $subdir = NULL) {
-//        if (!is_dir($dir . '/' . $subdir)) {
-//            throw new \Exception('Directory does not exists');
-//        }
+        if ( ! is_dir( $dir . '/' . $subdir ) ) {
+            throw new \Exception( 'Directory does not exists' );
+        }
 
         $config = Config::get();
-        $items = scandir($dir . '/' . $subdir);
+        $namespace = $config->getOptionValue('daemon.global.namespace');
         $tasks = array();
         $defaultClasses = array('Executor', 'Queue', 'Manager', 'Job');
+
+        $items = scandir($dir . '/' . $subdir);
         foreach($items as $item) {
+            // Skip '.' and '..' directory entries.
             if ($item== '.' || $item == '..') { continue; }
+
+            // Crate base task name.
             $base = (is_NULL($subdir)) ? $item : $subdir . '/'. $item;
                     Logger::log(
                         "Trying file: /Task/" . $base, 
                         \Zend_Log::DEBUG
                     );
-            if (preg_match('/Executor.php$/', $base)) {
-                // Try manager file
-                $class = preg_replace('#/#', '\\', Config::get()->getOptionValue('daemon.global.namespace') .'/' . substr($base, 0, -4));
-                include_once($dir . '/' . $base);
 
-                if (class_exists('\\' . $class)) {
+            if ( preg_match( '/Executor.php$/', $base ) ) {
+                // Try manager file
+                $taskName = $namespace . '/' . substr( $base, 0, -4 );
+                $class = preg_replace( '#/#', '\\', $fileName );
+                include_once( $dir . '/' . $base );
+
+                // Manager exists
+                if ( class_exists( '\\' . $class ) ) {
                     Logger::log(
                         "Found executor file: /Task/" . $base, 
                         \Zend_Log::DEBUG
                     );
-                    array_push($tasks, substr($base, 0, -13));
+                    array_push( $tasks, substr( $base, 0, -13 ) );
                 }
-            } elseif (is_dir($dir . '/' . $base)) {
+
+            } elseif ( is_dir( $dir . '/' . $base ) ) {
                 // Load recursively
                 $tasks = array_merge(
                     $tasks, 
-                    $this->_scanTasksInDirs($dir, $base)
+                    $this->_scanTasksInDirs( $dir, $base )
                 );
             }
         }
