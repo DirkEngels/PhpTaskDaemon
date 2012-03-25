@@ -18,25 +18,25 @@ Version 1.0 (roadmap)
 - Clean up pid & ipc resources
 
 
-Version 0.8.5 (planned)
+Version 0.8.6 (planned)
 -----------------------
-- Add example tasks
+- Finish example tasks
 - Add some more unit tests
 - Add some more documentation
 
 
-Version 0.8.5 (almost done)
----------------------------
+Version 0.8.5 (25-03-2012)
+==========================
 + Fix setting IPC status & statistics
 + Move namespace example tasks to App
 + Fix incomplete unit tests
 + Refactor status into executor
 + Refactor statistics into queue
-- Refactor daemon state
++ Refactor daemon state
 
 
 Version 0.8.4 (27-11-2011)
-==========================
+--------------------------
 + Refactor manager
     + Move queue class to the process class
     + Add process pid ID to the logger log method
