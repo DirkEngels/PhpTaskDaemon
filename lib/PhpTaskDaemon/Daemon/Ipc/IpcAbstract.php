@@ -111,8 +111,6 @@ abstract class IpcAbstract {
      */
     public function addArrayVar($key, $value) {
         $array = $this->getVar($key);
-        echo $key;
-        echo var_dump($array);
         if (!is_array($array)) {
             return FALSE;
         }

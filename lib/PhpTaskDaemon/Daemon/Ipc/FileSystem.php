@@ -45,8 +45,8 @@ class FileSystem extends IpcAbstract implements IpcInterface {
      * @return bool
      */
     public function setVar($key, $value) {
-        $sql = "REPLACE INTO ipc (key, value) VALUES ('" . $key . "','" . $value . "')";
-        return $this->_queryFileSystem($sql);
+        $keyFile = $this->_getFileForKey($key);
+        return file_put_contents($keyFile, $value);
     }
 
 
