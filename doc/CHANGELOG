@@ -20,12 +20,18 @@ Version 1.0 (roadmap)
 
 Version 0.8.5 (planned)
 -----------------------
+- Add example tasks
+- Add some more unit tests
+- Add some more documentation
+
+
+Version 0.8.5 (almost done)
+---------------------------
 + Fix setting IPC status & statistics
 + Move namespace example tasks to App
 + Fix incomplete unit tests
 + Refactor status into executor
 + Refactor statistics into queue
-- Add example tasks
 - Refactor daemon state
 
 

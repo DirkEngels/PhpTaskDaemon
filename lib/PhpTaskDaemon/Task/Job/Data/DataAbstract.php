@@ -26,7 +26,9 @@ abstract class DataAbstract {
 
 
     /**
-     * Returns the data keys
+     * Returns the data keys.
+     * 
+     * @return array
      */
     public function getKeys() {
     	return array_keys($this->_data);
@@ -34,8 +36,8 @@ abstract class DataAbstract {
 
 
     /**
+     * Returns an array with input variables.
      * 
-     * Returns an array with input variables
      * @return array
      */
     public function get() {
@@ -44,9 +46,11 @@ abstract class DataAbstract {
 
 
     /**
-     * 
-     * (Re)Sets the input array 
+     * (Re)Sets the input array.
+     *  
      * @param array $data
+     * @throws \InvalidArgumentException 'Job data must be an array!'
+     * @return bool
      */
     public function set($data, $reset = FALSE) {
         if (!is_array($data)) {
@@ -63,9 +67,9 @@ abstract class DataAbstract {
 
 
     /**
+     * (Re)Sets a single input key.
      * 
-     * (Re)Sets a single input key
-     * @return mixed
+     * @return NULL|mixed
      */
     public function getVar($var) {
         if (in_array($var, array_keys($this->_data))) {
@@ -76,8 +80,8 @@ abstract class DataAbstract {
 
 
     /**
+     * (Re)Sets a single input key.
      * 
-     * (Re)Sets a single input key
      * @param string $var
      * @param mixed $value
      * @return bool
@@ -92,8 +96,9 @@ abstract class DataAbstract {
 
 
     /**
+     * Validate the input.
      * 
-     * Validate the input
+     * @return bool
      */
     public function validate() {
     	return TRUE;

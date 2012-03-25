@@ -19,18 +19,19 @@ namespace PhpTaskDaemon\Daemon\Interrupt;
 class Signal {
 
     /**
-     * Task identifier
+     * Task identifier.
+     * 
      * @var string|NULL 
      */
     protected $_identifier = NULL;
 
     /**
+     * Register POSIX Signals.
      * 
-     * Register POSIX Signals
-     * @param $identifier
-     * @param $log
-     * @param $callback
-     * @param $signals
+     * @param $identifier Identifier for the POSIX signal handler.
+     * @param $callback Callback method for handling the signal.
+     * @param $signals Array of signals to handle.
+     * @return NULL 
      */
     public function __construct($identifier, $callback = NULL, $signals = NULL) {
         $this->_identifier = $identifier;
@@ -51,9 +52,9 @@ class Signal {
 
 
     /**
-     * 
-     * POSIX Signal handler callback
-     * @param $sig
+     * POSIX Signal handler callback.
+     * @param $sig POSIX Signal to handle.
+     * @return NULL
      */
     public function defaultHandler($sig) {
         switch ($sig) {

@@ -8,6 +8,8 @@
  */
 
 namespace PhpTaskDaemon\Task;
+use PhpTaskDaemon\Exception\FileNotFound;
+
 use \PhpTaskDaemon\Exception as Exception;
 use \PhpTaskDaemon\Daemon;
 
@@ -17,10 +19,11 @@ use \PhpTaskDaemon\Daemon;
  * able to create a complete task component instantiation. (Which is basically
  * a manager object with manager timer and manager process instances, a queue
  * and queue statistics instances and also an executor and executor status
- * instances, which are injected into the manager base class.  
+ * instances, which are injected into the manager base class.
  *
  */
 class Factory {
+
     const TYPE_MANAGER = 'manager';
 
     const TYPE_TRIGGER = 'timer';
@@ -29,66 +32,78 @@ class Factory {
     const TYPE_PROCESS = 'process';
     const TYPE_EXECUTOR = 'executor';
 
+    const MSG_UNKNOWN_TYPE = 'Object type is not registered as a class constant of this class.';
+
+
     /**
      * Instantiates a new Manager object and injects all needed components 
      * based on the class definitions, configurations settings and defaults.
+     * 
      * @param $taskName
      * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
+     * @throws FileNotFound Task has no defined executor
      */
-    public static function get($taskName) {
+    public static function get( $taskName ) {
         $msg = 'Task Factory: ' . $taskName;
-        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
-        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::get()->log( $msg, \Zend_Log::DEBUG );
+        \PhpTaskDaemon\Daemon\Logger::get()->log( '----------', \Zend_Log::DEBUG );
 
-        $executor = self::getComponentType($taskName, self::TYPE_EXECUTOR);
-        if ($executor instanceof \PhpTaskDaemon\Task\Executor\ExecutorDefault) {
-            throw new \Exception('Task has no defined executor');
+        // Verify that the executor has been defined
+        $executor = self::getComponentType( $taskName, self::TYPE_EXECUTOR );
+        if ( $executor instanceof \PhpTaskDaemon\Task\Executor\ExecutorDefault ) {
+            throw new \Exception( 'Task has no defined executor' );
         }
 
         // Base Manager
-        $manager = self::getManager($taskName);
+        $manager = self::getManager( $taskName);
 
         // Timer
         $manager->setTimer(
-            self::getComponentType($taskName, self::TYPE_TRIGGER)
+            self::getComponentType( $taskName, self::TYPE_TRIGGER )
         );
 
         // Process
         $manager->setProcess(
-            self::getComponentType($taskName, self::TYPE_PROCESS)
+            self::getComponentType( $taskName, self::TYPE_PROCESS )
         );
 
         // Queue
         $manager->getProcess()->setQueue(
-            self::getComponentType($taskName, self::TYPE_QUEUE)
+            self::getComponentType( $taskName, self::TYPE_QUEUE )
         );
 
         // Executor
         $manager->getProcess()->setExecutor($executor);
 
-        \PhpTaskDaemon\Daemon\Logger::get()->log('----------', \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::get()->log( '----------', \Zend_Log::DEBUG );
         return $manager;
     }
 
 
     /**
-     * Returns an object of the specified objectType based on the taskName.  
+     * Returns an object of the specified objectType based on the taskName.
+     * 
      * @param string $taskName
      * @param string $objectType
      * @return stdClass
      */
-    public static function getComponentType($taskName, $objectType) {
+    public static function getComponentType($taskName, $objectType ) {
         // First: Check if the class has been overloaded
-        $object = self::_getObjectClass($taskName, $objectType);
+        $object = self::_getObjectClass( $taskName, $objectType );
 
-        if ( ! is_object($object) ) {
-            // Second: Check configuration
-            $object = self::_getObjectConfig($taskName, $objectType);
+        // Second: Check configuration
+        if ( ! is_object( $object )) {
+            $object = self::_getObjectConfig( $taskName, $objectType );
         }
 
-        if ( ! is_object($object) ) {
-            // Finally: Try the hard code default
-            $object = self::_getObjectDefault($taskName, $objectType);
+        // Finally: Try the hard code default
+        if ( ! is_object( $object )) {
+            $object = self::_getObjectDefault( $taskName, $objectType );
+        }
+
+        // Panic: This is bad, throw an error!
+        if ( ! is_object( $object )) {
+            throw new InvalidArgumentException( 'Unknow' );
         }
 
         return $object;
@@ -96,7 +111,8 @@ class Factory {
 
 
     /**
-     * Returns the manager timer for the specified task
+     * Returns the manager timer for the specified task.
+     * 
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */
@@ -108,7 +124,8 @@ class Factory {
 
 
     /**
-     * Returns the manager timer for the specified task
+     * Returns the manager timer for the specified task.
+     * 
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
@@ -118,7 +135,8 @@ class Factory {
 
 
     /**
-     * Returns the manager process for the specified task
+     * Returns the manager process for the specified task.
+     * 
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract
      */
@@ -130,7 +148,8 @@ class Factory {
 
 
     /**
-     * Returns the executor status for the specified task
+     * Returns the executor status for the specified task.
+     * 
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Executor\Status\StatusAbstract
      */
@@ -139,7 +158,8 @@ class Factory {
     }
 
     /**
-     * Returns the queue for the specified task
+     * Returns the queue for the specified task.
+     * 
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Queue\QueueAbstract
      */
@@ -149,7 +169,8 @@ class Factory {
 
 
     /**
-     * Returns the classname based on the taskName and objectType
+     * Returns the classname based on the taskName and objectType.
+
      * @param string $taskName
      * @param string $objectType
      * @return string
@@ -165,6 +186,7 @@ class Factory {
 
     /**
      * Returns the config name based on the task name.
+     * 
      * @param unknown_type $objectType
      */
     protected static function _getConfigName($taskName) {
@@ -173,7 +195,8 @@ class Factory {
 
 
     /**
-     * Checks if a objectType class of a specific manager exists
+     * Checks if a objectType class of a specific manager exists.
+     * 
      * @param string $taskName
      * @param string $objectType
      * @return null|stdClass
@@ -196,6 +219,7 @@ class Factory {
     /**
      * Checks if task specific configuration options for the objectType are
      * set.
+     * 
      * @param string $taskName
      * @param string $objectType
      * @return null|stdClass
@@ -231,6 +255,14 @@ class Factory {
     }
 
 
+    /**
+     * Return a instance of a object type (class constant) from the
+     * configuration file.
+     * 
+     * @param string $objectType A defined object type constant.
+     * @return string Namespace of the object type.
+     * @throws InvalidArgumentException MSG_UNKNOWN_TYPE
+     */
     protected static function _getObjectConfigNamespace($objectType) {
         $nameSpace = '\\PhpTaskDaemon\\Task\\';
         switch($objectType) {
@@ -250,7 +282,7 @@ class Factory {
                 $nameSpace .= 'Manager\\Executor';
                 break;
             default:
-                $nameSpace .= 'Manager';
+                throw new \InvalidArgumentException(self::MSG_UNKNOWN_TYPE);
                 break;
         }
         return $nameSpace;
@@ -258,15 +290,20 @@ class Factory {
 
 
     /**
-     * Returns the hardcoded default object for a specific type.
+     * Returns the hardcoded default object for a specific type. The hard coded
+     * default will only be selected when there is no task specific and no
+     * global configuration option has been set.
+     * 
      * @param string $objectType
      * @return null|StdClass
+     * @throws InvalidArgumentException Unknown object type: {$objectType}
      */
     public static function _getObjectDefault($taskName, $objectType) {
         $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Default';
         \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
 
         switch($objectType) {
+            // Manager
             case 'manager':
                 return new \PhpTaskDaemon\Task\Manager\ManagerDefault(
                     self::getComponentType($taskName, self::TYPE_EXECUTOR)
@@ -277,9 +314,16 @@ class Factory {
                 return new \PhpTaskDaemon\Task\Queue\QueueDefault();
             case 'process':
                 return new \PhpTaskDaemon\Task\Manager\Process\Same();
+
+            // Queue
+            case 'queue':
+                return new \PhpTaskDaemon\Task\Queue\QueueDefault();
+
+            // Executor
             case 'executor':
                 return new \PhpTaskDaemon\Task\Executor\ExecutorDefault();
         }
+
         throw new Exception\UndefinedObjectType('Unknown object type: ' . $objectType);
 
         return NULL;

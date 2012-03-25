@@ -13,6 +13,12 @@ require_once \LIBRARY_PATH . '/cron.phar';
 
 class Cron extends Interval {
 
+    /**
+     * Defines the cron wait (absolute time) to wait for.
+     * 
+     * @see PhpTaskDaemon\Task\Manager\Timer.Interval::getTimeToWait()
+     * @return integer The number of seconds to wait before running again.
+     */
     public function getTimeToWait() {
         $cron = Cron\CronExpression::factory('@daily');
         $cron->isDue();
