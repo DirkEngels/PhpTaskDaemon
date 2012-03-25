@@ -120,16 +120,15 @@ class Manager {
      * @return bool Process ID was registered.
      */
     public function removeChild($pid) {
-        $key = array_search($pid, $this->_childs);
+        $key = array_search( $pid, $this->_childs );
 
-        // 
-        if ($key == FALSE) {
-            $msg = sprintf( self::MSG_PID_UNKNOWN, $pid );
-            throw new \InvalidArgumentException( $msg );
+        // Key not found
+        if ( $key === FALSE ) {
+            return FALSE;
         }
 
-            unset($this->_childs[$key]);
-            return TRUE;
+        unset( $this->_childs[ $key ] );
+        return TRUE;
     }
 
 
