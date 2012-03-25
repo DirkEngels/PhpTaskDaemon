@@ -34,6 +34,7 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
     /**
      * The actual resource of the shared memory segment
+     * 
      * @var resource
      */
     protected $_sharedMemory = NULL;
@@ -93,6 +94,8 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
 
     /**
      * The destructor detaches the shared memory segment.
+     * 
+     * @return NULL
      */
     public function __destruct() {
         if (is_resource($this->_sharedMemory)) {
@@ -129,12 +132,15 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
      */
     public function getVar($key) {
         $key = strtolower($key);
-        sem_acquire($this->_semaphoreLock);
         $value = false;
+
+        sem_acquire($this->_semaphoreLock);
         $keys = shm_get_var($this->_sharedMemory, 1);
+
         if (in_array($key, array_keys($keys))) {
             $value = shm_get_var($this->_sharedMemory, $keys[$key]);
         }
+
         Logger::get()->log($this->_id . ': Reading SHM key (' . $key . ') => value (' . $value . ')', \Zend_Log::DEBUG);
         sem_release($this->_semaphoreLock);
 
@@ -153,6 +159,7 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
     public function setVar($key, $value) {
         $key = strtolower($key);
         sem_acquire($this->_semaphoreLock);
+
         // Check the first variable for keys
         $keys = array('keys' => 1);
         if (shm_has_var($this->_sharedMemory, 1)) {
@@ -235,9 +242,10 @@ class SharedMemory extends IpcAbstract implements IpcInterface {
             if ($value<0) { $value = 0; }
         }
         $retPut = shm_put_var($this->_sharedMemory, $keys[$key], $value);
+
         Logger::get()->log($this->_id . ': Decrementing SHM key (' . $key . ') => value (' . $value . ')', \Zend_Log::DEBUG);
         sem_release($this->_semaphoreLock);
-        
+
         return $retInit && $retPut;
     }
 

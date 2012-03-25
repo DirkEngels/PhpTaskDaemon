@@ -29,8 +29,8 @@ class None extends IpcAbstract implements IpcInterface {
     /**
      * Sets nothing.
      * 
-     * @param string $key
-     * @param mixed $value
+     * @param string $key Imaginary IPC key
+     * @param mixed $value Whatever you want!
      * @return bool
      */
     public function setVar($key, $value) {
@@ -41,7 +41,7 @@ class None extends IpcAbstract implements IpcInterface {
     /**
      * Increments nothing.
      * 
-     * @param string $key
+     * @param string $key Imaginary IPC key
      * @return bool
      */
     public function incrementVar($key, $count = 1) {
@@ -52,7 +52,7 @@ class None extends IpcAbstract implements IpcInterface {
     /**
      * Decrements nothing.
      * 
-     * @param string $key
+     * @param string $key Imaginary IPC key
      * @return bool
      */
     public function decrementVar($key, $count = 1) {

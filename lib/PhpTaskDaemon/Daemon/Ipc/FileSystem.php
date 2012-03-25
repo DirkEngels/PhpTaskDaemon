@@ -10,9 +10,9 @@
 namespace PhpTaskDaemon\Daemon\Ipc;
 
 /**
- * 
  * The Daemon\Ipc\FileSystem class is responsible for storing and retrieving
  * inter process communication data from the database.
+ * 
  */
 class FileSystem extends IpcAbstract implements IpcInterface {
 
@@ -29,8 +29,9 @@ class FileSystem extends IpcAbstract implements IpcInterface {
     /**
      * Returns nothing (NULL).
      *  
+     * @todo Read IPC keys from a filesystem
      * @param string $key
-     * @return mixed
+     * @return NULL
      */
     public function getVar($key) {
     }
@@ -107,7 +108,7 @@ class FileSystem extends IpcAbstract implements IpcInterface {
      * Returns the filename for a specific key.
      * 
      * @param string $key
-     * @output string
+     * @return string
      */
     protected function _getFileForKey($key) {
         return $this->getId() . '_' . strtolower($key);

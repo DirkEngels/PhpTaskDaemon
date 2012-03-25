@@ -9,13 +9,14 @@
 
 namespace PhpTaskDaemon\Daemon\Ipc;
 
+use PhpTaskDaemon\Exception;
 use PhpTaskDaemon\Daemon\Config;
 use PhpTaskDaemon\Daemon\Logger;
 
 /**
- * 
  * The Daemon\Ipc\DataBase class is responsible for storing and retrieving
  * inter process communication data from the database.
+ * 
  */
 class DataBase extends IpcAbstract implements IpcInterface {
 
@@ -23,20 +24,28 @@ class DataBase extends IpcAbstract implements IpcInterface {
     const MSG_NOT_NUMERIC = 'Value (%s) is not numeric: %d';
 
     /**
-     * PDO Object
+     * PDO Object.
+     * 
      * @var \PDO
      */
     protected $_pdo;
 
     /**
-     * PDO Statement Object
+     * PDO Statement Object.
+     * 
      * @var \PDOStatement
      */
     protected $_stmt;
 
 
-    public function __construct( $id ) {
-        parent::__construct( $id );
+    /**
+     * Constructor with mandatory IPC identifier.
+     * 
+     * @param string $id
+     * @return NULL
+     */
+    public function __construct($id) {
+        parent::__construct($id);
         $this->_dbSetup();
     }
 
@@ -92,7 +101,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Returns nothing (NULL).
+     * Returns the key value from a database.
      *  
      * @param string $name
      * @return NULL
@@ -114,8 +123,8 @@ class DataBase extends IpcAbstract implements IpcInterface {
     }
 
 
-    /** 
-     * Sets nothing.
+    /**
+     * Stores a key value in the database.
      * 
      * @param string $name
      * @param mixed $value
@@ -134,18 +143,22 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Increments nothing.
+     * Increments a key with 1 (or more).
      * 
      * @param string $name
+     * @throws InvalidArgumentException Value is not an integer!
      * @return bool
      */
     public function incrementVar( $name, $count = 1 ) {
         $this->getPdo()->beginTransaction();
+        $value = $this->getVar($name);
 
-        $value = $this->getVar( $name );
-        if ( ! isset( $value ) ) {
-            $value = 0;
+        // Exception: Value is not an integer!
+        if ( ! is_numeric($value) ) {
+        	throw new InvalidArgumentException( 'Value is not an integer!' );
         }
+
+        // Success
         $value += $count;
         $this->setVar( $name, $value );
 
@@ -154,26 +167,22 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Decrements nothing.
+     * Decrements a key with 1 (or more).
      * 
      * @param string $name
+     * @throws InvalidArgumentException Value is not an integer!
      * @return bool
      */
     public function decrementVar( $name, $count = 1 ) {
         $this->getPdo()->beginTransaction();
         $value = $this->getVar( $name );
 
-        // Exception when value is not numeric
-        if ( ! is_numeric( $value ) ) {
-            $msg = sprintf( self::MSG_NOT_NUMERIC, $name, $value );
-            throw new \UnexpectedValueException( $msg );
+        // Exception: Value is not an integer!
+        if ( ! is_numeric($value) ) {
+        	throw new InvalidArgumentException( 'Value is not an integer!' );
         }
 
-        // Reset value when not set
-        if ( ! isset( $value ) ) {
-            $value = 0;
-        }
-
+        // Success
         $value -= $count;
         $this->setVar( $name, $value );
 
@@ -222,7 +231,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
     /**
      * Removes nothing.
-     * 
+     *  
      * @param string $name
      * @return bool
      */
@@ -237,9 +246,9 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Removes all registered keys.
+     * Removes all key registered known of this ipc instance.
      * 
-     * @return bool
+     * @see PhpTaskDaemon\Daemon\Ipc.IpcAbstract::remove()
      */
     public function remove() {
         $sql = "DELETE FROM ipc WHERE ipcId=:ipcId";
@@ -251,8 +260,10 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Sets up the database connection based on the configuration values.
+     * Sets up the database connection using the credentials from the config.
+     * object.
      * 
+     * @return NULL
      */
     protected function _dbSetup() {
         // Try loading PDO from config
@@ -288,13 +299,16 @@ class DataBase extends IpcAbstract implements IpcInterface {
 
 
     /**
-     * Executes a single query
-     * @param string $query
-     * @return integer
+     * Executes a single query with optiona paramaters.
+     * 
+     * @param string $query An sql query statement (string) with PDO parameter keys
+     * @param array $params Optional parameters
+     * @return NULL | integer
      */
     protected function _dbStatement($sql, $params = array()) {
         Logger::log('Executing SQL Statement: ' . $sql, \Zend_Log::DEBUG);
         Logger::log('Executing SQL Params: ' . implode(", ", $params), \Zend_Log::DEBUG);
+        
         $this->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         try {
             $this->_stmt = $this->getPdo()->prepare($sql);
@@ -305,6 +319,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
         } catch (\Exception $e) {
             Logger::log('Failed to execute SQL Statement: ' . $e->getMessage(), \Zend_Log::DEBUG);
         }
+        return NULL;
     }
 
 }

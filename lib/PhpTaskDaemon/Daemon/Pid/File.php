@@ -22,25 +22,25 @@ class File {
     /**
      * The location of the pidfile. This is only used by the main and its 
      * managers daemon to storing the process ID to a file.
-     * @var string
+     * 
+     * @var string Name of the file to store the Process ID in.
      */
     protected $_filename = NULL;
 
 
     /**
-     * 
      * The pid reader constructor has one optional argument containing a 
      * filename.
      * 
      * @param string $filename
+     * @return string
      */
     public function __construct($filename = NULL) {
-        $this->setFilename($filename);
+        return $this->setFilename($filename);
     }
 
 
     /**
-     * 
      * The main daemon saves its pid into a pidfile. This methods returns the
      * filename of the pidfile.
      * 

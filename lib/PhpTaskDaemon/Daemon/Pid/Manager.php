@@ -27,7 +27,7 @@ class Manager {
     protected $_current = NULL;
 
     /**
-     * The parent process ID
+     * The parent process ID.
      * 
      * @var int|NULL
      */
@@ -42,7 +42,7 @@ class Manager {
 
 
     /**
-     * Constructor with an optional PID and parent PID.
+     * Constructor with optional process (and parent) id.
      * 
      * @param int $pid
      * @param int $parent
@@ -79,7 +79,7 @@ class Manager {
 
 
     /**
-     * Returns an array with pids of child processes, or not.
+     * Returns an array with pids of child processes, if any.
      * 
      * @return array Contains the child process IDs of the current process.
      */
@@ -102,10 +102,10 @@ class Manager {
 
 
     /**
-     * Adds a child process ID.
+     * Adds a PID of a child process.
      * 
      * @param int $pid The process ID to add.
-     * @return bool
+     * @return int The total number of processes.
      */
     public function addChild($pid) {
         return array_push($this->_childs, $pid);
@@ -113,7 +113,7 @@ class Manager {
 
 
     /**
-     * Removes a child process ID.
+     * Removes a PID of a child process.
      * 
      * @param int $pid
      * @throws InvalidArgumentException PID_UNKNOWN
@@ -148,3 +148,4 @@ class Manager {
     }
 
 }
+

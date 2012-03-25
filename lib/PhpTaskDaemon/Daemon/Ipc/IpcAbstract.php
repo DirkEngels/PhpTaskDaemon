@@ -38,6 +38,7 @@ abstract class IpcAbstract {
      * Constructs a new unique (id) Ipc object.
      * 
      * @param string $id
+     * @return boolean
      */
     public function __construct($id) {
         $this->_id = $id;
@@ -106,6 +107,7 @@ abstract class IpcAbstract {
      * 
      * @param string $key
      * @param mixed $value
+     * @return boolean
      */
     public function addArrayVar($key, $value) {
         $array = $this->getVar($key);
@@ -129,6 +131,7 @@ abstract class IpcAbstract {
      * 
      * @param string $key
      * @param mixed $value
+     * @return boolean
      */
     public function removeArrayVar($key, $value) {
         $array = $this->getVar($key);
@@ -161,9 +164,9 @@ abstract class IpcAbstract {
 
 
     /**
-     * Removes the ipc data.
+     * Removes all registered keys.
      * 
-     * @return bool
+     * @return boolean
      */
     public function remove() {
         $this->_keys = array();
