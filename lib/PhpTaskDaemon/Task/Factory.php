@@ -32,7 +32,7 @@ class Factory {
     const TYPE_PROCESS = 'process';
     const TYPE_EXECUTOR = 'executor';
 
-    const MSG_UNKNOWN_TYPE = 'Object type is not registered as a class constant of this class.';
+    const MSG_UNKNOWN_TYPE = 'Object type is not registered as a class constant of this class: %s.';
 
 
     /**
@@ -50,7 +50,7 @@ class Factory {
 
         // Verify that the executor has been defined
         $executor = self::getComponentType( $taskName, self::TYPE_EXECUTOR );
-        if ( $executor instanceof \PhpTaskDaemon\Task\Executor\ExecutorDefault ) {
+        if ( ! $executor instanceof \PhpTaskDaemon\Task\Executor\ExecutorInterface ) {
             throw new \Exception( 'Task has no defined executor' );
         }
 
@@ -275,6 +275,9 @@ class Factory {
             case 'process':
                 $nameSpace .= 'Manager\\Process';
                 break;
+            case 'timer':
+                $nameSpace .= 'Manager\\Timer';
+                break;
             case 'queue':
                 $nameSpace .= 'Manager\\Queue';
                 break;
@@ -282,7 +285,8 @@ class Factory {
                 $nameSpace .= 'Manager\\Executor';
                 break;
             default:
-                throw new \InvalidArgumentException(self::MSG_UNKNOWN_TYPE);
+                $msg = sprintf( self::MSG_UNKNOWN_TYPE, $objectType );
+                throw new \InvalidArgumentException( $msg);
                 break;
         }
         return $nameSpace;

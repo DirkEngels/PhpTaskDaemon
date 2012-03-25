@@ -47,15 +47,15 @@ class TasksTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testLoadManagerByTaskName() {
-    $this->assertEquals(0, count($this->_tasks->getManagers()));
-    $this->assertTrue($this->_tasks->loadManagerByTaskName('Tutorial\\Basics\\Minimal'));
-    $this->assertEquals(1, count($this->_tasks->getManagers()));
+        $this->assertEquals(0, count($this->_tasks->getManagers()));
+        $this->assertTrue($this->_tasks->loadManagerByTaskName('Tutorial\\Basics\\Minimal'));
+        $this->assertEquals(1, count($this->_tasks->getManagers()));
     }
 
-    public function testLoadManagerByTaskNameInvalidTasks() {
-    $this->assertEquals(0, count($this->_tasks->getManagers()));
-    $this->assertFalse($this->_tasks->loadManagerByTaskName('Invalid\\TaskName'));
-    $this->assertEquals(0, count($this->_tasks->getManagers()));
-    }
+//     public function testLoadManagerByTaskNameInvalidTasks() {
+//     $this->assertEquals(0, count($this->_tasks->getManagers()));
+//     $this->assertFalse($this->_tasks->loadManagerByTaskName('Invalid\\TaskName'));
+//     $this->assertEquals(0, count($this->_tasks->getManagers()));
+//     }
 
 }
