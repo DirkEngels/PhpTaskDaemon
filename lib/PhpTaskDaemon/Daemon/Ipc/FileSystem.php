@@ -111,7 +111,7 @@ class FileSystem extends IpcAbstract implements IpcInterface {
      * @return string
      */
     protected function _getFileForKey($key) {
-        return $this->getId() . '_' . strtolower($key);
+        return \TMP_PATH . '/' . $this->getId() . '_' . strtolower($key);
     }
 
 }
