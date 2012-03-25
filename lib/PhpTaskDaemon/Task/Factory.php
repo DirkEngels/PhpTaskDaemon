@@ -176,11 +176,11 @@ class Factory {
      * @return string
      */
     public static function _getClassName($taskName, $objectType) {
-    	return implode('\\', array(
-    		Daemon\Config::get()->getOptionValue('global.namespace'),
-    		str_replace('/', '\\', $taskName),
-    		ucfirst($objectType)
-    	));
+        return implode('\\', array(
+            Daemon\Config::get()->getOptionValue('global.namespace'),
+            str_replace('/', '\\', $taskName),
+            ucfirst($objectType)
+        ));
     }
 
 
@@ -230,7 +230,7 @@ class Factory {
 
         $configType = ucfirst(
             \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
-                strtolower($objectType) . '.type', 
+                strtolower($objectType) . '.type',
                 $taskName
             )
         );
@@ -244,7 +244,7 @@ class Factory {
         $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
-        if (class_exists($objectClassName, true)) {
+        if (class_exists($objectClassName, TRUE)) {
             $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
             \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
             $object = new $objectClassName();

@@ -27,19 +27,19 @@ abstract class ManagerAbstract {
      * parent and child process IDs.
      * @var \PhpTaskDaemon\Daemon\Pid\Manager
      */
-    protected $_pidManager = null;
+    protected $_pidManager = NULL;
 
     /**
      * Queue object.
      * @var \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
-    protected $_timer = null;
+    protected $_timer = NULL;
 
     /**
      * Executor object.
      * @var \PhpTaskDaemon\Task\Manager\Process\TimerAbstract
      */
-    protected $_process = null;
+    protected $_process = NULL;
 
     /**
      * Time to wait in milliseconds before running the next task.
@@ -59,9 +59,9 @@ abstract class ManagerAbstract {
      * 
      * @param int $parentPid
      */
-    public function init($parentPid = null) {
+    public function init($parentPid = NULL) {
         $this->_pidManager = new \PhpTaskDaemon\Daemon\Pid\Manager(
-            getmypid(), 
+            getmypid(),
             $parentPid
         );
     }
@@ -172,15 +172,13 @@ abstract class ManagerAbstract {
 
     /**
      * Starts the manager.
-     * 
-     * @todo
      */
     public function runManager() {
         // Override signal handler
-//        $this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
-//            get_class($this),
-//            array(&$this, 'sigHandler')
-//        );
+        $this->_sigHandler = new \PhpTaskDaemon\Daemon\Interrupt\Signal(
+            get_class($this),
+            array(&$this, 'sigHandler')
+        );
 
         // Set taskname to queue ipc
         $queueIpc = $this->getProcess()->getQueue()->getIpc();
