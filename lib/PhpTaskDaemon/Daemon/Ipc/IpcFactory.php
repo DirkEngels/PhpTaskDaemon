@@ -16,26 +16,34 @@ use PhpTaskDaemon\Daemon\Logger;
  *
  */
 class IpcFactory {
+
     const TYPE_NONE = 'None';
     const TYPE_SHAREDMEMORY = 'SharedMemory';
     const TYPE_FILESYSTEM = 'FileSystem';
     const TYPE_DATABASE = 'DataBase';
 
-    const NAME_DAEMON = 'daemon';
+    const NAME_DAEMON = 'phptaskdaemond';
     const NAME_QUEUE = 'queue';
     const NAME_EXECUTOR = 'executor';
 
 
     /**
      * Instantiates a new Ipc object.
+     * 
      * @param $ipcType
      * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */
     public static function get($type = self::NAME_DAEMON, $id = NULL, $taskName = NULL) {
-        if (is_null($id)) {
+        // Set IPC ID
+        $ipcId = $type;
+    	if ( is_null($id) ) {
             $id = getmypid();
         }
-        $ipcId = $type . '-' . $id;
+
+        // Append process ID for queues and executors
+        if ( $type != self::NAME_DAEMON) {
+        	$ipcId .= '-' . $id;
+        }
 
         $ipcType = Config::get()->getOptionValue('global.ipc', $taskName);
         switch($ipcType) {
@@ -54,7 +62,8 @@ class IpcFactory {
                 $ipcObject = new None($ipcId);
                 break;
         }
-        Logger::log('Create new IPC object: ' . $ipcId, \Zend_Log::DEBUG);
+
+        Logger::log('Create new IPC object (' . $ipcType . '): ' . $ipcId, \Zend_Log::DEBUG);
         return $ipcObject;
     }
 

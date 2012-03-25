@@ -128,7 +128,7 @@ class DataDefaultTest extends \PHPUnit_Framework_Testcase {
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \InvalidArgumentException
      */
     public function testSetInvalidData () {
         $this->assertEquals(0, sizeof($this->_data->get()));

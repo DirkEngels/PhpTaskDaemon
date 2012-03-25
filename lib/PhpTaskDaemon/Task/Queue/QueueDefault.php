@@ -12,12 +12,16 @@ namespace PhpTaskDaemon\Task\Queue;
 use \PhpTaskDaemon\Task\Job;
 
 /**
- * 
  * The base class implements an example load method. The base class will also 
  * be used when no queue object is available for a certain task.
  */
 class QueueDefault extends QueueAbstract implements QueueInterface {
 
+	/**
+	 * (non-PHPdoc)
+	 * 
+	 * @see Queue/PhpTaskDaemon\Task\Queue.QueueInterface::load()
+	 */
     public function load() {
         $queue = array(
             new Job\JobDefault(

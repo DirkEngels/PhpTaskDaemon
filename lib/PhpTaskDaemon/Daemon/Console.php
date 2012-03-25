@@ -12,83 +12,108 @@ namespace PhpTaskDaemon\Daemon;
 /**
 * The main Console class is responsible for starting, stopping and monitoring
 * the daemon. It accepts command line arguments to set daemon daemon options.
-* The start method creates an Instance object 
+* The start method creates an Instance object.
 */
 class Console {
 
+    // Messages
+    const MSG_NO_TASKS = "No tasks found!";
+
+    // Configuration options
+    const CONFIG_PROCESS_TYPE           = 'process.type';
+    const CONFIG_IPC                    = 'ipc';
+    const CONFIG_ACTION                 = 'action';
+
+    // Manager depndies.
+    const CONFIG_TIMER_TYPE             = 'timer.type';
+    const CONFIG_TIMER_INTERVAL_TIME    = 'timer.interval.time';
+    const CONFIG_TIMER_CRON_TIME        = 'timer.cron.time';
+
+    // Actions
+    const ACTION_START                  = 'start';
+    const ACTION_STOP                   = 'stop';
+    const ACTION_RESTART                = 'restart';
+    const ACTION_STATUS                 = 'status';
+    const ACTION_MONITOR                = 'monitor';
+    const ACTION_LIST_TASKS             = 'list-tasks';
+    const ACTION_SETTINGS               = 'settings';
+    const ACTION_HELP                   = 'action';
+
     /**
      * Console options object
+     * 
      * @var Zend_Console_Getopt
      */
     protected $_consoleOpts;
 
     /**
+     * Instance run object.
      * 
-     * Instance run object
      * @var Instance
      */
     protected $_instance;
 
     /**
+     * Tasks collection object.
      * 
-     * Tasks collection object
      * @var Tasks
      */
     protected $_tasks;
 
 
     /**
+     * Daemon constructor method.
      * 
-     * Daemon constructor method
      * @param \Zend_Console_Getopt $consoleOpts
      */
-    public function __construct(Instance $instance = NULL) {
+    public function __construct( Instance $instance = NULL ) {
         // Initialize command line arguments
-        $this->setInstance($instance);
+        $this->setInstance( $instance );
         $this->setConsoleOpts();
     }
 
 
     /**
-     * 
      * Returns an object containing the console arguments.
+     * 
      * @return Zend_Console_Getopt
      */
     public function getConsoleOpts() {
         // Initialize default console options
-        if (is_NULL($this->_consoleOpts)) {
+        if ( is_null( $this->_consoleOpts ) ) {
             $this->_consoleOpts = new \Zend_Console_Getopt(
                 array(
-                    'config-file|c-s'    => 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
-                    'log-file|l-s'        => 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
+                    'config-file|c-s'   => 'Configuration file (defaults: /etc/{name}.conf, {cwd}/{name}.conf)',
+                    'log-file|l-s'      => 'Log file (defaults /var/log/{name}.log, {cwd}/{name}.log)',
                     'action|a=s'        => 'Action (default: start) (options: start, stop, restart, status, monitor)',
                     'list-tasks|lt'     => 'List tasks',
                     'settings|s'        => 'Display tasks settings',
-                    'task|t=s'             => 'Run single task',
-                    'verbose|v-i'            => 'Verbose',
-                    'help|h'              => 'Show help message (this message)',
+                    'task|t=s'          => 'Run single task',
+                    'verbose|v-i'       => 'Verbose',
+                    'help|h'            => 'Show help message (this message)',
                 )
             );
         }
+
         return $this->_consoleOpts;
     }
 
 
     /**
+     * Sets new console arguments.
      * 
-     * Sets new console arguments
      * @param \Zend_Console_Getopt $consoleOpts
      * @return $this
      */
-    public function setConsoleOpts(\Zend_Console_Getopt $consoleOpts = NULL) {
-        if ($consoleOpts === NULL) {
+    public function setConsoleOpts( \Zend_Console_Getopt $consoleOpts = NULL ) {
+        if ( $consoleOpts === NULL ) {
             $consoleOpts = $this->getConsoleOpts();
         }
 
         // Parse Options
         try {
             $consoleOpts->parse();
-        } catch (\Zend_Console_Getopt_Exception $e) {
+        } catch ( \Zend_Console_Getopt_Exception $e ) {
             echo $e->getUsageMessage();
             $this->_exit();
         }
@@ -99,8 +124,8 @@ class Console {
 
 
     /**
+     * Returns the daemon instance object.
      * 
-     * Returns the daemon instance object
      * @return Instance
      */
     public function getInstance() {
@@ -112,20 +137,20 @@ class Console {
 
 
     /**
+     * Sets a daemon instance object.
      * 
-     * Sets a daemon instance object
      * @param Instance $instance
      * @return $this
      */
-    public function setInstance($instance) {
+    public function setInstance( $instance ) {
         $this->_instance = $instance;
         return $this;
     }
 
 
     /**
+     * Returns the daemon tasks collection object.
      * 
-     * Returns the daemon tasks collection object
      * @return Tasks
      */
     public function getTasks() {
@@ -137,20 +162,21 @@ class Console {
 
 
     /**
+     * Sets a daemon tasks collection object.
      * 
-     * Sets a daemon tasks collection object
      * @param Tasks $tasks
      * @return $this
      */
-    public function setTasks($tasks) {
+    public function setTasks( $tasks ) {
         $this->_tasks = $tasks;
         return $this;
     }
 
 
     /**
-     * 
      * Reads the command line arguments and invokes the selected action.
+     * 
+     * @expected \RuntimeException
      */
     public function run() {
         try {
@@ -161,13 +187,13 @@ class Console {
             $this->_initConfig();
 
             // List Tasks (--list-tasks)
-            if ($this->_consoleOpts->getOption('list-tasks')) {
+            if ($this->_consoleOpts->getOption( self::ACTION_LIST_TASKS ) ) {
                 $this->listTasks();
                 $this->_exit();
             }
 
             // Display Settings (--settings)
-            if ($this->_consoleOpts->getOption('settings')) {
+            if ($this->_consoleOpts->getOption( self::ACTION_SETTINGS ) ) {
                 $this->settings();
                 $this->_exit();
             }
@@ -176,10 +202,19 @@ class Console {
             $this->_initLogFile();
 
             // Check action, otherwise display help
-            if ($this->_consoleOpts->getOption('action')) {
-                $allActions = array('start', 'stop', 'restart', 'status', 'monitor');
-                $action = $this->_consoleOpts->getOption('action');
-                if (in_array($action, $allActions))  {
+            if ($this->_consoleOpts->getOption( self::ACTION_HELP ) ) {
+
+                // All available actions
+                $allActions = array(
+                    self::ACTION_START,
+                    self::ACTION_STOP,
+                    self::ACTION_RESTART,
+                    self::ACTION_STATUS,
+                    self::ACTION_MONITOR,
+                );
+
+                $action = $this->_consoleOpts->getOption( self::CONFIG_ACTION );
+                if ( in_array( $action, $allActions ) )  {
                     // Perform action
                     $this->$action();
                     $this->_exit();
@@ -189,47 +224,53 @@ class Console {
             // Display Command Help
             $this->help();
 
-        } catch (\Exception $e) {
-            Logger::log('FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT);
+        } catch (\RuntimeException $e) {
+            Logger::log( 'FATAL EXCEPTION: ' . $e->getMessage(), \Zend_Log::CRIT );
         }
 
     }
 
 
     /**
-     * 
      * Lists the current loaded tasks.
      */
     public function listTasks() {
+        $config = Config::get();
         $taskNames = $this->getTasks()->scan();
 
+        // Print header
         echo "List Tasks\n";
         echo "==========\n\n";
-        if (count($taskNames)==0) {
-            echo "No tasks found!\n";
-        } else {
-            foreach ($taskNames as $taskName) {
-                echo $taskName, "\n";
-                echo str_repeat('-', strlen($taskName)), "\n";
 
-                echo "Process:\t\t", Config::get()->getOptionValue('process.type', $taskName), "\n";
-                echo "IPC:\t\t\t", Config::get()->getOptionValue('ipc', $taskName), "\n";
+        // One or more tasks found
+        if ( ! count( $taskNames ) == 0 ) {
+            foreach ( $taskNames as $taskName ) {
+
+                // Print header
+                echo $taskName, "\n";
+                echo str_repeat( '-', strlen($taskName) ), "\n";
+
+                echo "Process:\t\t", $config->getOptionValue( self::CONFIG_PROCESS_TYPE, $taskName ), "\n";
+                echo "IPC:\t\t\t", $config->getOptionValue( self::CONFIG_IPC, $taskName ), "\n";
 
                 // Manager Timer
-                $timer = Config::get()->getOptionValue('manager.timer.type', $taskName);
+                $timer = $config->getOptionValue( self::CONFIG_TIMER_TYPE, $taskName );
                 echo "Timer:\t\t", $timer, "\n";
                 switch($timer) {
                     case 'interval':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.interval.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", $config->getOptionValue( self::CONFIG_TIMER_INTERVAL_TIME, $taskName ), "\n";
                         break;
                     case 'cron':
-                        echo "- Time:\t\t\t", Config::get()->getOptionValue('manager.timer.cron.time', $taskName), "\n";
+                        echo "- Time:\t\t\t", $config->getOptionValue( self::CONFIG_TIMER_CRON_TIME, $taskName ), "\n";
                         break;
                     default:
                         break;
                 }
                 echo "\n";
             }
+        // No Tasks
+        } else {
+            echo self::MSG_NO_TASKS . "\n";
         }
     }
 
@@ -243,8 +284,7 @@ class Console {
 
 
     /**
-     * 
-     * Action: Start Daemon
+     * Action: Start Daemon.
      */
     public function start() {
         $taskNames = $this->getTasks()->scan();
@@ -266,8 +306,7 @@ class Console {
 
 
     /**
-     * 
-     * Action: Stop daemon 
+     * Action: Stop daemon. 
      */
     public function stop() {
         if (!$this->getInstance()->isRunning()) {
@@ -290,8 +329,7 @@ class Console {
 
 
     /**
-     * 
-     * Action: Get daemon status
+     * Action: Get daemon status.
      */
     public function status() {
         $state = State::getState();
@@ -300,7 +338,7 @@ class Console {
             $this->_exit();
         }
 
-        echo "PhpTaskDaemon - Status (" . count($state['childs']) . ")\n";
+        echo "PhpTaskDaemon - Status (" . count($state['processes']) . ")\n";
         echo "==========================\n";
         echo "\n";
 
@@ -314,11 +352,11 @@ class Console {
             $state = State::getState();
         }
 
-        if (count($state['childs']) == 0) {
+        if (count($state['processes']) == 0) {
             echo "No processes!\n";
 
         } else {
-            foreach ($state['childs'] as $queuePid) {
+            foreach ($state['processes'] as $queuePid) {
                 $queue = $state['queue-' . $queuePid];
 
                 // Statistics
@@ -332,9 +370,11 @@ class Console {
                 // Status
                 foreach ($queue['executors'] as $executorPid) {
                     $status = $state['executor-' . $executorPid];
+                    $percentage = (isset($status['percentage'])) ? $status['percentage'] : 0;
+                    $mesage = (isset($status['message'])) ? $status['message'] : '';
                     echo "- [" . $executorPid . "]: ";
-                    echo "\t" . $status['percentage'] . "%:";
-                    echo "\t" . $status['message'];
+                    echo "\t" . $percentage . "%:";
+                    echo "\t" . $message;
                     echo "\n";
                 }
 
@@ -347,7 +387,6 @@ class Console {
 
 
     /**
-     * 
      * Displays the current tasks and activities of the daemon. The monitor 
      * action refreshes every x milliseconds.
      */
@@ -358,7 +397,7 @@ class Console {
             ob_start();
 
             $state = State::getState();
-            echo "PhpTaskDaemon - Monitoring (" . count($state['childs']) . ")\n";
+            echo "PhpTaskDaemon - Monitoring (" . count($state['processes']) . ")\n";
             echo "==============================\n";
             echo "\n";
             $this->_status($state);
@@ -376,7 +415,6 @@ class Console {
 
 
     /**
-     * 
      * Displays a help message containing usage instructions.
      */
     public function help() {
@@ -410,7 +448,7 @@ class Console {
 
 
     /**
-     * Initializes the logging verbose mode
+     * Initializes the logging verbose mode.
      */
     protected function _initLogVerbose() {
         // Log Verbose Output
@@ -424,8 +462,8 @@ class Console {
             }
             $writerVerbose->addFilter($logLevel);
 
-            \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerVerbose);
-            $msg = 'Adding log writer: verbose (level: ' . $logLevel . ')';
+            \PhpTaskDaemon\Daemon\Logger::get()->addWriter( $writerVerbose );
+            $msg = 'Added Log Writer: Verbose';
             \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
         }
     }
@@ -433,7 +471,8 @@ class Console {
 
     /**
      * Initalizes the Logger component to save log messages to a file based on
-     * the command line arguments and/or configuration files. 
+     * the command line arguments and/or configuration files.
+     * 
      * @throws \Exception
      */
     protected function _initLogFile() {
@@ -453,7 +492,7 @@ class Console {
                 // Adding logfile
                 $writerFile = new \Zend_Log_Writer_Stream($logFile);
                 \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-                \PhpTaskDaemon\Daemon\Logger::log('Adding log writer: ' . $logFile, \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::log('Added Log Writer: ' . $logFile, \Zend_Log::DEBUG);
             } catch (\Exception $e) {
                 \PhpTaskDaemon\Daemon\Logger::log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
             }
@@ -461,6 +500,30 @@ class Console {
     }
 
 
+    /**
+     * Output daemon settings.
+     * 
+     * Format:
+     * - Global
+     *   - Namespace
+     *   - Interrupt adapter
+     *   - IPC adapter
+     * - Paths
+     *   - App dir
+     *   - Task dir
+     *   - Tmp dir
+     *   - Log dir
+     * - Database
+     *   - Adapter
+     *   - Host
+     *   - Database
+     *   - Username
+     * - Log
+     *   - File
+     *   - Level
+     * 
+     * @return string
+     */
     protected function _settingsDaemon() {
         $out  = "Daemon Settings\n";
         $out .= "===============\n\n";
@@ -482,8 +545,8 @@ class Console {
         $out .= "Database\n";
         $out .= "--------\n";
         $out .= "- Adapter:\t\t" . Config::get()->getOptionValue('daemon.db.adapter') . "\n";
-        $out .= "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
         $out .= "- Host:\t\t\t" . Config::get()->getOptionValue('daemon.db.params.host') . "\n";
+        $out .= "- Database:\t\t" . Config::get()->getOptionValue('daemon.db.params.dbname') . "\n";
         $out .= "- Username:\t\t" . Config::get()->getOptionValue('daemon.db.params.username') . "\n";
         $out .= "\n";
 
@@ -554,7 +617,20 @@ class Console {
         return $out;
     }
 
-    protected function _exit() {
+
+    /**
+     * Stop the application immediately with an optioan message.
+     * 
+     * @param $string Log a last message before exiting.
+     */
+    protected function _exit( $msg = NULL ) {
+        // Log a last (default) message.
+        if ( is_null( $msg ) ) {
+            $msg = 'Exiting application with no specified reason!';
+        }
+        Logger::log( $msg );
+
+        // Goodbye!
         exit;
     }
 

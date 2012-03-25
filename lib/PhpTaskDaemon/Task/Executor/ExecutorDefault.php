@@ -15,6 +15,12 @@ namespace PhpTaskDaemon\Task\Executor;
  */
 class ExecutorDefault extends ExecutorAbstract implements ExecutorInterface {
 
+    /**
+     * The default implementation just retuns the input as the output without
+     * any processing.
+     * 
+     * @see PhpTaskDaemon\Task\Executor.ExecutorInterface::run()
+     */
     public function run() {
         return $this->getJob();
     }
