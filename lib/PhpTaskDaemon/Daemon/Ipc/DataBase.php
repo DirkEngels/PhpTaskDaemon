@@ -248,7 +248,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
     /**
      * Removes all key registered known of this ipc instance.
      * 
-     * @see PhpTaskDaemon\Daemon\Ipc.IpcAbstract::remove()
+     * @return bool
      */
     public function remove() {
         $sql = "DELETE FROM ipc WHERE ipcId=:ipcId";
@@ -263,7 +263,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
      * Sets up the database connection using the credentials from the config.
      * object.
      * 
-     * @return NULL
+     * @return bool
      */
     protected function _dbSetup() {
         // Try loading PDO from config
@@ -292,6 +292,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
         } catch (\Exception $e) {
             echo $e->getMessage();
             Logger::log('Could not initialize the DB PDO driver:' . $e->getMessage(), \Zend_Log::ERR);
+            return FALSE;
         }
 
         return TRUE;
