@@ -20,7 +20,7 @@ class Interval extends TimerAbstract implements TimerInterface {
      * @output integer
      */
     public function getTimeToWait() {
-        if (is_int($this->_timeToWait) || ($this->_timeToWait > 0)) {
+        if ( is_int( $this->_timeToWait ) || ( $this->_timeToWait > 0 ) ) {
             return $this->_timeToWait;
         }
 
@@ -34,7 +34,7 @@ class Interval extends TimerAbstract implements TimerInterface {
      * @param $timeToWait
      * @return $this
      */
-    public function setTimeToWait($timeToWait) {
+    public function setTimeToWait( $timeToWait ) {
         $this->_timeToWait = $timeToWait;
         return $this;
     }

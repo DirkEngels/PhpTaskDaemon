@@ -16,7 +16,7 @@ use PhpTaskDaemon\Task\Job;
 class ManagerDefault extends ManagerAbstract implements ManagerInterface {
 
     public function execute() {
-        while (true) {
+        while ( true ) {
             // Re-initialize the IPC components
             $process = $this->getProcess();
             $process->getExecutor()->resetIpc();
@@ -26,15 +26,15 @@ class ManagerDefault extends ManagerAbstract implements ManagerInterface {
             $jobs = $this->getProcess()->getQueue()->load();
 
             if (count($jobs)==0) {
-                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Queue checked: empty!!!", \Zend_Log::DEBUG);
+                \PhpTaskDaemon\Daemon\Logger::get()->log( getmypid() . ": Queue checked: empty!!!", \Zend_Log::DEBUG );
 
             } else {
-                $this->getProcess()->getQueue()->updateQueue(count($jobs));
-                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ": Queue loaded: " . count($jobs) . " elements", \Zend_Log::NOTICE);
+                $this->getProcess()->getQueue()->updateQueue( count( $jobs ) );
+                \PhpTaskDaemon\Daemon\Logger::get()->log( getmypid() . ": Queue loaded: " . count($jobs) . " elements", \Zend_Log::NOTICE );
 
                 // Pass the jobs to the Process compomnent
-                $this->getProcess()->setJobs($jobs)->run();
-                \PhpTaskDaemon\Daemon\Logger::get()->log(getmypid() . ': Queue finished', \Zend_Log::DEBUG);
+                $this->getProcess()->setJobs( $jobs )->run();
+                \PhpTaskDaemon\Daemon\Logger::get()->log( getmypid() . ': Queue finished', \Zend_Log::DEBUG );
             }
 
             // Take a small rest after so much work. This also prevents
