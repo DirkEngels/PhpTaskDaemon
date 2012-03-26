@@ -19,11 +19,11 @@ class Gearman extends ManagerAbstract implements ManagerInterface {
         $gearmanWorker->addServer();
 
         // Register executor dispather
-        $gearmanWorker->addFunction('test', array($this, 'processGearmanTask'));
+        $gearmanWorker->addFunction( 'test', array( $this, 'processGearmanTask' ) );
 
         // Start the gearman worker
-        while($gearmanWorker->work()) {
-            if ($gearmanWorker->returnCode() != GEARMAN_SUCCESS) {
+        while( $gearmanWorker->work() ) {
+            if ( $gearmanWorker->returnCode() != GEARMAN_SUCCESS ) {
                 echo "return_code: " . $gearmanWorker->returnCode();
                 break;
             }
@@ -36,10 +36,10 @@ class Gearman extends ManagerAbstract implements ManagerInterface {
      * 
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $gearmanJob
      */
-    public function processGearmanTask($gearmanJob) {
-        $data = unserialize($gearmanJob->workload());
-        if (!is_array($data)) {
-            $data = array('data' => $data);
+    public function processGearmanTask( $gearmanJob ) {
+        $data = unserialize( $gearmanJob->workload() );
+        if ( ! is_array( $data ) ) {
+            $data = array( 'data' => $data );
         }
         $job = new \PhpTaskDaemon\Task\Job\JobDefault(
             'gearman-' . getmypid(),
@@ -48,7 +48,7 @@ class Gearman extends ManagerAbstract implements ManagerInterface {
             )
         );
         return $this->getProcess()
-            ->setJobs(array($job))
+            ->setJobs( array( $job ) )
             ->run();
     }
 

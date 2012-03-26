@@ -21,25 +21,25 @@ class Child extends ProcessAbstract implements ProcessInterface {
     public function run() {
 
         $jobs = $this->getJobs();
-        foreach($jobs as $job) {
+        foreach( $jobs as $job ) {
             $pid = pcntl_fork();
             $this->_childCount++;
 
-            if ($pid == -1) {
-                die ('Could not fork.. dunno why not... shutting down... bleep bleep.. blap...');
-            } elseif ($pid) {
+            if ( $pid == -1 ) {
+                die ( 'Could not fork.. dunno why not... shutting down... bleep bleep.. blap...' );
+            } elseif ( $pid ) {
                 $this->getQueue()->resetIpc();
-                $this->getQueue()->getIpc()->addArrayVar('executors', $pid);
+                $this->getQueue()->getIpc()->addArrayVar( 'executors', $pid );
 
                 // Continue parent process
-                $this->runParent($pid);
+                $this->runParent( $pid );
             } else {
                 // Run child process
-                $this->runChild($job);
+                $this->runChild( $job );
             }
         }
 
-        \PhpTaskDaemon\Daemon\Logger::log('Finished current set of tasks!', \Zend_Log::NOTICE);
+        \PhpTaskDaemon\Daemon\Logger::log( 'Finished current set of tasks!', \Zend_Log::NOTICE );
     }
 
 
@@ -48,17 +48,17 @@ class Child extends ProcessAbstract implements ProcessInterface {
      * 
      * @param unknown_type $pid
      */
-    public function runParent($pid) {
+    public function runParent( $pid ) {
         // The manager waits later
-        \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
+        \PhpTaskDaemon\Daemon\Logger::log( 'Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE );
 
         try {
             $this->getQueue()->resetIpc();
-            $this->getQueue()->getIpc()->addArrayVar('executors', $pid);
-            $pid = pcntl_wait($status);
+            $this->getQueue()->getIpc()->addArrayVar( 'executors', $pid );
+            $pid = pcntl_wait( $status );
 
             $this->_childCount--;
-        } catch (Exception $e) {
+        } catch ( \Exception $e ) {
             echo $e->getMessage();
         }
     }
@@ -69,22 +69,22 @@ class Child extends ProcessAbstract implements ProcessInterface {
      * 
      * @param \PhpTaskDaemon\Task\job\Data\DataInterface $job
      */
-    public function runChild($job) {
-        \PhpTaskDaemon\Daemon\Logger::log('Processing task started!', \Zend_Log::NOTICE);
+    public function runChild( $job ) {
+        \PhpTaskDaemon\Daemon\Logger::log( 'Processing task started!', \Zend_Log::NOTICE );
         $this->getExecutor()->resetPid();
         $this->getExecutor()->resetIpc();
         $this->getQueue()->resetIpc();
 
         try {
-            $this->_processTask($job);
+            $this->_processTask( $job );
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
 
-        \PhpTaskDaemon\Daemon\Logger::log('Processing task done!', \Zend_Log::NOTICE);
+        \PhpTaskDaemon\Daemon\Logger::log( 'Processing task done!', \Zend_Log::NOTICE );
 
         // Clean up IPC
-        $this->getQueue()->getIpc()->removeArrayVar('executors', getmypid());
+        $this->getQueue()->getIpc()->removeArrayVar( 'executors', getmypid() );
         $this->getExecutor()->resetIpc();
         $this->getExecutor()->getIpc()->remove();
 
