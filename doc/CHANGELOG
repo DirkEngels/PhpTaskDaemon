@@ -21,6 +21,7 @@ Version 0.8.6 (planned)
 -----------------------
 - Finish example tasks
 - Clean up pid & ipc resources
++ Check coding style
 - Add some more unit tests
 - Add some more documentation
 - Fix unit tests
