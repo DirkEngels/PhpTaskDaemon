@@ -12,10 +12,10 @@ namespace PhpTaskDaemon\Task\Job;
 interface JobInterface {
 
     public function getJobId();
-    public function setJobId($jobId);
+    public function setJobId( $jobId );
     public function getInput();
-    public function setInput($input);
+    public function setInput( $input );
     public function getOutput();
-    public function setOutput($output);
+    public function setOutput( $output );
 
 }

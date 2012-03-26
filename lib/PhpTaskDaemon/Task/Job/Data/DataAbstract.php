@@ -20,8 +20,8 @@ abstract class DataAbstract {
     protected $_data = array();
 
 
-    public function __construct($data = array()) {
-        $this->set($data);
+    public function __construct( $data = array() ) {
+        $this->set( $data );
     }
 
 
@@ -31,7 +31,7 @@ abstract class DataAbstract {
      * @return array
      */
     public function getKeys() {
-    	return array_keys($this->_data);
+    	return array_keys( $this->_data );
     }
 
 
@@ -52,15 +52,15 @@ abstract class DataAbstract {
      * @throws \InvalidArgumentException 'Job data must be an array!'
      * @return bool
      */
-    public function set($data, $reset = FALSE) {
-        if (!is_array($data)) {
-            throw new \InvalidArgumentException('Job data must be an array!');
+    public function set( $data, $reset = FALSE ) {
+        if ( ! is_array( $data ) ) {
+            throw new \InvalidArgumentException( 'Job data must be an array!' );
         }
 
-        if ($reset) {
+        if ( $reset ) {
             $this->_data = $data;
         } else {
-            $this->_data = array_merge($this->_data, $data);
+            $this->_data = array_merge( $this->_data, $data );
         }
         return TRUE;
     }
@@ -71,9 +71,9 @@ abstract class DataAbstract {
      * 
      * @return NULL|mixed
      */
-    public function getVar($var) {
-        if (in_array($var, array_keys($this->_data))) {
-            return $this->_data[$var];
+    public function getVar( $var ) {
+        if ( in_array( $var, array_keys( $this->_data ) ) ) {
+            return $this->_data[ $var ];
         }
         return NULL;
     }
@@ -86,9 +86,9 @@ abstract class DataAbstract {
      * @param mixed $value
      * @return bool
      */
-    public function setVar($var, $value, $force = FALSE) {
-        if ( in_array($var, $this->getKeys()) || $force) {
-            $this->_data[$var] = $value;
+    public function setVar( $var, $value, $force = FALSE ) {
+        if ( in_array( $var, $this->getKeys() ) || $force ) {
+            $this->_data[ $var ] = $value;
             return TRUE;
         }
         return FALSE;

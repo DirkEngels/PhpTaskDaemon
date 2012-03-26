@@ -18,6 +18,7 @@ use \PhpTaskDaemon\Task\Job\Data as Data;
  * used by the managers. 
  */
 abstract class JobAbstract {
+
     protected $_jobId;
     protected $_input = NULL;
     protected $_output = NULL;
@@ -31,14 +32,14 @@ abstract class JobAbstract {
      * @param string $jobId
      * @param \PhpTaskDaemon\Task\Job\JobAbstract $input 
      */
-    public function __construct($jobId = NULL, $input = NULL) {
-        if ($jobId === NULL) {
+    public function __construct( $jobId = NULL, $input = NULL ) {
+        if ( $jobId === NULL ) {
             $jobId = $this::generateJobId();
         }
 
-        $this->setJobId($jobId);
-        if (!is_null($input)) {
-            $this->setInput($input);
+        $this->setJobId( $jobId );
+        if ( ! is_null( $input ) ) {
+            $this->setInput( $input );
         }
 
         $this->_output = new \PhpTaskDaemon\Task\Job\Data\DataDefault();
@@ -51,7 +52,7 @@ abstract class JobAbstract {
      * @return string
      */
     public static function generateJobId() {
-        return substr(md5(uniqid()), 0,10);
+        return substr( md5( uniqid() ), 0, 10 );
     }
 
 
@@ -71,8 +72,8 @@ abstract class JobAbstract {
      * @param string $jobId
      * @return $this;
      */
-    public function setJobId($jobId = NULL) {
-        if ($jobId===NULL) {
+    public function setJobId( $jobId = NULL ) {
+        if ( $jobId === NULL ) {
             $jobId = $this->generateJobId();
         }
         $this->_jobId = $jobId;
@@ -97,9 +98,9 @@ abstract class JobAbstract {
      * @exception \InvalidArgumentException
      * @return bool
      */
-    public function setInput($input) {
-        if (!is_a($input, '\PhpTaskDaemon\Task\Job\Data\DataAbstract')) {
-            throw new \InvalidArgumentException('Wrong data format for job input!');
+    public function setInput( $input ) {
+        if ( ! is_a( $input, '\PhpTaskDaemon\Task\Job\Data\DataAbstract' ) ) {
+            throw new \InvalidArgumentException( 'Wrong data format for job input!' );
         }
         $this->_input = $input;
         return TRUE; 
@@ -123,9 +124,9 @@ abstract class JobAbstract {
      * @exception \InvalidArgumentException
      * @return bool
      */
-    public function setOutput($output) {
-        if (!is_a($output, '\PhpTaskDaemon\Task\Job\Data\DataAbstract')) {
-            throw new \InvalidArgumentException('Wrong data format for job output!');
+    public function setOutput( $output ) {
+        if ( ! is_a( $output, '\PhpTaskDaemon\Task\Job\Data\DataAbstract' ) ) {
+            throw new \InvalidArgumentException( 'Wrong data format for job output!' );
         }
         $this->_output = $output;
         return TRUE; 
