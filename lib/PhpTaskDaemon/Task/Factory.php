@@ -73,7 +73,7 @@ class Factory {
         );
 
         // Executor
-        $manager->getProcess()->setExecutor($executor);
+        $manager->getProcess()->setExecutor( $executor );
 
         \PhpTaskDaemon\Daemon\Logger::get()->log( '----------', \Zend_Log::DEBUG );
         return $manager;
@@ -116,9 +116,9 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\ManagerAbstract
      */
-    public static function getManager($taskName) {
-        $manager = self::getComponentType($taskName, self::TYPE_MANAGER);
-        $manager->setName($taskName);
+    public static function getManager( $taskName ) {
+        $manager = self::getComponentType( $taskName, self::TYPE_MANAGER );
+        $manager->setName( $taskName );
         return $manager;
     }
 
@@ -129,8 +129,8 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\Timer\TimerAbstract
      */
-    public static function getManagerTimer($taskName) {
-        return self::getComponentType($taskName, self::TYPE_TRIGGER);
+    public static function getManagerTimer( $taskName ) {
+        return self::getComponentType( $taskName, self::TYPE_TRIGGER );
     }
 
 
@@ -140,9 +140,9 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Manager\Process\ProcessAbstract
      */
-    public static function getManagerProcess($taskName) {
-        $process = self::getComponentType($taskName, self::TYPE_PROCESS);
-        $process->setName($taskName);
+    public static function getManagerProcess( $taskName ) {
+        $process = self::getComponentType( $taskName, self::TYPE_PROCESS );
+        $process->setName( $taskName );
         return $process;
     }
 
@@ -153,8 +153,8 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Executor\Status\StatusAbstract
      */
-    public static function getExecutor($taskName) {
-        return self::getComponentType($taskName, self::TYPE_EXECUTOR);
+    public static function getExecutor( $taskName ) {
+        return self::getComponentType( $taskName, self::TYPE_EXECUTOR );
     }
 
     /**
@@ -163,8 +163,8 @@ class Factory {
      * @param string $taskName
      * @return \PhpTaskDaemon\Task\Queue\QueueAbstract
      */
-    public static function getQueue($taskName) {
-        return self::getComponentType($taskName, self::TYPE_QUEUE);
+    public static function getQueue( $taskName ) {
+        return self::getComponentType( $taskName, self::TYPE_QUEUE );
     }
 
 
@@ -175,12 +175,12 @@ class Factory {
      * @param string $objectType
      * @return string
      */
-    public static function _getClassName($taskName, $objectType) {
-        return implode('\\', array(
-            Daemon\Config::get()->getOptionValue('global.namespace'),
-            str_replace('/', '\\', $taskName),
-            ucfirst($objectType)
-        ));
+    public static function _getClassName( $taskName, $objectType ) {
+        return implode( '\\', array(
+            Daemon\Config::get()->getOptionValue( 'global.namespace' ),
+            str_replace( '/', '\\', $taskName ),
+            ucfirst( $objectType )
+        ) );
     }
 
 
@@ -189,8 +189,8 @@ class Factory {
      * 
      * @param unknown_type $objectType
      */
-    protected static function _getConfigName($taskName) {
-        return strtolower(str_replace('\\', '.', $taskName));
+    protected static function _getConfigName( $taskName ) {
+        return strtolower( str_replace( '\\', '.', $taskName ) );
     }
 
 
@@ -201,15 +201,15 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected static function _getObjectClass($taskName, $objectType) {
-        $className = self::_getClassName($taskName, $objectType);
+    protected static function _getObjectClass( $taskName, $objectType ) {
+        $className = self::_getClassName( $taskName, $objectType );
 
-        $msg = 'Trying ' . $objectType . ' class component: ' . self::_getClassName($taskName, $objectType);
+        $msg = 'Trying ' . $objectType . ' class component: ' . self::_getClassName( $taskName, $objectType );
         \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
 
-        if (class_exists($className)) {
+        if ( class_exists( $className ) ) {
             $msg = 'Found ' . $objectType . ' class component: ' . $className;
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+            \PhpTaskDaemon\Daemon\Logger::get()->log( $msg, \Zend_Log::NOTICE );
             return new $className();
         }
         return NULL;
@@ -224,13 +224,13 @@ class Factory {
      * @param string $objectType
      * @return null|stdClass
      */
-    protected static function _getObjectConfig($taskName, $objectType) {
+    protected static function _getObjectConfig( $taskName, $objectType ) {
         $msg = 'Trying ' . $objectType . ' config component: ' . $taskName;
-        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::get()->log( $msg, \Zend_Log::DEBUG );
 
         $configType = ucfirst(
             \PhpTaskDaemon\Daemon\Config::get()->getOptionValue(
-                strtolower($objectType) . '.type',
+                strtolower( $objectType ) . '.type',
                 $taskName
             )
         );
@@ -239,14 +239,14 @@ class Factory {
             'global.namespace'
         );
 
-        $objectClassName = self::_getObjectConfigNamespace($objectType) . '\\' . $configType;
+        $objectClassName = self::_getObjectConfigNamespace( $objectType ) . '\\' . $configType;
 
         $msg = 'Testing class (' . $taskName . '): ' . $objectClassName;
-        \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::get()->log( $msg, \Zend_Log::DEBUG );
 
-        if (class_exists($objectClassName, TRUE)) {
+        if ( class_exists( $objectClassName, TRUE ) ) {
             $msg = 'Found ' . $objectType . ' config component: ' . $taskName;
-            \PhpTaskDaemon\Daemon\Logger::get()->log($msg, \Zend_Log::NOTICE);
+            \PhpTaskDaemon\Daemon\Logger::get()->log( $msg, \Zend_Log::NOTICE );
             $object = new $objectClassName();
             return $object;
         }
@@ -263,9 +263,9 @@ class Factory {
      * @return string Namespace of the object type.
      * @throws InvalidArgumentException MSG_UNKNOWN_TYPE
      */
-    protected static function _getObjectConfigNamespace($objectType) {
+    protected static function _getObjectConfigNamespace( $objectType ) {
         $nameSpace = '\\PhpTaskDaemon\\Task\\';
-        switch($objectType) {
+        switch( $objectType ) {
             case 'manager':
                 $nameSpace .= 'Manager';
                 break;
@@ -286,7 +286,7 @@ class Factory {
                 break;
             default:
                 $msg = sprintf( self::MSG_UNKNOWN_TYPE, $objectType );
-                throw new \InvalidArgumentException( $msg);
+                throw new \InvalidArgumentException( $msg );
                 break;
         }
         return $nameSpace;
@@ -302,15 +302,15 @@ class Factory {
      * @return null|StdClass
      * @throws InvalidArgumentException Unknown object type: {$objectType}
      */
-    public static function _getObjectDefault($taskName, $objectType) {
+    public static function _getObjectDefault( $taskName, $objectType ) {
         $msg = 'Defaulting ' . $objectType . ' component: ' . $taskName . ' => Default';
-        \PhpTaskDaemon\Daemon\Logger::log($msg, \Zend_Log::DEBUG);
+        \PhpTaskDaemon\Daemon\Logger::log( $msg, \Zend_Log::DEBUG );
 
-        switch($objectType) {
+        switch( $objectType ) {
             // Manager
             case 'manager':
                 return new \PhpTaskDaemon\Task\Manager\ManagerDefault(
-                    self::getComponentType($taskName, self::TYPE_EXECUTOR)
+                    self::getComponentType( $taskName, self::TYPE_EXECUTOR )
                 );
             case 'timer':
                 return new \PhpTaskDaemon\Task\Manager\Timer\Interval();
@@ -328,7 +328,7 @@ class Factory {
                 return new \PhpTaskDaemon\Task\Executor\ExecutorDefault();
         }
 
-        throw new Exception\UndefinedObjectType('Unknown object type: ' . $objectType);
+        throw new Exception\UndefinedObjectType( 'Unknown object type: ' . $objectType );
 
         return NULL;
     }
