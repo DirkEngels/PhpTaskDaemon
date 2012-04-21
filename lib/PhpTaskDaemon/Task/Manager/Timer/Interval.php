@@ -24,7 +24,7 @@ class Interval extends TimerAbstract implements TimerInterface {
             return $this->_timeToWait;
         }
 
-        return parent::timeToWait();
+        return parent::getTimeToWait();
     }
 
 
