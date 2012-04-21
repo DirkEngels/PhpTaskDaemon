@@ -479,23 +479,24 @@ class Console {
         if ($this->_consoleOpts->getOption('log-file')) {
             $logFile =  getcwd() . '/' . $this->_consoleOpts->getOption('log-file');
         } else {
-            $logFile = Config::get()->getOptionValue('log.file');
+            $logFile = realpath(Config::get()->getOptionValue('log.file'));
             if (substr($logFile, 0, 1)!='/') {
                 $logFile = realpath(\APPLICATION_PATH) . '/' . $logFile;
             }
         }
+        \PhpTaskDaemon\Daemon\Logger::log('Check if log file exists or can be created: ' . $logFile, \Zend_Log::DEBUG);
 
         // Create logfile if not exists
-        if (!file_exists($logFile)) {
-            try {
+        try {
+            if (!file_exists($logFile)) {
                 touch($logFile);
-                // Adding logfile
-                $writerFile = new \Zend_Log_Writer_Stream($logFile);
-                \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
-                \PhpTaskDaemon\Daemon\Logger::log('Added Log Writer: ' . $logFile, \Zend_Log::DEBUG);
-            } catch (\Exception $e) {
-                \PhpTaskDaemon\Daemon\Logger::log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
             }
+            // Adding logfile
+            $writerFile = new \Zend_Log_Writer_Stream($logFile);
+            \PhpTaskDaemon\Daemon\Logger::get()->addWriter($writerFile);
+            \PhpTaskDaemon\Daemon\Logger::log('Added Log Writer: ' . $logFile, \Zend_Log::DEBUG);
+        } catch (\Exception $e) {
+            \PhpTaskDaemon\Daemon\Logger::log('Cannot create log file: ' . $logFile, \Zend_Log::ALERT);
         }
     }
 
