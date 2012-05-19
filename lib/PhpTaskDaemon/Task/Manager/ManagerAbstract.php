@@ -51,7 +51,7 @@ abstract class ManagerAbstract {
      * Time to wait in milliseconds before loading the queue again.
      * @var integer
      */
-    protected $_sleepTimeQueue = 3000000;
+    protected $_sleepTimeQueue = 5000000;
 
 
     /**
@@ -201,7 +201,12 @@ abstract class ManagerAbstract {
 
         // Sleep
         \PhpTaskDaemon\Daemon\Logger::get()->log( "Sleeping for : " . $this->_sleepTimeQueue . " micro seconds", \Zend_Log::INFO );
-        usleep( $sleepTime );
+        while ( $sleepTime > 0 ) {
+            usleep( 5000 );
+//             \PhpTaskDaemon\Daemon\Logger::get()->log( "Sleeping shortly for : 5000 micro seconds", \Zend_Log::INFO );
+            $sleepTime -= 5000;
+        }
+        //usleep( $sleepTime );
         return TRUE;
     }
 
