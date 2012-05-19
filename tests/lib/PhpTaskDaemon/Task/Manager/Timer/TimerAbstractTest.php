@@ -31,8 +31,8 @@ class TimerAbstractTest extends \PHPUnit_Framework_TestCase {
     /**
      * @todo
      */
-    public function testNothing() {
-        $this->assertTrue(TRUE);
+    public function testGetTimeToWait() {
+        $this->assertEquals( 1, $this->_timer->getTimeToWait() );
     }
 
 }
