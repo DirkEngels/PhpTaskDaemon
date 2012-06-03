@@ -273,13 +273,12 @@ class Config {
         $keyString = $this->_prepareString($keyString);
         $configArray = explode('.', $keyString);
 
-        $value= $configArray;
-        $configArray = Config::get()->getConfig()->toArray();
+        $value = Config::get()->getConfig()->toArray();
         foreach( $configArray as $keyPiece ) {
-            if ( ! in_array( $keyPiece, $value ) ) {
+            if ( ! isset( $value[ $keyPiece ] ) ) {
                 throw new \Exception('Config option does not exists: ' . $keyString);
             }
-            $value = $value[$keyPiece];
+            $value = $value[ $keyPiece ];
         }
         return $value;
     }
