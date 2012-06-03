@@ -269,20 +269,20 @@ class Factory {
             case 'manager':
                 $nameSpace .= 'Manager';
                 break;
-            case 'trigger':
-                $nameSpace .= 'Manager\\Trigger';
+            case 'timer':
+                $nameSpace .= 'Manager\\Timer';
                 break;
             case 'process':
                 $nameSpace .= 'Manager\\Process';
                 break;
             case 'queue':
-                $nameSpace .= 'Manager\\Queue';
+                $nameSpace .= 'Queue';
                 break;
             case 'executor':
-                $nameSpace .= 'Manager\\Executor';
+                $nameSpace .= 'Executor';
                 break;
             default:
-                throw new \InvalidArgumentException(self::MSG_UNKNOWN_TYPE);
+                throw new \InvalidArgumentException(self::MSG_UNKNOWN_TYPE . ': ' . $objectType);
                 break;
         }
         return $nameSpace;
