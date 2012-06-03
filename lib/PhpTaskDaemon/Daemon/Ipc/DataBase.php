@@ -21,6 +21,7 @@ use PhpTaskDaemon\Daemon\Logger;
 class DataBase extends IpcAbstract implements IpcInterface {
 
     const MSG_INVALID_VALUE = 'Value for key (%s) does not exists (ipcId: %s)';
+    const MSG_INVALID_RECORD = 'Invalid record for key (%s) (ipcId: %s)';
     const MSG_NOT_NUMERIC = 'Value (%s) is not numeric: %d';
 
     /**
