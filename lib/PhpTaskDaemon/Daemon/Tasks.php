@@ -131,7 +131,7 @@ class Tasks {
             if ( preg_match( '/Executor.php$/', $base ) ) {
                 // Try manager file
                 $taskName = $namespace . '/' . substr( $base, 0, -4 );
-                $class = preg_replace( '#/#', '\\', $fileName );
+                $class = preg_replace( '#/#', '\\', $taskName );
                 include_once( $dir . '/' . $base );
 
                 // Manager exists
