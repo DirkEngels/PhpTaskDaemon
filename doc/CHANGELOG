@@ -17,18 +17,24 @@ Version 1.0 (roadmap)
 - Double check php doc info
 
 
-Version 0.8.6 (planned)
+Version 0.8.7 (planned)
 -----------------------
 - Finish example tasks
 - Clean up pid & ipc resources
-+ Check coding style
 - Add some more unit tests
 - Add some more documentation
+
+
+Version 0.8.6 (04-06-2012)
+==========================
++ Check coding style
++ Add some more unit tests
++ Add some more documentation
 + Fix unit tests
 
 
 Version 0.8.5 (25-03-2012)
-==========================
+--------------------------
 + Fix setting IPC status & statistics
 + Move namespace example tasks to App
 + Fix incomplete unit tests
