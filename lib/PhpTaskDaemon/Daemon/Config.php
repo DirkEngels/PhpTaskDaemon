@@ -141,44 +141,44 @@ class Config {
             try {
                 $value = $this->_getRecursiveKey( 'tasks.' . $taskName . '.' . $option );
                 $source = self::CONFIG_SOURCE_TASK;
-            } catch (\Exception $e) {
-                Logger::log('TASK SPECIFIC ' . $e->getMessage(), \Zend_Log::DEBUG);
+            } catch ( \Exception $e ) {
+                Logger::log( $e->getMessage(), \Zend_Log::DEBUG );
             }
         }
 
         // Daemon option
-        if (is_null($source)) {
+        if ( is_null( $source ) ) {
             try {
                 $value = $this->_getRecursiveKey('daemon.' . $option);
                 $source = self::CONFIG_SOURCE_DAEMON;
-            } catch (\Exception $e) {
-                Logger::log('DAEMON ' . $e->getMessage(), \Zend_Log::DEBUG);
+            } catch ( \Exception $e ) {
+                Logger::log( $e->getMessage(), \Zend_Log::DEBUG );
             }
         }
 
         // Defaults
-        if (is_null($source)) {
+        if ( is_null( $source ) ) {
             try {
                 $value = $this->_getRecursiveKey('tasks.defaults.' . $option);
                 $source = self::CONFIG_SOURCE_DEFAULT;
-            } catch (\Exception $e) {
-                Logger::log('TASK DEFAULT ' . $e->getMessage(), \Zend_Log::DEBUG);
+            } catch ( \Exception $e ) {
+                Logger::log( $e->getMessage(), \Zend_Log::DEBUG );
             }
         }
 
         // Fallback
-        if (is_null($source)) {
+        if ( is_null( $source ) ) {
             try {
-                $value = $this->_getRecursiveKey($option);
+                $value = $this->_getRecursiveKey( $option );
                 $source = self::CONFIG_SOURCE_FALLBACK;
-            } catch (\Exception $e) {
-                Logger::log('FALLBACK ' . $e->getMessage(), \Zend_Log::DEBUG);
+            } catch ( \Exception $e ) {
+                Logger::log( $e->getMessage(), \Zend_Log::DEBUG );
             }
         }
 
         $msg = sprintf( self::MSG_OPTION_VALUE, $option, $value, $source );
-        Logger::log( $msg, \Zend_Log::DEBUG);
-        $out = array($source, $value);
+        Logger::log( $msg, \Zend_Log::DEBUG );
+        $out = array( $source, $value );
         return $out;
     }
 
@@ -190,8 +190,8 @@ class Config {
      * @param $taskName
      * @return string
      */
-    public function getOptionSource($option, $taskName = NULL) {
-        list($source, $value) = $this->getOption($option, $taskName);
+    public function getOptionSource( $option, $taskName = NULL ) {
+        list( $source, $value ) = $this->getOption( $option, $taskName );
         return $source;
     }
 
@@ -203,8 +203,8 @@ class Config {
      * @param $taskName
      * @return string
      */
-    public function getOptionValue($option, $taskName = NULL) {
-        list($source, $value) = $this->getOption($option, $taskName);
+    public function getOptionValue( $option, $taskName = NULL ) {
+        list( $source, $value ) = $this->getOption( $option, $taskName );
         return $value;
     }
 
@@ -218,11 +218,11 @@ class Config {
      */
     protected function _initConfig( $configFiles = array() ) {
         foreach( $configFiles as $configFile ) {
-            $msg = sprintf( self::MSG_CONFIG_TRYING, $configFile);
+            $msg = sprintf( self::MSG_CONFIG_TRYING, $configFile );
             Logger::log( $msg, \Zend_Log::DEBUG );
 
             // Config file exists.
-            if (!file_exists($configFile)) {
+            if ( ! file_exists( $configFile ) ) {
                 $msg = sprintf( self::MSG_CONFIG_NOTFOUND, $configFile );
                 Logger::log( $msg, \Zend_Log::ERR );
                 continue;
@@ -247,14 +247,14 @@ class Config {
             }
 
             // Register configurations file
-            array_push($this->_files, $configFile);
+            array_push( $this->_files, $configFile );
             $msg = sprintf( self::MSG_CONFIG_LOADED, $configFile );
             Logger::log( $msg, \Zend_Log::INFO);
         }
 
         // At least one configuration file must be loaded.
         if (count($this->_files) == 0) {
-            throw new \PhpTaskDaemon\Exception\FileNotFound('No configuration files found!');
+            throw new \PhpTaskDaemon\Exception\FileNotFound( 'No configuration files found!' );
         }
 
         $this->_config->setReadonly();
@@ -268,18 +268,17 @@ class Config {
      * 
      * @param $keyString Strips the config key in order to find a value.
      */
-    protected function _getRecursiveKey($keyString) {
+    protected function _getRecursiveKey( $keyString ) {
         // Format config strings, because it is a framework.
-        $keyString = $this->_prepareString($keyString);
-        $configArray = explode('.', $keyString);
+        $keyString = $this->_prepareString( $keyString );
+        $configPieces = explode( '.', $keyString );
 
-        $value= $configArray;
-        $configArray = Config::get()->getConfig()->toArray();
-        foreach( $configArray as $keyPiece ) {
-            if ( ! in_array( $keyPiece, $value ) ) {
-                throw new \Exception('Config option does not exists: ' . $keyString);
+        $value = $configArray = Config::get()->getConfig()->toArray();
+        foreach( $configPieces as $keyPiece ) {
+            if ( ! in_array( $keyPiece, array_keys( $value ) ) ) {
+                 throw new \Exception('Config option does not exists: ' . $keyString . ' => ' . $keyPiece);
             }
-            $value = $value[$keyPiece];
+            $value = $value[ $keyPiece ];
         }
         return $value;
     }

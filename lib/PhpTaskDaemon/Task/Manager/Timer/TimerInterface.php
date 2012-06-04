@@ -11,6 +11,6 @@ namespace PhpTaskDaemon\Task\Manager\Timer;
 
 interface TimerInterface {
 
-    public function timeToWait();
+    public function getTimeToWait();
 
 }

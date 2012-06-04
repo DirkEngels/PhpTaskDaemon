@@ -24,7 +24,7 @@ abstract class ExecutorAbstract {
 	protected $_job = NULL;
 
     /**
-     * Process ID
+     * Process ID.
      * @var integer
      */
     private $_pid;
@@ -41,10 +41,10 @@ abstract class ExecutorAbstract {
      * 
      * @param \PhpTaskDaemon\Ipc\IpcAbstract $ipc
      */
-    public function __construct(Ipc\IpcAbstract $ipc = NULL) {
+    public function __construct( Ipc\IpcAbstract $ipc = NULL ) {
         $this->_pid = getmypid();
-        if (!is_null($ipc)) {
-            $this->setIpc($ipc);
+        if ( ! is_null( $ipc ) ) {
+            $this->setIpc( $ipc );
         }
     }
 
@@ -76,13 +76,13 @@ abstract class ExecutorAbstract {
      */
     public function getIpc() {
         if ( getmypid() != $this->_pid ) {
-            if ( ! is_null($this->_ipc) ) {
+            if ( ! is_null( $this->_ipc ) ) {
                 $this->_ipc = NULL;
                 $this->_pid = getmypid();
             }
         }
 
-        if ( is_null($this->_ipc) ) {
+        if ( is_null( $this->_ipc ) ) {
             $this->_ipc = Ipc\IpcFactory::get(
                 Ipc\IpcFactory::NAME_EXECUTOR, 
                 $this->_pid
@@ -124,7 +124,7 @@ abstract class ExecutorAbstract {
      * @param integer $pid
      * @return $this
      */
-    public function resetPid($pid = NULL) {
+    public function resetPid( $pid = NULL ) {
         if ( is_null( $pid ) ) {
             $pid = getmypid();
         }
@@ -142,9 +142,9 @@ abstract class ExecutorAbstract {
      * 
      * @param string|NULL $key
      */
-    public function getStatus($key = NULL) {
+    public function getStatus( $key = NULL ) {
         if ( $key != NULL ) {
-            return $this->getIpc()->getVar($key);
+            return $this->getIpc()->getVar( $key );
         }
         return $this->getIpc()->get();
     }
@@ -158,14 +158,14 @@ abstract class ExecutorAbstract {
      * @param string $message
      * @return bool
      */
-    public function setStatus($percentage, $message = NULL) {
+    public function setStatus( $percentage, $message = NULL ) {
         if ( ( $percentage == 0 ) && ( $message == NULL ) ) {
             $message = 'Initializing task';
         }
 
-        $this->getIpc()->setVar('percentage', $percentage);
+        $this->getIpc()->setVar( 'percentage', $percentage );
         if ($message != NULL) {
-            $this->getIpc()->setVar('message', $message);
+            $this->getIpc()->setVar( 'message', $message );
         }
         return TRUE;
     }

@@ -20,12 +20,12 @@ class Cron extends Interval {
      * @return integer The number of seconds to wait before running again.
      */
     public function getTimeToWait() {
-        $cron = Cron\CronExpression::factory('@daily');
+        $cron = Cron\CronExpression::factory( '@daily' );
         $cron->isDue();
         $nextRun = $cron->getNextRunDate();
         $now = new DateTime();
 
-        if ($nextRun <= $now) {
+        if ( $nextRun <= $now ) {
             return 0;
         }
         return $nextRun->getTimestamp() - $now->getTimestamp();

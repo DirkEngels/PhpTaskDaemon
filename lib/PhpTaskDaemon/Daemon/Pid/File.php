@@ -52,7 +52,7 @@ class File {
         }
 
         // Adjust relative paths.
-        if (substr( $this->_filename, 0, 1 ) == '/' ) {
+        if ( ! substr( $this->_filename, 0, 1 ) == '/' ) {
             $this->_filename = \APPLICATION_PATH . $this->_filename;
         }
 

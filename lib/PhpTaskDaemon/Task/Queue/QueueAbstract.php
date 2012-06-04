@@ -32,10 +32,10 @@ abstract class QueueAbstract {
      * 
      * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
      */
-    public function __construct(\PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc = NULL) {
+    public function __construct( \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc = NULL ) {
         $this->_pid = getmypid();
-        if (!is_null($ipc)) {
-            $this->setIpc($ipc);
+        if ( ! is_null( $ipc ) ) {
+            $this->setIpc( $ipc );
         }
     }
 
@@ -46,15 +46,15 @@ abstract class QueueAbstract {
      * @return PhpTaskDaemon\Daemon\Ipc\IpcAbstract
      */
     public function getIpc() {
-        if (getmypid() != $this->_pid) {
-            if (!(is_null($this->_ipc))) {
+        if ( getmypid() != $this->_pid ) {
+            if ( ! ( is_null( $this->_ipc ) ) ) {
                 $this->_ipc = NULL;
             }
         }
 
-        if (is_null($this->_ipc)) {
+        if ( is_null( $this->_ipc ) ) {
             $this->setIpc(
-                Ipc\IpcFactory::get(Ipc\IpcFactory::NAME_QUEUE, $this->_pid)
+                Ipc\IpcFactory::get( Ipc\IpcFactory::NAME_QUEUE, $this->_pid )
             );
         }
 
@@ -68,7 +68,7 @@ abstract class QueueAbstract {
      * @param \PhpTaskDaemon\Daemon\Ipc\IpcAbstract $ipc
      * @return $this
      */
-    public function setIpc($ipc) {
+    public function setIpc( $ipc ) {
         $this->_ipc = $ipc;
         $this->_initializeIpc();
         return TRUE;
@@ -82,7 +82,7 @@ abstract class QueueAbstract {
      * @return $this
      */
     public function resetIpc() {
-        Logger::log('Resetting Statistics IPC', \Zend_Log::DEBUG);
+        Logger::log( 'Resetting Statistics IPC', \Zend_Log::DEBUG );
         $this->_ipc = NULL;
         return $this;
     }
@@ -94,12 +94,12 @@ abstract class QueueAbstract {
      * @param integer $pid
      * @return $this
      */
-    public function resetPid($pid) {
-        if (is_null($pid)) {
+    public function resetPid( $pid ) {
+        if ( is_null( $pid ) ) {
             $pid = getmypid();
         }
 
-        Logger::log('Resetting Statistics PID (' . $pid . ')', \Zend_Log::DEBUG);
+        Logger::log( 'Resetting Statistics PID (' . $pid . ')', \Zend_Log::DEBUG );
         $this->_pid = $pid;
         return $this;
     }
@@ -111,8 +111,8 @@ abstract class QueueAbstract {
      * @param string $status
      * @return integer
      */
-    public function incrementStatus($status = self::STATUS_DONE, $count = 1) {
-        return $this->getIpc()->incrementVar($status, $count);
+    public function incrementStatus( $status = self::STATUS_DONE, $count = 1 ) {
+        return $this->getIpc()->incrementVar( $status, $count );
     }
 
 
@@ -122,8 +122,8 @@ abstract class QueueAbstract {
      * @param integer $count
      * @return integer
      */
-    public function decrementQueue($count = 1) {
-        return $this->getIpc()->decrementVar(self::STATUS_QUEUED, $count);
+    public function decrementQueue( $count = 1 ) {
+        return $this->getIpc()->decrementVar( self::STATUS_QUEUED, $count );
     }    
 
     /**
@@ -133,12 +133,12 @@ abstract class QueueAbstract {
      * @param integer $count
      * @return bool
      */
-    public function setStatusCount($status = self::STATUS_DONE, $count = 0) {
+    public function setStatusCount( $status = self::STATUS_DONE, $count = 0 ) {
         $ipc = $this->getIpc();
-        if (!in_array($status, $ipc->getKeys())) {
-            $ipc->setVar($status, 0);
+        if ( ! in_array( $status, $ipc->getKeys() ) ) {
+            $ipc->setVar( $status, 0 );
         }
-        return $ipc->setVar($status, $count);
+        return $ipc->setVar( $status, $count );
     }
 
 
@@ -147,9 +147,9 @@ abstract class QueueAbstract {
      * 
      * @param integer $count
      */
-    public function setQueueCount($count = 0) {
-        $this->setStatusCount(self::STATUS_QUEUED, $count);
-        $this->getIpc()->setVar(self::STATUS_LOADED, $count);
+    public function setQueueCount( $count = 0 ) {
+        $this->setStatusCount( self::STATUS_QUEUED, $count );
+        $this->getIpc()->setVar( self::STATUS_LOADED, $count );
         return $count;
     }
 
@@ -163,11 +163,11 @@ abstract class QueueAbstract {
      * @param integer|NULL $count
      * @return bool
      */
-    public function updateStatus($status, $count = 1, $reset = false) {
-        if ($reset) {
-            return $this->setStatusCount($status, $count);
+    public function updateStatus( $status, $count = 1, $reset = false ) {
+        if ( $reset ) {
+            return $this->setStatusCount( $status, $count );
         } else {
-            return $this->incrementStatus($status, $count);
+            return $this->incrementStatus( $status, $count );
         }
     }
 
@@ -179,9 +179,9 @@ abstract class QueueAbstract {
      * @param integer|NULL $count
      * @return boolean
      */
-    public function updateQueue($count = NULL) {
-        if ($count != NULL) {
-            return $this->setQueueCount($count);
+    public function updateQueue( $count = NULL ) {
+        if ( $count != NULL ) {
+            return $this->setQueueCount( $count );
         } else {
             return $this->decrementQueue();
         }
@@ -201,9 +201,9 @@ abstract class QueueAbstract {
             self::STATUS_FAILED
         );
         $ipcKeys = $this->_ipc->getKeys();
-        foreach($statuses as $status) {
-            if (!in_array($status, $ipcKeys)) {
-                $this->_ipc->setVar($status, 0);
+        foreach( $statuses as $status ) {
+            if ( ! in_array( $status, $ipcKeys ) ) {
+                $this->_ipc->setVar( $status, 0 );
             }
         }
         return TRUE;

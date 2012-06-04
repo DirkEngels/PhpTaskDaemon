@@ -58,6 +58,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
     public function initResource() {
         $this->_pdo = NULL;
         $this->_stmt = NULL;
+        return parent::initResource();
     }
 
 
@@ -80,7 +81,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
      * 
      * @param $pdo \PDO
      */
-    public function setJob( $pdo ) {
+    public function setPdo( $pdo ) {
         $this->_pdo = $pdo;
     }
 
@@ -190,43 +191,43 @@ class DataBase extends IpcAbstract implements IpcInterface {
     }
 
 
-    /**
-     * Adds a value to an array key.
-     * 
-     * @param string $key
-     * @param mixed $value
-     */
-    public function addArrayVar($key, $value) {
-        $result = FALSE;
-        $this->getPdo()->beginTransaction();
-        $array = $this->getVar($key);
-        if (!is_array($array)) {
-            $array = array();
-        }
+//     /**
+//      * Adds a value to an array key.
+//      * 
+//      * @param string $key
+//      * @param mixed $value
+//      */
+//     public function addArrayVar($key, $value) {
+//         $result = FALSE;
+//         $this->getPdo()->beginTransaction();
+//         $array = $this->getVar($key);
+//         if (!is_array($array)) {
+//             $array = array();
+//         }
 
-        if (!in_array($value, $array)) {
-            array_push($array, $value);
-            $this->setVar($key, $array);
-            $result = TRUE;
-        }
+//         if (!in_array($value, $array)) {
+//             array_push($array, $value);
+//             $this->setVar($key, $array);
+//             $result = TRUE;
+//         }
 
-        $this->getPdo()->commit();
-        return $result;
-    }
+//         $this->getPdo()->commit();
+//         return $result;
+//     }
 
 
-    /**
-     * Removes a value to an array key.
-     * 
-     * @param string $key
-     * @param mixed $value
-     */
-    public function removeArrayVar($key, $value) {
-        $this->getPdo()->beginTransaction();
-        $result = parent::removeArrayVar($key, $value);
-        $this->getPdo()->commit();
-        return $result;
-    }
+//     /**
+//      * Removes a value to an array key.
+//      * 
+//      * @param string $key
+//      * @param mixed $value
+//      */
+//     public function removeArrayVar($key, $value) {
+//         $this->getPdo()->beginTransaction();
+//         $result = parent::removeArrayVar($key, $value);
+//         $this->getPdo()->commit();
+//         return $result;
+//     }
 
 
     /**
@@ -248,7 +249,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
     /**
      * Removes all key registered known of this ipc instance.
      * 
-     * @see PhpTaskDaemon\Daemon\Ipc.IpcAbstract::remove()
+     * @return bool
      */
     public function remove() {
         $sql = "DELETE FROM ipc WHERE ipcId=:ipcId";
@@ -263,7 +264,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
      * Sets up the database connection using the credentials from the config.
      * object.
      * 
-     * @return NULL
+     * @return bool
      */
     protected function _dbSetup() {
         // Try loading PDO from config
@@ -292,6 +293,7 @@ class DataBase extends IpcAbstract implements IpcInterface {
         } catch (\Exception $e) {
             echo $e->getMessage();
             Logger::log('Could not initialize the DB PDO driver:' . $e->getMessage(), \Zend_Log::ERR);
+            return FALSE;
         }
 
         return TRUE;
@@ -303,14 +305,14 @@ class DataBase extends IpcAbstract implements IpcInterface {
      * 
      * @param string $query An sql query statement (string) with PDO parameter keys
      * @param array $params Optional parameters
-     * @return NULL | integer
+     * @return boolean
      */
     protected function _dbStatement($sql, $params = array()) {
         Logger::log('Executing SQL Statement: ' . $sql, \Zend_Log::DEBUG);
         Logger::log('Executing SQL Params: ' . implode(", ", $params), \Zend_Log::DEBUG);
-        
-        $this->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
         try {
+            $this->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->_stmt = $this->getPdo()->prepare($sql);
             foreach($params as $name => $value) {
                 $this->_stmt->bindParam(':' . $name, $value);
@@ -318,8 +320,9 @@ class DataBase extends IpcAbstract implements IpcInterface {
             return $this->_stmt->execute($params);
         } catch (\Exception $e) {
             Logger::log('Failed to execute SQL Statement: ' . $e->getMessage(), \Zend_Log::DEBUG);
+            return FALSE;
         }
-        return NULL;
+        return TRUE;
     }
 
 }

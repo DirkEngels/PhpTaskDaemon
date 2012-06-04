@@ -10,15 +10,14 @@ Future features
 Version 1.0 (roadmap)
 ---------------------
 - Add tools (init.d script)
-- Add developer tutorial
+- Increase unit test coverage
 - Create user documentation (doc dir + website/wiki)
-- Increate unit test coverage
+- Add developer tutorial
 - Double check coding style
 - Double check php doc info
-- Clean up pid & ipc resources
 
 
-Version 0.8.6 (planned)
+Version 0.8.7 (planned)
 -----------------------
 - Finish example tasks
 - Clean up pid & ipc resources
@@ -27,8 +26,16 @@ Version 0.8.6 (planned)
 - Update website documentation
 
 
-Version 0.8.5 (25-03-2012)
+Version 0.8.6 (04-06-2012)
 ==========================
++ Check coding style
++ Add some more unit tests
++ Add some more documentation
++ Fix unit tests
+
+
+Version 0.8.5 (25-03-2012)
+--------------------------
 + Fix setting IPC status & statistics
 + Move namespace example tasks to App
 + Fix incomplete unit tests

@@ -53,6 +53,7 @@ class Signal {
 
     /**
      * POSIX Signal handler callback.
+     * 
      * @param $sig POSIX Signal to handle.
      * @return NULL
      */

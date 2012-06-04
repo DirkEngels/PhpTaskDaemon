@@ -100,8 +100,7 @@ class Tasks {
 
 
     /**
-     * Scans a directory for task managers and returns the number of loaded
-     * tasks.
+     * Scans a directory for task managers and returns the tasks loaded.
      * 
      * @param string $dir
      * @return integer
@@ -120,21 +119,24 @@ class Tasks {
         foreach($items as $item) {
             // Skip '.' and '..' directory entries.
             if ($item== '.' || $item == '..') { continue; }
+            Logger::log( '', \Zend_Log::DEBUG );
 
             // Crate base task name.
             $base = (is_NULL($subdir)) ? $item : $subdir . '/'. $item;
-                    Logger::log(
-                        "Trying file: /Task/" . $base, 
-                        \Zend_Log::DEBUG
-                    );
 
             if ( preg_match( '/Executor.php$/', $base ) ) {
-                // Try manager file
+                // Try executor file
+                Logger::log(
+                    "Tasks trying to load file: /Task/" . $base,
+                    \Zend_Log::DEBUG
+                );
+
+                // Load file
                 $taskName = $namespace . '/' . substr( $base, 0, -4 );
-                $class = preg_replace( '#/#', '\\', $fileName );
+                $class = preg_replace( '#/#', '\\', $taskName );
                 include_once( $dir . '/' . $base );
 
-                // Manager exists
+                // Executor class exists
                 if ( class_exists( '\\' . $class ) ) {
                     Logger::log(
                         "Found executor file: /Task/" . $base, 
@@ -151,6 +153,7 @@ class Tasks {
                 );
             }
         }
+
         return $tasks;
     }
 

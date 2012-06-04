@@ -61,6 +61,8 @@
  <target name="phpcpd"
          description="Generate pmd-cpd.xml using PHPCPD">
   <exec executable="phpcpd">
+   <arg value="--exclude"/>
+   <arg value="${basedir}/lib/Zend/"/>
    <arg value="--log-pmd" />
    <arg value="${basedir}/build/logs/pmd-cpd.xml" />
    <arg path="${source}" />
@@ -70,6 +72,8 @@
  <target name="phploc"
          description="Generate phploc.csv">
   <exec executable="phploc">
+   <arg value="--exclude"/>
+   <arg value="${basedir}/lib/Zend/"/>
    <arg value="--log-csv" />
    <arg value="${basedir}/build/logs/phploc.csv" />
    <arg path="${source}" />
@@ -89,6 +93,8 @@
  <target name="phpdoc"
          description="Generate API documentation using PHPDocumentor">
   <exec executable="phpdoc">
+   <arg value="--ignore"/>
+   <arg value="${basedir}/lib/Zend/"/>
    <arg value="--directory" />
    <arg path="${source}" />
    <arg value="--target" />

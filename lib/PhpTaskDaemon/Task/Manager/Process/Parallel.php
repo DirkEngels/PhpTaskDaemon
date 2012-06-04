@@ -17,23 +17,23 @@ class Parallel extends Child {
      * Overrides the parent process bby 
      * @see PhpTaskDaemon\Task\Manager\Process.Child::runParent()
      */
-    public function runParent($pid) {
+    public function runParent( $pid ) {
         // The manager waits later
-        \PhpTaskDaemon\Daemon\Logger::log('Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE);
+        \PhpTaskDaemon\Daemon\Logger::log( 'Spawning child process: ' . $pid . '!', \Zend_Log::NOTICE );
 
         try {
-            if ($this->_childCount >= $this->_maxProcess) {
+            if ( $this->_childCount >= $this->_maxProcess ) {
                 $pid = getmypid();
 
-                while ($pid != -1) {
-                    $pid = pcntl_wait($status);
-                    $status = pcntl_wexitstatus($status);
+                while ( $pid != -1 ) {
+                    $pid = pcntl_wait( $status );
+                    $status = pcntl_wexitstatus( $status );
                     echo "Child $status completed\n";
                     $this->_childCount--;
                 }
             }
 
-        } catch (Exception $e) {
+        } catch ( \Exception $e ) {
             echo $e->getMessage();
         }
     }

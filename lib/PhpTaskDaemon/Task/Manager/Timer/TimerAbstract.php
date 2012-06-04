@@ -16,7 +16,7 @@ abstract class TimerAbstract {
      * 
      * @return integer The number of seconds to wait.
      */
-    public function timeToWait() {
+    public function getTimeToWait() {
         return 1;
     }
 
