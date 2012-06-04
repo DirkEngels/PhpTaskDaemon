@@ -269,8 +269,8 @@ class Factory {
             case 'manager':
                 $nameSpace .= 'Manager';
                 break;
-            case 'trigger':
-                $nameSpace .= 'Manager\\Trigger';
+            case 'timer':
+                $nameSpace .= 'Manager\\Timer';
                 break;
             case 'process':
                 $nameSpace .= 'Manager\\Process';
@@ -279,10 +279,10 @@ class Factory {
                 $nameSpace .= 'Manager\\Timer';
                 break;
             case 'queue':
-                $nameSpace .= 'Manager\\Queue';
+                $nameSpace .= 'Queue';
                 break;
             case 'executor':
-                $nameSpace .= 'Manager\\Executor';
+                $nameSpace .= 'Executor';
                 break;
             default:
                 $msg = sprintf( self::MSG_UNKNOWN_TYPE, $objectType );
