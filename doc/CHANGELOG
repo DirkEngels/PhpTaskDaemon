@@ -23,6 +23,7 @@ Version 0.8.7 (planned)
 - Clean up pid & ipc resources
 - Add some more unit tests
 - Add some more documentation
+- Update website documentation
 
 
 Version 0.8.6 (04-06-2012)
