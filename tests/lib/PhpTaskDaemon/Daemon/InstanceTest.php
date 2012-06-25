@@ -105,20 +105,20 @@ class InstanceTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->_instance->isRunning());
     }
 
-    public function testStop() {
-        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('_exit'));
-        $instance->expects($this->once())
-             ->method('_exit')
-             ->will($this->returnValue(NULL));
-
-        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('read'), array('test'));
-        $pidFile->expects($this->once())
-            ->method('read')
-            ->will($this->returnValue(123456789));
-        $instance->setPidFile($pidFile);
-
-        $this->assertNull($instance->stop());
-    }
+#    public function testStop() {
+#        $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('_exit'));
+#        $instance->expects($this->once())
+#             ->method('_exit')
+#             ->will($this->returnValue(NULL));
+#
+#        $pidFile = $this->getMock('\\PhpTaskDaemon\\Daemon\\Pid\\File', array('read'), array('test'));
+#        $pidFile->expects($this->once())
+#            ->method('read')
+#            ->will($this->returnValue(123456789));
+#        $instance->setPidFile($pidFile);
+#
+#        $this->assertNull($instance->stop());
+#    }
 
     /**
      * @expectedException \PhpTaskDaemon\Daemon\Exception\FileNotFound
