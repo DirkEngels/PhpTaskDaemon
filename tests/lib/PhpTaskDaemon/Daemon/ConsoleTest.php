@@ -22,9 +22,9 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+//         $this->markTestIncomplete(
+//           'This test has not been implemented yet.'
+//         );
 
         $this->_console = new \PhpTaskDaemon\Daemon\Console();
     }
@@ -58,19 +58,21 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($instance, $this->_console->getInstance());
     }
 
+
     public function testSetTasks() {
         $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Tasks', $this->_console->getTasks());
         $this->assertEquals(new \PhpTaskDaemon\Daemon\Tasks(), $this->_console->getTasks());
 
         $tasks = new Tasks();
         $tasks->addManager(
-            new \PhpTaskDaemon\Task\Manager\DefaultClass()
+            new \PhpTaskDaemon\Task\Manager\ManagerDefault()
         );
         $this->assertEquals($this->_console, $this->_console->setTasks($tasks));
 
         $this->assertInstanceOf('\\PhpTaskDaemon\\Daemon\\Tasks', $this->_console->getTasks());
         $this->assertEquals($tasks, $this->_console->getTasks());
     }
+
 
     public function testListTasksNoneFound() {
         $tasks = $this->getMock('\\PhpTaskDaemon\\Daemon\\Tasks');
@@ -82,6 +84,7 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->expectOutputString("List Tasks\n==========\n\nNo tasks found!\n");
         $this->assertNull($this->_console->listTasks());
     }
+
 
     public function testListTasksSomeFound() {
         $tasks = $this->getMock('\\PhpTaskDaemon\\Daemon\\Tasks');
@@ -96,6 +99,7 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->_console->listTasks());
     }
 
+
     public function testSettings() {
         $this->expectOutputRegex('/Daemon Settings/');
         $this->assertNull($this->_console->settings());
@@ -106,6 +110,7 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->expectOutputRegex('/Help/');
         $this->assertNull($this->_console->help());
     }
+
 
     public function testStart() {
         $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('setTasks', 'start'));
@@ -130,6 +135,7 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->_console->start());
     }
 
+
     public function testStopNotRunning() {
         $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('isRunning'));
         $instance->expects($this->once())
@@ -141,6 +147,7 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->expectOutputString("Daemon is NOT running!!!\n\n");
         $this->assertNull($this->_console->stop());
     }
+
 
     public function testStopRunning() {
         $instance = $this->getMock('\\PhpTaskDaemon\\Daemon\\Instance', array('isRunning', 'stop'));
@@ -157,6 +164,7 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($this->_console->stop());
     }
 
+
     public function testRestart() {
         $console = $this->getMock('\\PhpTaskDaemon\\Daemon\\Console', array('stop', 'start', '_exit'));
         $console->expects($this->once())
@@ -170,4 +178,5 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase {
              ->will($this->returnValue(NULL));
         $this->assertNull($console->restart());
     }
+
 }
