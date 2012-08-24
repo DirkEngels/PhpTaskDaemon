@@ -36,7 +36,6 @@ class Memcached extends IpcAbstract implements IpcInterface {
      */
     public function __construct($id) {
         parent::__construct($id);
-        $this->_memCachedSetup();
     }
 
 
@@ -152,7 +151,7 @@ class Memcached extends IpcAbstract implements IpcInterface {
      *
      * @return bool
      */
-    protected function _memCachedSetup( $id ) {
+    protected function _memCachedSetup() {
         $this->_memcached = new \Memcache();
         return $this->_memcached->connect('localhost', 11211);
     }
